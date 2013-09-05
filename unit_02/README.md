@@ -20,3 +20,8 @@
 ### Explain the project structure
 ### Explain the model-view-controller pattern
 ### Explain ruby gems & bundler
+
+### Homework, use this command to generate the products index and show page
+### Modify the code to show a list of products and then details for a product
+### Use the images in app/assets/images
+rails g controller products index show
