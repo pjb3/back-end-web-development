@@ -22,7 +22,7 @@
 
 ## Class instance variables
 
-## Metaprogramming
+## Metaprogramming? If we get to it
 
 ## class_eval
 
