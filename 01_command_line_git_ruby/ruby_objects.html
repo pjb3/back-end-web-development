@@ -280,6 +280,34 @@ If the object changes, since these variables are referring to the same object, y
 
 ---
 
+# Constants
+
+Constants begin with a capital letter and are variables that you don't intend to change
+
+    .terminal
+    >> NAME = "Paul"
+    => "Paul"
+
+You will get a warning if you change a constant
+
+    .terminal
+    >> NAME = "John"
+    (irb):5: warning: already initialized constant NAME
+    (irb):4: warning: previous definition of NAME was here
+
+You Object the constant refers to change change
+
+    .terminal
+    => "John"
+    >> NAME << " Doe"
+    => "John Doe"
+    >> NAME
+    => "John Doe"
+
+Although that is not typical
+
+---
+
 # Symbols
 
 Used for labeling things in code
@@ -482,27 +510,201 @@ Methods can have arguments
 
 The methods that an object has is determined by what type of Object it is
 
+# Methods Are Messages
+
+    .terminal
+    >> "hello".send(:upcase)
+    => "HELLO"
+
+A method call is really sending a message to an object
+
+Every method call is called on an object
+
 ---
 
-# Objects Methods
+# Object Methods
 
-    #to_s
-    #inspect
-    #class
+Determine what type of Object it is
+
+    .terminal
+    >> :hello.class
+    => Symbol
+    >> nil.class
+    => NilClass
+
+Ask an object if it is a a certain type
+
+    .terminal
+    >> :hello.is_a?(Symbol)
+    => true
+    >> :hello.is_a?(Object)
+    => true
+    >> :hello.is_a?(String)
+    => false
+
+Methods that end in a question mark are usually methods that return `true` or `false` as the answer to a "question"
+
+---
+
+# Object Methods
+
+Get the string representation of an Object
+
+    .terminal
+    >> :hello.to_s
+    => "hello"
+    >> nil.to_s
+    => ""
+
+Get a more detailed representation of an Object for debugging
+
+    .terminal
+    >> :hello.inspect
+    => ":hello"
+    >> nil.inspect
+    => "nil"
+
+---
+
+# Object Methods
+
+Create a copy of the Object
+
+    .terminal
+    >> my_name = "John"
+    => "John"
+    >> name = my_name.dup
+    => "John"
+    >> my_name << " Doe"
+    => "John Doe"
+    
+The original Object has been modified
+    
+    .terminal
+    >> my_name
+    => "John Doe"
+    
+The copy has not
+    
+    .terminal
+    >> name
+    => "John"
+
+---
+
+# Object Methods
+
+Freeze an object so it cannot be changed
+
+    .terminal
+    >> name.freeze
+    => "John"
+    >> name << " Doe"
+    RuntimeError: can't modify frozen String
+    	from (irb):38
+    	from /Users/pbarry/.rbenv/versions/2.0.0-p0/bin/irb:12:in `<main>'
+
+---
 
 # String Methods
 
-    #split
-    #strip
-    #sub, #gsub
-    #upcase
+Change the case of characters in a String
+
+    .terminal
+    >> "hello".capitalize
+    >> "Hello"
+    >> "hello".upcase
+    => "HELLO"
+    >> "hello".upcase.downcase
+    => "hello"
+
+Split a String into an Array
+
+    .terminal
+    >> "hello word".split
+    => ["hello", "world"]
+    >> "hello, world!".split(',')
+    => ["hello", " world!"]
+
+Remove whitespace from the beginning and the end
+
+    .terminal
+    >> "  hello  ".strip
+    => "hello"
+
+
+---
+
+# String Methods
+
+Replace parts of a String
+
+    .terminal
+    >> "hello world".sub('hello','goodbye')
+    => "goodbye world"
+
+Replace all occurrences of a String
+
+    .terminal
+    >> "one two one".sub('one','three')
+    => "three two one"
+    >> "one two one".gsub('one','three')
+    => "three two three"
+
+Get a "slice" of a String
+
+    .terminal
+    >> "hello world".slice(0)
+    => "h"
+    >> "hello world".slice(-1)
+    => "d"
+    >> "hello world".slice(4,4)
+    => "o wo"    
+
+---
 
 # Array Methods
 
-    #size
-    #join
+    .terminal
+    >> a = [42,99,100]
+    => [42, 99, 100]
 
-<<<<<<< HEAD:01_command_line_git_ruby/ruby_objects.html
+Determine how many elements are in the Array
+
+    .terminal
+    >> a.size
+    => 3
+    >> a.length
+    => 3
+
+Join an Array into a String separated by a character
+
+    .terminal
+    >> a.join(',')
+    => "42,99,100"
+
+Get the first/last elements of an array
+
+    .terminal
+    >> a.first
+    => 42
+    >> a.last
+    => 100
+
+---
+
+# Array Methods
+
+Add/remove an element from the end of the Array
+
+    .terminal
+    >> a.push 120
+    => [42, 99, 100, 120]
+    >> a.pop
+    => 120
+    >> a
+    => [42, 99, 100]
+
 Add/remove an element from the front of the Array
 
     .terminal
@@ -568,8 +770,6 @@ Merge hashes
     .terminal
     >> person.merge(name: "Paul Barry", city: "Baltimore")
     => {:name=>"Paul Barry", :age=>35, :city=>"Baltimore"}
-
-In any method call, when passing a Hash as the last argument, the curly braces can be omitted
     
 `merge` returns a new Hash, does not modify the Hash
     
@@ -582,12 +782,8 @@ In any method call, when passing a Hash as the last argument, the curly braces c
     => {:name=>"Paul Barry", :age=>35, :city=>"Baltimore"}
     >> person
     => {:name=>"Paul Barry", :age=>35, :city=>"Baltimore"}
-=======
-# Hash
->>>>>>> parent of 644deae... More content for Ruby lesson:01_command_line_git_ruby/intro_to_ruby.html
 
-    #keys
-    #values
+Having two versions of a method, one that ends without an exclamation mark and does not modify the Object and another that ends with an exclamation mark that does modify the Object, is a common idiom
 
   </textarea><div id="slideshow"></div>
   </body>
