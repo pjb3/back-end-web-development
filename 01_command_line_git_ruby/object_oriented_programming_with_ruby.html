@@ -108,17 +108,17 @@ Commit it
 # Defining A Class
 
 ```ruby
-class Item
+class Product
 end
 
-item = Item.new
+product = Product.new
 
-puts item.inspect
+puts product.inspect
 ```
 
     .terminal
     $ ruby my_program.rb
-    #<Item:0x007fd9b29f5c48>
+    #<Product:0x007fd9b29f5c48>
 
 Commit it
     
@@ -132,16 +132,16 @@ Commit it
 # Constructors and Instance Variables
 
 ```ruby
-class Item
+class Product
   def initialize(name, price)
     @name = name
     @price = price
   end
 end
 
-item = Item.new("iPhone", 499)
+product = Product.new("iPhone", 499)
 
-puts item.inspect
+puts product.inspect
 ```
 
 The `initialize` method is called the constructor.  It is run when the object is created with `new`
@@ -150,7 +150,7 @@ Instance variables start with a `@` and can be accessed from within the class
 
     .terminal
     $ ruby my_program.rb
-    #<Item:0x007fe0eb1f57d8 @name="iPhone", @price=499>
+    #<Product:0x007fe0eb1f57d8 @name="iPhone", @price=499>
 
 Commit it
 
@@ -164,7 +164,7 @@ Commit it
 # Reader methods
 
 ```ruby
-class Item
+class Product
   def initialize(name, price)
     @name = name
     @price = price
@@ -179,10 +179,10 @@ class Item
   end
 end
 
-item = Item.new("iPhone", 499)
+product = Product.new("iPhone", 499)
 
-puts item.name
-puts item.price
+puts product.name
+puts product.price
 ```
 
 Accessor methods expose the Objects instance variables refer to outside of the class
@@ -197,7 +197,7 @@ Accessor methods expose the Objects instance variables refer to outside of the c
 # Writer methods
 
 ```ruby
-class Item
+class Product
   def name
     @name
   end
@@ -215,14 +215,14 @@ class Item
   end
 end
 
-item = Item.new
-item.name = "iPhone"
-item.price = 499
+product = Product.new
+product.name = "iPhone"
+product.price = 499
 
-puts item.inspect
+puts product.inspect
 
-puts item.name
-puts item.price
+puts product.name
+puts product.price
 ```
 
 ---
@@ -232,19 +232,25 @@ puts item.price
 Have Ruby generate readers and writers for you with `attr_accessor`
 
 ```ruby
-class Item
+class Product
   attr_accessor :name, :price
 end
 
-item = Item.new
-item.name = "iPhone"
-item.price = 499
+product = Product.new
+product.name = "iPhone"
+product.price = 499
 
-puts item.inspect
+puts product.inspect
 
-puts item.name
-puts item.price
+puts product.name
+puts product.price
 ```
+
+---
+
+# TODO: Slide about encapsulation / behavior
+
+Need an example here that illustrates how an object has state, but that is typically kept internal to the object and other code interacts with the object through methods that indirectly modify the state
 
 ---
 
@@ -288,9 +294,9 @@ class OrderTest < Minitest::Test
     order = Order.new
     order.tax_rate = 0.05
 
-    order.add(2, Item.new("Muffin", 2.99))
-    order.add(1, Item.new("Coffee", 3.75))
-    order.add(1, Item.new("Smoothie", 3.99))
+    order.add(2, Product.new("Muffin", 2.99))
+    order.add(1, Product.new("Coffee", 3.75))
+    order.add(1, Product.new("Smoothie", 3.99))
 
     assert_equal 14.41, order.total_price
   end
