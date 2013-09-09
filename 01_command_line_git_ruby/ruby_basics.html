@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Ruby Objects</title>
+    <title>Ruby Basics</title>
     <meta charset="utf-8" />
 
     <script src="js/remark-0.4.4.min.js"></script>
@@ -61,13 +61,41 @@
 
 class: center
 
-# Ruby Objects
+# Ruby Basics
 
 ![Ruby](img/ruby-logo.png)
 
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
+
+---
+
+# Our Goal
+
+The be able to understand this relatively simple Ruby program
+
+```ruby
+TAX_RATE = 0.05
+
+def calculate_total(line_items)
+  total = 0
+
+  for line_item in line_items
+    total += line_item[:quantity] * line_item[:unit_price]
+  end
+
+  (total * (1 + TAX_RATE)).round(2)
+end
+
+total = calculate_total [
+  { quantity: 2, unit_price: 2.99 },
+  { quantity: 1, unit_price: 3.75 },
+  { quantity: 1, unit_price: 3.99 }
+]
+
+puts "$#{total}"
+```
 
 ---
 
@@ -201,6 +229,20 @@ Variables are named referenced to objects
     => true
     >> my_name == 42
     => false
+    
+Shorthand for incrementing a variable
+    
+    .terminal
+    >> i = 0
+    => 0
+    >> i += 1
+    => 1
+
+Equivalent to
+
+    .terminal
+    >> i = i + i
+    => 2
 
 ---
 
@@ -508,6 +550,10 @@ All Objects have methods. You can call a method with `object.method`
 
 Methods can have arguments
 
+    .terminal
+    >> 5.remainder(2)
+    => 1
+
 The methods that an object has is determined by what type of Object it is
 
 # Methods Are Messages
@@ -515,10 +561,10 @@ The methods that an object has is determined by what type of Object it is
     .terminal
     >> "hello".send(:upcase)
     => "HELLO"
+    >> 5.send(:remainder, 2)
+    => 1
 
-A method call is really sending a message to an object
-
-Every method call is called on an object
+Event method call is really sending a message to an Object
 
 ---
 
@@ -663,6 +709,53 @@ Get a "slice" of a String
 
 ---
 
+# String Methods
+
+Convert to an Integer
+
+    .terminal
+    >> "42".to_i
+    => 42
+
+Convert to a Float
+    
+    .terminal
+    >> "3.14159".to_f
+    => 3.14159
+
+Convert to a Symbol
+
+    .terminal
+    >> "hello".to_sym
+    => :hello
+
+---
+
+# Numeric Methods
+
+Check for even/odd
+
+    .terminal
+    >> 1.even?
+    => false
+    >> 1.odd?
+    => true
+
+Get the absolute value of a number
+
+    .terminal
+    >> -42.abs
+    => 42
+
+Round a decimal
+
+    .terminal
+    >> 3.14159.round
+    => 3
+    >> 3.14159.round(2)
+
+---
+
 # Array Methods
 
     .terminal
@@ -785,6 +878,132 @@ Merge hashes
 
 Having two versions of a method, one that ends without an exclamation mark and does not modify the Object and another that ends with an exclamation mark that does modify the Object, is a common idiom
 
+---
+
+# Writing a program
+
+Open your editor and enter in the following program
+
+```ruby
+puts "Hello World"
+```
+
+Save the program to a file
+
+Press command-b to run the program from within Sublime Text
+
+    .terminal
+    Hello World
+
+---
+
+# Defining Methods
+
+```ruby
+def say_hello(name)
+  puts "Hello #{name}"
+end
+
+say_hello "Peter"
+say_hello "Paul"
+say_hello "Mary"
+```
+
+    .terminal
+    Hello Peter
+    Hello Paul
+    Hello Mary
+
+---
+
+# Changing Method Implementation
+
+```ruby
+def say_hello(name)
+  puts "Hello, #{name}!"
+end
+
+say_hello "Peter"
+say_hello "Paul"
+say_hello "Mary"
+```
+
+    .terminal
+    Hello, Peter!
+    Hello, Paul!
+    Hello, Mary!
+
+---
+
+# Iterating over elements in an Array
+
+```ruby
+def say_hello(name)
+  puts "Hello, #{name}!"
+end
+
+people = ["Peter", "Paul", "Mary"]
+
+for person in people
+  say_hello person
+end
+```
+    .terminal
+    Hello Peter
+    Hello Paul
+    Hello Mary
+
+---
+
+# Updating the Array
+
+```ruby
+def say_hello(name)
+  puts "Hello, #{name}!"
+end
+
+people = ["Peter", "Paul", "Mary"]
+people << "Bob"
+
+for person in people
+  say_hello person
+end
+```
+    .terminal
+    Hello, Peter!
+    Hello, Paul!
+    Hello, Mary!
+    Hello, Bob!
+
+---
+
+# Homework
+
+Email me the result of running this program
+
+```ruby
+TAX_RATE = 0.05
+
+def calculate_total(line_items)
+  total = 0
+
+  for line_item in line_items
+    total += line_item[:quantity] * line_item[:unit_price]
+  end
+
+  (total * (1 + TAX_RATE)).round(2)
+end
+
+total = calculate_total [
+  { quantity: 2, unit_price: 2.99 },
+  { quantity: 1, unit_price: 3.75 },
+  { quantity: 1, unit_price: 3.99 }
+]
+
+puts "$#{total}"
+```
+
+If there is anything about this program you don't understand, ask questions at the beginning of next class
   </textarea><div id="slideshow"></div>
   </body>
 </html>
