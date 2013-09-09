@@ -73,27 +73,29 @@ class: center
 
 # Commands
 
+    .terminal
     prompt $ command -s --option argument1 argument2
 
 ---
 
-# list the contents of a directory with ls
+# ls
+
+list the contents of a directory with ls
 
 .small[
 
     .terminal
-    2.0.0-p247 ~ $ ls
+    ~ $ ls
     Applications  Documents   Dropbox   Movies  Pictures  VirtualBox VMs  certs  dotfiles  ls
     Desktop       Downloads   Library   Music   Public    bin             dev    lb        src
 ]
 
-
-# use -l for the long format
+use -l for the long format
 
 .small[
 
     .terminal
-    2.0.0-p247 ~ $ ls -l
+    ~ $ ls -l
     total 0
     drwx------    3 pbarry  staff   102 Jan 20  2013 Applications
     drwx------+  19 pbarry  staff   646 Sep  6 16:26 Desktop
@@ -118,13 +120,20 @@ class: center
 
 ---
 
-# Use pwd to Print the current Working Directory
+# pwd
+
+Print the current Working Directory with `pwd`
 
     .terminal
-    2.0.0-p247 ~ $ pwd
+    ~ $ pwd
     /Users/pbarry
 
-# Path
+---
+
+# Paths
+
+    .terminal
+    /Users/pbarry
 
 .small[
 
@@ -155,46 +164,76 @@ class: center
 
 ---
 
-# Make a directory with mkdir
+# mkdir
+
+Make a directory with `mkdir`
 
     .terminal
-    2.0.0-p247 ~ $ mkdir bewd
+    ~ $ mkdir bewd
 
-# Change into a directory with cd
+---
+
+# cd
+
+Change into a directory with `cd`
 
     .terminal
-    2.0.0-p247 ~ $ cd bewd
-
-# Print the new working directory
-
-    .terminal
-    2.0.0-p247 ~/bewd $ pwd
+    ~ $ cd bewd
+    ~/bewd $ pwd
     /Users/pbarry/bewd
 
 ---
 
-# Print a string with echo
+# echo
+
+Print a string with `echo`
 
     .terminal
-    2.0.0-p247 ~/bewd $ echo 'Hello'
+    ~/bewd $ echo 'Hello'
     Hello
 
-# Put the string in a file
+Put the string in a file
 
     .terminal
-    2.0.0-p247 ~/bewd $ echo 'Hello' > example.txt
+    ~/bewd $ echo 'Hello' > example.txt
 
-# A new file has been created
+A new file has been created
 
     .terminal
-    2.0.0-p247 ~/bewd $ ls
+    ~/bewd $ ls
     example.txt
 
-# Print the contents of the file
+---
+
+# cat
+
+Print the contents of the file with `cat` _(short for concatenate)_
 
     .terminal
-    2.0.0-p247 ~/bewd $ cat example.txt 
+    ~/bewd $ cat example.txt 
     Hello
+    
+---
+
+# history
+
+Bash keeps track of what you've done
+
+    .terminal
+    ~/bewd $ history
+       18  ls
+       19  ls -l
+       20  pwd
+       21  mkdir bewd
+       22  cd bewd
+       23  echo 'Hello'
+       24  echo 'Hello' > example.txt
+       25  ls
+       26  cat example.txt
+       27  history
+
+Use the up and down arrow to retrieve previous commands
+
   </textarea><div id="slideshow"></div>
   </body>
 </html>
