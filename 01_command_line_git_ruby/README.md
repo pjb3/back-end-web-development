@@ -1,6 +1,6 @@
 # Part 1
 
-[Ruby Objects](ruby_objects.html)
+[Ruby Basics](ruby_basics.html)
 
 # Part 2
 
@@ -8,4 +8,4 @@
 
 [Git](git.html)
 
-[Ruby Methods and Classes](ruby_methods_and_classes.html)
+[Object-Oriented Programming with Ruby](object_oriented_programming_with_ruby.html)
