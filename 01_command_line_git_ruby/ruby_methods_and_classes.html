@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Git</title>
+    <title>Ruby Methods and Classes</title>
     <meta charset="utf-8" />
 
     <script src="js/remark-0.4.4.min.js"></script>
@@ -61,9 +61,9 @@
 
 class: center
 
-# Version Control with Git
+# Ruby Methods and Classes
 
-![Command Line](img/git.png)
+![Ruby](img/ruby-logo.png)
 
 .footnote[
   created with [remark](http://github.com/gnab/remark)
@@ -71,38 +71,21 @@ class: center
 
 ---
 
-# Basic Git
-
-TODO: Break this out into multiple slides with explanations
+# Your First Ruby Program
 
     .terminal
-    echo 'Hello' > README.md
-    ls
-    cat README.md
-    git init
-    git status
-    git add README.md
-    git status
-    git commit -m "First commit!"
-    git log
-    echo 'Goodbye' > README.md
-    git status
-    git diff
-    git add README.md
-    git status
-    git commit -am "Changed text"
-    git status
-    git log
-    git revert <sha>
+    $ echo 'puts "Hello World"' > my_program.rb
+    $ cat my_program.rb
+    puts "Hello World"
+    $ ruby my_program.rb
+    Hello World
 
+Better to use an editor
+
+    .terminal
+    # subl my_program.rb
 
 ---
-
-# GitX
-
----
-
-# Github
 
   </textarea><div id="slideshow"></div>
   </body>
