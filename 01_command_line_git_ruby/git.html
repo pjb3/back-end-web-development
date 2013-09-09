@@ -83,19 +83,18 @@ TODO: Break this out into multiple slides with explanations
     git status
     git add README.md
     git status
-    git commit -m "First commit!"
+    git commit -m 'First commit!'
     git log
     echo 'Goodbye' > README.md
     git status
     git diff
     git add README.md
     git status
-    git commit -am "Changed text"
+    git config --global core.editor 'subl -w'
+    git commit
     git status
     git log
-    git config --global core.editor 'subl -w'
     git revert <sha>
-
 
 ---
 
