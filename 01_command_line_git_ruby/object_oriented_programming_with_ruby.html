@@ -248,9 +248,75 @@ puts product.price
 
 ---
 
-# TODO: Slide about encapsulation / behavior
+# State
 
-Need an example here that illustrates how an object has state, but that is typically kept internal to the object and other code interacts with the object through methods that indirectly modify the state
+Objects hold state
+
+```ruby
+class Catalog
+  def products
+    @products ||= []
+  end
+  
+  def add(product)
+    products << product
+  end
+end
+```
+
+`||=` is the short for
+
+```ruby
+if @products
+  @products
+else
+  @products = []
+end
+```
+
+Add products to the catalog
+
+```ruby
+catalog = Catalog.new
+catalog.add Product.new("iPhone", 499)
+catalog.add Product.new("T-Shirt", 19)
+```
+
+---
+
+# Blocks
+
+Used for iteration, but also much more
+
+```ruby
+catalog.products.each do |product|
+  puts "#{product.name} #{product.price}"
+end
+```
+
+Same as
+
+```ruby
+for product in catalog.products
+  puts "#{product.name} #{product.price}"
+end
+```
+
+To get an Array of all prices, you could do this
+
+```
+prices = []
+for product in products
+  prices << product.price
+end
+prices
+```
+
+This is shorter and much more common
+
+    .terminal
+    >> catalog.products.map{|p| p.price }
+    => [499, 19]
 
 ---
 
