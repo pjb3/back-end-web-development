@@ -1,89 +1,8 @@
 # Part 1 - HTML, HTTP
 
-## HTML
-
-### tags
-
-      <h1>Hello, World!</h1>
-
-### document
-
-      <html>
-        <head>
-          <title>Example</title>
-        </head>
-        <body>
-          <h1>Hello, World!</h1>
-        </body>
-      </html>
-
-### images
-
-      <html>
-        <head>
-          <title>Example</title>
-        </head>
-        <body>
-          <h1>Hello, World!</h1>
-          <img src="http://betamore.com/wp-content/uploads/2013/04/logo.png" />
-        </body>
-      </html>
-    
-### lists
-
-      <html>
-        <head>
-          <title>Example</title>
-        </head>
-        <body>
-          <h1>Hello, World!</h1>
-          <img src="http://betamore.com/wp-content/uploads/2013/04/logo.png" />
-          <ul>
-            <li>Tables</li>
-            <li>Forms</li>
-            <li>Betamore</li>
-          </ul>
-        </body>
-      </html>
-
-### links
-
-      <html>
-        <head>
-          <title>Example</title>
-        </head>
-        <body>
-          <h1>Hello, World!</h1>
-          <img src="http://betamore.com/wp-content/uploads/2013/04/logo.png" />
-          <ul>
-            <li><a href="tables.html">Tables</a></li>
-            <li><a href="forms.html">Forms</a></li>
-            <li><a href="http://betamore.com">Betamore</a></li>
-          </ul>
-        </body>
-      </html>
-
-### tables
-
-see tables.html
-
-### forms
-
-see forms.html
-
-## DNS & HTTP
-
-* Explain DNS, use dig to resolve domain names to IP addresses
-* Use curl to show retrieving an HTML document
-
-## Give introduction to the purpose of Rails
-
-* Explain static vs. dynamic HTML
-
-## Homework
-
-* Create an HTML page with a log in form
-* Create an HTML page with a table with a list of the tracks of your favorite music album with number, title and length as the columns. Include a link to the log in form on this page as well.
+* [HTML](http://pjb3.github.io/back-end-web-development/02_html_and_rails/html)
+* [The Internet](http://pjb3.github.io/back-end-web-development/02_html_and_rails/internet)
+* [Dynamic Web Sites](http://pjb3.github.io/back-end-web-development/02_html_and_rails/dynamc_web_sites)
 
 # Part 2 - Rails
 
@@ -110,5 +29,3 @@ see forms.html
 Use this command to generate the products index. Modify the code to show a list of products
 
     rails g controller products index
-
-[html]: http://html.net/tutorials/html

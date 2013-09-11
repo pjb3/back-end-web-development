@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dynamic Web Sites</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Dynamic Web Sites
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Static Web Page
+
+A static web page is an HTML file on a server
+
+1. Browser requests http://example.com/something.html
+
+2. Web server running on `example.com` gets the `something.html` file and returns it in the body of the HTTP response
+
+3. Browser renders the HTML to display the web page
+
+---
+
+# Rack
+
+A framework for building web application, used by Rails
+
+    .terminal
+    $ echo '<h1>Something</h1>' > something.html
+    $ subl config.ru
+
+```ruby
+class MyServer
+  def call(env)
+    body = env['REQUEST_PATH']
+    [
+      200,
+      {
+        'Content-Type' => 'text/plain',
+        'Content-Length' => body.length.to_s
+      },
+      [body]
+    ]
+  end
+end
+
+run MyServer.new
+```
+
+---
+
+# Running Our Server
+
+Start up the server
+
+    .terminal
+    $ rackup
+    >> Thin web server (v1.5.1 codename Straight Razor)
+    >> Maximum connections set to 1024
+    >> Listening on 0.0.0.0:9292, CTRL+C to stop
+
+It starts on port 9292 by default
+
+Hit our server
+
+    .terminal
+    $ curl http://localhost:9292/something.html
+    /something.html
+
+See the request being logged
+
+    .terminal
+    127.0.0.1 - - [11/Sep/2013 15:56:25] "GET /something.html HTTP/1.1" 200 16 0.0009
+
+---
+
+# Static File Server
+
+```ruby
+class MyServer
+  def initialize(document_root)
+    @document_root = document_root
+  end
+  
+  def call(env)
+    file_path = File.join(@document_root, env['REQUEST_PATH'])
+    respond 200, File.read(file_path)
+  end
+  
+  def respond(status_code, body)
+    [
+      status_code,
+      {
+        'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s
+      },
+      [body]
+    ]
+  end
+end
+
+run MyServer.new(File.dirname(__FILE__))
+```
+
+---
+
+# Static File Server
+
+What happens if we ask for a file that doesn't exist?
+
+.small[
+
+    .terminal
+    $ curl http://localhost:9292/something_else.html
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html lang="en">
+    <head>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+      <meta name="robots" content="NONE,NOARCHIVE" />
+      <title>Errno::ENOENT at &#x2F;something_else.html</title>
+      ...
+  
+]
+
+Stack trace
+
+.small[
+
+    .terminal
+    Errno::ENOENT: No such file or directory - /Users/pbarry/dev/course/02_html_and_rails/something_else.html
+      /Users/pbarry/dev/course/02_html_and_rails/config.ru:8:in `read'
+      /Users/pbarry/dev/course/02_html_and_rails/config.ru:8:in `call'
+      ...
+    127.0.0.1 - - [11/Sep/2013 16:02:49] "GET /something_else.html HTTP/1.1" 500 67449 0.0204
+
+]
+
+Response code is 500 instead of a 200
+
+Should be a 404
+
+---
+
+# Static File Server With Not Found
+
+```ruby
+class MyServer
+  def initialize(document_root)
+    @document_root = document_root
+  end
+  
+  def call(env)
+    file_path = File.join(@document_root, env['REQUEST_PATH'])
+    if File.exists?(file_path)
+      respond 200, File.read(file_path)
+    else
+      respond 404, File.read('not_found.html')
+    end
+  end
+  
+  def respond(status_code, body)
+    [ status_code,
+      {
+        'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s
+      },
+      [body] 
+    ]
+  end
+end
+
+run MyServer.new(File.dirname(__FILE__))
+```
+
+---
+
+# Static File Server With Not Found
+
+Generate the error page
+
+    .terminal
+    $ echo '<h1>Not Found</h1>' > not_found.html
+
+Now try pages that exist and don't exist
+
+    .terminal
+    $ curl http://localhost:9292/something.html
+    <h1>Something</h1>
+    $ curl http://localhost:9292/something_else.html
+    <h1>Not Found</h1>
+
+logs
+
+.small[
+
+    .terminal
+    127.0.0.1 - - [11/Sep/2013 16:05:11] "GET /something.html HTTP/1.1" 200 19 0.0010
+    127.0.0.1 - - [11/Sep/2013 16:05:13] "GET /something_else.html HTTP/1.1" 404 18 0.0007
+
+]
+---
+
+# Dynamic Web Page
+
+A dynamic web page does not exist in an HTML file on the server, instead the HTML is produced on-demand, when requested
+
+1. Browser requests http://example.com/something.html
+
+2. Web server running on `example.com` generates the `something.html` HTML document and returns it in the body of the HTTP response
+
+3. Browser renders the HTML to display the web page
+
+---
+
+# Dynamic Web Page
+
+```ruby
+class MyServer
+  def call(env)
+    path_name = File.basename(env['REQUEST_PATH'], '.html')
+    body = "<h1>#{path_name.to_s.capitalize}</h1>\n"
+    respond 200, body
+  end
+  
+  def respond(status_code, body)
+    [ status_code,
+      {
+        'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s
+      },
+      [body] ]
+  end
+end
+
+run MyServer.new
+```
+
+This server will generate a page based on whatever the path is
+
+    .terminal
+    $ curl http://localhost:9292/something.html
+    <h1>Something</h1>
+    $ curl http://localhost:9292/something_else.html
+    <h1>Something_else</h1>
+
+---
+
+# Uses for Dynamic Web Pages
+
+* Managing a catalog of products in a database
+* Personalizing the page to the users preferences
+* Time-sensitive content
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
