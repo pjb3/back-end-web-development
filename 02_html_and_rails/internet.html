@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Internet</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# The Internet
+
+![The Internet](img/internet.jpg)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+class: middle, center
+
+# How does it work?
+
+![URL Bar](img/url_bar.png)
+
+---
+
+# IP Addresses
+
+All computers on the Internet have an Internet Protocol (IP) Address
+
+They look like this:
+
+    50.62.65.162
+
+IP addresses are too hard to memorize and they change a lot anyway
+
+---
+
+# DNS
+
+The Domain Name System (DNS) allows us to use names instead of numbers
+
+The process of looking up the actual IP address for a domain name is called __resolution__
+
+    .terminal
+    $ dig betamore.com +short
+    50.62.65.162
+
+`dig` is a command line tool that allows you to see what IP address a domain name resolves to
+
+---
+
+# URLs
+
+Uniform Resource Location (URL) is a reference to a page on the internet
+
+    .terminal
+    http://betamore.com/academy/back-end-web-development.html
+
+`http` is the protocol to use to retrieve the document
+
+`betamore.com` is the domain of the server that is hosting this document
+
+`/academy/back-end-web-development` is the path to the document
+
+Possible server configuration:
+
+    .terminal
+    ServerName betamore.com
+    DocumentRoot /var/www/betamore
+
+Directory structure
+
+    .terminal
+    /
+    └── var
+        └── www
+            └── betamore
+                └── academy
+                    └── back-end-web-development.html
+
+---
+
+# HTTP
+
+__HyperText Transfer Protocol__ (HTTP) is the underlying protocol of the Internet
+
+    .terminal
+    $ curl -v http://betamore.com/academy/back-end-web-development
+    * About to connect() to betamore.com port 80 (#0)
+    *   Trying 50.62.65.162...
+    * connected
+    * Connected to betamore.com (50.62.65.162) port 80 (#0)
+    > GET /academy/back-end-web-development HTTP/1.1
+    > User-Agent: curl/7.24.0
+    > Host: betamore.com
+    > Accept: */*
+    >
+    < HTTP/1.1 200 OK
+    < Date: Wed, 11 Sep 2013 11:44:20 GMT
+    < Server: Apache
+    < Vary: Accept-Encoding,User-Agent
+    < Last-Modified: Thu, 01 Jan 1970 00:00:00 GMT
+    < Transfer-Encoding: chunked
+    < Content-Type: text/html
+
+`curl` is a tool that allow you to send HTTP requests and receive the response
+
+It is like a web browser that doesn't render the HTML document
+
+---
+
+# HTTP Request
+
+`curl` first gets the domain, looks it up and connects to that server on port 80
+
+    .terminal
+    * About to connect() to betamore.com port 80 (#0)
+    *   Trying 50.62.65.162...
+    * connected
+    * Connected to betamore.com (50.62.65.162) port 80 (#0)
+
+Then it sends this HTTP Request:
+
+    .terminal
+    GET /academy/back-end-web-development HTTP/1.1
+    User-Agent: curl/7.24.0
+    Host: betamore.com
+    Accept: */*
+
+First line is the HTTP method, the path to the document and the HTTP version
+
+`GET` is used to get a document, `POST` is used for posting forms
+
+Each line after the first is a header in the format of `Name: value`
+
+A blank link indicates the end of the request
+
+---
+
+# HTTP Response
+
+    .terminal
+    HTTP/1.1 200 OK
+    Date: Wed, 11 Sep 2013 11:44:20 GMT
+    Server: Apache
+    Vary: Accept-Encoding,User-Agent
+    Last-Modified: Thu, 01 Jan 1970 00:00:00 GMT
+    Transfer-Encoding: chunked
+    Content-Type: text/html
+
+First line has the HTTP version, the response code and a status message
+
+Like the request, each line after the first is a `Name: value` header
+
+After a blank link comes the body of the response, which usually contains the HTML document
+
+---
+
+# Cookies
+
+Cookies are a special HTTP header that get stored in the browser and sent back with each request
+
+If the response to an HTTP request contains a header like this:
+
+    .terminal
+    Set-Cookie: session_id=abc123
+
+The browser will store that in the cookies for the current site
+
+All subsequent requests will contain the cookie header in the request:
+
+    .terminal
+    Cookie: session_id=abc123
+
+This can be used to track your shopping cart, who you are logged in as, etc.
+
+Cookies can have an expiration date, which looks like this:
+
+    Set-Cookie: session_id=abc123; expires=Thu, 13-Mar-2014 12:02:59 GMT
+
+Once the `expires` time has passed, the cookie will not be sent by the browser anymore
+    
+If there is no `expires`, the cookie will be cleared when the user closes their browser
+
+---
+
+# HTTP POST
+
+Install Firefox & HTTPFox
+
+post.html
+
+```html
+<html>
+  <head>
+    <title>POST example</title>
+  </head>
+  <body>
+    <form method="POST" action="http://example.com/">
+      <label>
+        Credit Card
+        <input type="text" name="credit_card_number" />
+      </label>
+    </form>
+  </body>
+</html>
+```
+
+    .terminal
+    $ open -a Firefox.app post.html
+
+Open HTTPFox in a new window, start and submit the form
+
+---
+
+# POST Data
+
+![HTTPFox](img/httpfox.png)
+
+---
+
+# Raw HTTP POST
+
+    .terminal
+    POST / HTTP/1.1
+    User-Agent: curl/7.24.0
+    Host: example.com
+    Accept: */*
+    Content-Length: 35
+    Content-Type: application/x-www-form-urlencoded
+
+    credit_card_number=4111111111111111
+
+__Problem__: Anyone on the network can intercept these requests!
+
+---
+
+# Security
+
+HTTPS, also known as Secure HTTP, uses a Secure Socket Layer (SSL) to encrypt HTTP requests/responses
+
+.center[![Pub/Priv Key Encryption](img/public-key.jpg)]
+
+The browser will use SSL for URLs with the `https` protocol
+
+---
+
+# Public/Private Key Encryption
+
+Generate your own public/private key pair
+
+    .terminal
+    $ openssl genrsa -out mykey.pem 512
+    Generating RSA private key, 512 bit long modulus
+    ...++++++++++++
+    .....++++++++++++
+    e is 65537 (0x10001)
+    
+Extract the public key from the key pair
+    
+    .terminal
+    $ openssl rsa -in mykey.pem -pubout > mykey.pub
+    writing RSA key
+
+---
+
+# Public / Private Key Encryption
+    
+The private key
+
+    .terminal
+    $ cat mykey.pem
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIBOQIBAAJBAPhtyQ8MkUroCBU5skqHj9gofp9CYVwb/9p/tadiRym1oE4LNRh6
+    tBh4bFggBUpycwostGT4qly5cPXuUc30iy8CAwEAAQJAe5Joe2Ld9quaMaykYewy
+    gewKp/9l3GJVDwONgTgie7zQoJow8U6FgpicS8UQzwyv76rgPs8d9mqv70UUE8on
+    mQIhAPyuO7epHS2I9sVAqhi2MOLlYjg2qgscoJ9ZkMT7fpJ1AiEA+7FA4g85qZOA
+    sAiBdKWtksePxNTbzBo/jAqZELTaapMCIGJU66hth41Q37ejko5LWHr0CWUW4NWy
+    Lk/U6yG9PWSBAiAkOSZ1YmuSFEB5FUBMYWvRrBbs5RWdEkoDBaNx3BVzMQIgLc/x
+    V2gHi0Rexg2rUlrO9lprEIUwLKNAHHnubImGISY=
+    -----END RSA PRIVATE KEY-----
+    
+The public key
+
+    .terminal
+    $ cat mykey.pub
+    -----BEGIN PUBLIC KEY-----
+    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPhtyQ8MkUroCBU5skqHj9gofp9CYVwb
+    /9p/tadiRym1oE4LNRh6tBh4bFggBUpycwostGT4qly5cPXuUc30iy8CAwEAAQ==
+    -----END PUBLIC KEY-----
+
+---
+
+# Public / Private Key Encryption
+
+```ruby
+require 'openssl'
+require 'base64'
+
+data = 'credit_card_number=4111111111111111'
+
+puts "Encrypting data: (this is what would be entered into the browser)"
+puts data
+puts
+
+# Everyone on the Internet gets access to this public key
+public_key = OpenSSL::PKey::RSA.new(File.read("mykey.pub"))
+encrypted_data = Base64.encode64(public_key.public_encrypt(data))
+
+puts "Encrypted data: (this is what would be sent to the sever)"
+puts encrypted_data
+puts
+
+# This file is kept a secret on the server of example.com
+private_key = OpenSSL::PKey::RSA.new(File.read("mykey.pem"))
+
+decrypted_data = private_key.private_decrypt(Base64.decode64(encrypted_data))
+
+puts "Decrypted data: (this is what the server gets after decryption)"
+puts decrypted_data
+puts
+```
+
+---
+
+# Public / Private Key Encryption
+
+    .terminal
+    $ ruby pub_priv_key.rb
+    Encrypting data: (this is what would be entered into the browser)
+    credit_card_number=4111111111111111
+
+    Encrypted data: (this is what would be sent to the sever)
+    qaaOj7kg7kxQ2OgYGzqFtZIjx4Rdve1q7lJkbz6wVKRLzKjXfP+iQQ4kFmjz
+    N55fQ7WHBjXK38g0to9yOsxJyQ==
+
+    Decrypted data: (this is what the server gets after decryption)
+    credit_card_number=4111111111111111
+
+---
+
+# Making our form secure
+
+```html
+<html>
+  <head>
+    <title>POST example</title>
+  </head>
+  <body>
+    <form method="POST" action="https://example.com/">
+      <label>
+        Credit Card
+        <input type="text" name="credit_card_number" />
+      </label>
+    </form>
+  </body>
+</html>
+```
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
