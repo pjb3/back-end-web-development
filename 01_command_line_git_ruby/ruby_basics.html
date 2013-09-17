@@ -208,7 +208,7 @@ Interpolation allows you to include the result of evaluating an expression in a 
     >> "40 + 2 = #{40 + 2}"
     => "40 + 2 = 42"
 
-If you don't want interpolation to occur, use single quotes or precede   the `#` with `\`
+If you don't want interpolation to occur, use single quotes or precede the `#` with `\`
 
     .terminal
     >> '40 + 2 = #{40 + 2}'
@@ -218,7 +218,7 @@ If you don't want interpolation to occur, use single quotes or precede   the `#`
 
 # Variables
 
-Variables are named referenced to objects
+Variables are named referenced to objects. You create a variable by assigning an Object to it.
 
     .terminal
     >> my_name = "Paul"
@@ -243,6 +243,37 @@ Equivalent to
     .terminal
     >> i = i + i
     => 2
+
+---
+
+# Dynamic Typing
+
+Ruby is said to have "dynamic typing" because you can assign any type of Object to the same variable
+
+    .terminal
+    >> x = "hello"
+    => "hello"
+    >> x = 42
+    => 42
+    >> x = 3.14159
+    => 3.14159
+
+In other some other languages (C/Java), you must declare what type of objects can be assigned to a variable. A compiler will check This is known as "static typing".
+
+```java
+String x = "hello";
+x = "world";
+x = 42;
+```
+
+    .terminal
+    $ javac Example.java
+    Example.java:5: incompatible types
+    found   : int
+    required: java.lang.String
+        x = 42;
+            ^
+    1 error
 
 ---
 
