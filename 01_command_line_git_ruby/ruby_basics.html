@@ -117,7 +117,7 @@ All values in Ruby are Objects.  The type of an object is determined by it's cla
     >> "Hello World"
     => "Hello World"
     >> "Hello World".class
-    => String    
+    => String
 
 ## Integers
 
@@ -170,13 +170,13 @@ Equality
     => true
     >> 42 != 10
     => true
-    
-Different types of objects are not equal    
-    
+
+Different types of objects are not equal
+
     .terminal
     >> 42 == "42"
     => false
-    
+
 Comparison
 
     >> 5 > 2
@@ -195,15 +195,15 @@ The `+` operator concatenates strings together into a new string
     .terminal
     >> "Hello" + " " + "World"
     => "Hello World"
-    
+
 The `<<` operator appends to a string
-    
+
     .terminal
     >> "Hello" << " World"
     => "Hello World"
 
-Interpolation allows you to include the result of evaluating an expression in a String    
-    
+Interpolation allows you to include the result of evaluating an expression in a String
+
     .terminal
     >> "40 + 2 = #{40 + 2}"
     => "40 + 2 = 42"
@@ -229,9 +229,9 @@ Variables are named referenced to objects. You create a variable by assigning an
     => true
     >> my_name == 42
     => false
-    
+
 Shorthand for incrementing a variable
-    
+
     .terminal
     >> i = 0
     => 0
@@ -241,7 +241,7 @@ Shorthand for incrementing a variable
 Equivalent to
 
     .terminal
-    >> i = i + i
+    >> i = i + 1
     => 2
 
 ---
@@ -321,7 +321,7 @@ Some operators modify the object
     >> my_name << " Doe"
     => "John Doe"
     >> my_name
-    => "John Doe"    
+    => "John Doe"
 
 Some operators return a new object
 
@@ -390,21 +390,21 @@ Used for labeling things in code
     => :paul
     >> :paul.class
     => Symbol
-    
-Symbols are similar to Strings    
+
+Symbols are similar to Strings
 
     .terminal
     >> my_name = :paul
     => :paul
     >> "Hello #{my_name}"
     => "Hello paul"
-    
+
 but Symbols are not the same type as Strings, so they are not equal to Strings
-    
+
     .terminal
     >> :paul == "paul"
     => false
-    
+
 ---
 
 # Hashes
@@ -414,18 +414,18 @@ A collection of objects named with keys
     .terminal
     >> { :name => "Paul", :age => 35 }
     => {:name=>"Paul", :age=>35}
-    
-More concise Syntax new in Ruby 1.9    
-    
+
+More concise Syntax new in Ruby 1.9
+
     .terminal
     >> { name: "Paul", age: 35 }
     => {:name=>"Paul", :age=>35}
-    
-You can use Strings or any other object for the keys, but Symbols are most common    
-    
+
+You can use Strings or any other object for the keys, but Symbols are most common
+
     .terminal
     >> { "name" => "Paul", "age" => 35 }
-    => {"name"=>"Paul", "age"=>35}      
+    => {"name"=>"Paul", "age"=>35}
 
 ---
 
@@ -433,14 +433,14 @@ You can use Strings or any other object for the keys, but Symbols are most commo
 
     >> person = { name: "Paul", age: 35 }
     => {:name=>"Paul", :age=>35}
-    
-Get the value for a key    
-    
+
+Get the value for a key
+
     >> person[:name]
     => "Paul"
-    
+
 Assign a value to a key
-    
+
     >> person[:city] = "Baltimore"
     => "Baltimore"
     >> person
@@ -464,7 +464,7 @@ Used to see if a String matches a pattern
 
     .terminal
     >> /oo/.class
-    => Regexp    
+    => Regexp
     >> "food" =~ /oo/
     => 1
     >> "food" =~ /^foo/
@@ -475,7 +475,7 @@ Used to see if a String matches a pattern
     => nil
     >> "food" !~ /foo$/
     => true
-    
+
 Regular Expressions
 
 ---
@@ -555,7 +555,7 @@ The conditional can be at the end of the line
     >> x = 0
     => 0
     >> if x then "yes" else "no" end
-    => 1
+    => "yes"
     >> x = "false"
     => "false"
     >> if x then 1 else 0 end
@@ -572,8 +572,8 @@ The conditional can be at the end of the line
 ---
 
 # Methods
-  
-All Objects have methods. You can call a method with `object.method`  
+
+All Objects have methods. You can call a method with `object.method`
 
     .terminal
     >> "hello".upcase
@@ -654,15 +654,15 @@ Create a copy of the Object
     => "John"
     >> my_name << " Doe"
     => "John Doe"
-    
+
 The original Object has been modified
-    
+
     .terminal
     >> my_name
     => "John Doe"
-    
+
 The copy has not
-    
+
     .terminal
     >> name
     => "John"
@@ -736,7 +736,7 @@ Get a "slice" of a String
     >> "hello world".slice(-1)
     => "d"
     >> "hello world".slice(4,4)
-    => "o wo"    
+    => "o wo"
 
 ---
 
@@ -749,7 +749,7 @@ Convert to an Integer
     => 42
 
 Convert to a Float
-    
+
     .terminal
     >> "3.14159".to_f
     => 3.14159
@@ -878,7 +878,7 @@ Get the keys of the Hash
     .terminal
     >> person.keys
     => [:name, :age]
-    
+
 Get the values of the Hash
 
     .terminal
@@ -894,14 +894,14 @@ Merge hashes
     .terminal
     >> person.merge(name: "Paul Barry", city: "Baltimore")
     => {:name=>"Paul Barry", :age=>35, :city=>"Baltimore"}
-    
+
 `merge` returns a new Hash, does not modify the Hash
-    
+
     >> person
     => {:name=>"Paul", :age=>35}
-    
+
 `merge!` modifies the Hash
-    
+
     >> person.merge!(name: "Paul Barry", city: "Baltimore")
     => {:name=>"Paul Barry", :age=>35, :city=>"Baltimore"}
     >> person
