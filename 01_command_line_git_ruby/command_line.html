@@ -73,8 +73,18 @@ class: center
 
 # Commands
 
+The program that runs inside Terminal and allows you to enter commands is called a "shell"
+
+The default and most commonly used shell on Unix-based OSes (Mac/Linux) is called "bash"
+
     .terminal
     prompt $ command -s --option argument1 argument2
+
+The prompt usually has your current directory and ends with a "$" characters, but it can be customized
+
+Switches are one letter and start with one hyphen
+
+Options are multiple letters and start with two hyphens
 
 ---
 
@@ -212,7 +222,49 @@ Print the contents of the file with `cat` _(short for concatenate)_
     .terminal
     ~/bewd $ cat example.txt 
     Hello
-    
+
+---
+
+# mv
+
+Move or rename a file
+
+    .terminal
+    ~/bewd $ mv example.txt hello.txt
+    ~/bewd $ cat hello.txt
+    Hello
+
+---
+
+# cp
+
+Copy a file
+
+    .terminal
+    ~/bewd $ cp hello.txt hello2.txt
+    ~/bewd $ ls
+    hello.txt	hello2.txt
+
+---
+
+# rm
+
+Use rm to remove a file
+
+    .terminal
+    ~/bewd $ ls
+    hello.txt
+    ~/bewd $ rm hello.txt
+    ~/bewd $ ls
+
+Use the `-r` switch (short for "recursive") to remove a directory
+
+    .terminal
+    ~/bewd $ mkdir foo
+    ~/bewd $ rm foo
+    rm: foo: is a directory
+    ~/bewd $ rm -r foo
+
 ---
 
 # history
@@ -233,6 +285,142 @@ Bash keeps track of what you've done
        27  history
 
 Use the up and down arrow to retrieve previous commands
+
+---
+
+# Common Commands
+
+* **ls** - List the contents of the current directory
+* **pwd** - What directory am I in (probably in your prompt)
+* **mkdir** - Create a new directory
+* **cd** - Change directory
+* **echo** - Print a string
+* **cat** - Print the contents of a file
+* **mv** - Move or rename a file
+* **cp** - Copy a file
+* **rm** - Remove a file or directory (-r)
+
+---
+
+# Environment Variables
+
+List current environment variables
+
+    .terminal
+    ~/bewd $ env
+    TERM_PROGRAM=iTerm.app
+    TERM=xterm-256color
+    SHELL=/bin/bash
+    ...
+    
+Set an environment variable
+
+    .terminal
+    ~/bewd $ HELLO='hello'    
+    ~/bewd $ echo $HELLO
+    hello
+    
+Use `export` to make the variable visible to other programs launched from the shell
+
+    .terminal
+    ~/bewd $ irb
+    >> ENV['HELLO']
+    => nil
+    ~/bewd $ export HELLO='hello'
+    ~/bewd $ irb
+    >> ENV['HELLO']
+    => "hello"
+
+---
+
+# Configuration Files
+
+Most common one is `~/.bash_profile`
+
+Used to set environment variables or run commands to initialize the shell
+
+---
+
+# Pipes
+
+Used to pass the output of one command into the input of another
+
+    .terminal
+    $ env | sort
+    COMMAND_MODE=unix2003
+    EDITOR=vim
+    HOME=/Users/pbarry
+    ...
+
+Use grep to search
+
+    .terminal
+    $ env | grep PATH
+    PATH=/Users/pbarry/.rbenv/shims:/Users/pbarry/bin:...
+
+---
+
+# Path
+
+`PATH` is the environment variable to control where commands are found
+
+It is a list of paths (directories) separated by `:` colons
+
+    .terminal
+    $ echo $PATH
+    /Users/pbarry/.rbenv/shims:/Users/pbarry/bin:/usr/local/bin:/usr/bin:/bin:...
+
+`which` is a command to determine where a command is:
+
+    .terminal
+    $ which ls
+    /bin/ls
+    $ which grep
+    /usr/bin/grep
+    $ which ruby
+    /Users/pbarry/.rbenv/shims/ruby
+
+---
+
+# Processes
+
+You computer has multiple processes running at the same time
+
+You can list them using the `ps` command
+
+Use `ps aux` to list "all" processes, show the "user" and show the "eXtra" info
+
+Each process has an id
+
+Combine ps with grep to find a process
+
+    .terminal
+    $ ps aux | grep irb
+    pbarry          33629   0.0  0.0  2423356  11:37AM   0:00.00 grep irb
+    pbarry          33015   0.0  0.3  2472492  11:34AM   0:00.43 irb
+
+Use `kill` to terminate a process
+
+    .terminal
+    $ kill 33015
+    $ ps aux | grep irb
+    pbarry         33761   0.0  0.0  2432768   11:38AM   0:00.00 grep irb
+
+By default, `kill` asks a process to shutdown. Use `kill -9` to terminate it immediately.
+
+Useful for processes that are hung and refuse to shutdown.
+
+---
+
+class: center
+
+# Learn More
+
+![Peepcode](img/peepcode-command-line-title.png)
+
+[https://peepcode.com/products/meet-the-command-line](https://peepcode.com/products/meet-the-command-line)
+
+[https://peepcode.com/products/advanced-command-line](https://peepcode.com/products/advanced-command-line)
 
   </textarea><div id="slideshow"></div>
   </body>
