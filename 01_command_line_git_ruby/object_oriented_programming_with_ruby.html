@@ -107,10 +107,20 @@ Commit it
 
 # Defining A Class
 
+All Objects have a Class. You can use the built in ones or create your own.
+
 ```ruby
 class Product
 end
+```
 
+An Object is an instance of a Class.
+
+You create an object by instantiating the class.
+
+You instantiate a class by calling `new` method on the class
+
+```ruby
 product = Product.new
 
 puts product.inspect
@@ -129,7 +139,7 @@ Commit it
 
 ---
 
-# Constructors and Instance Variables
+# Initializers and Instance Variables
 
 ```ruby
 class Product
@@ -144,7 +154,7 @@ product = Product.new("iPhone", 499)
 puts product.inspect
 ```
 
-The `initialize` method is called the constructor.  It is run when the object is created with `new`
+The `initialize` method is called the initializer (or constructor, in other languages).  It is run when the object is created with `new`
 
 Instance variables start with a `@` and can be accessed from within the class
 
@@ -155,8 +165,8 @@ Instance variables start with a `@` and can be accessed from within the class
 Commit it
 
     .terminal
-    $ git commit -am 'added a constructor to initialize instance variables'
-    [master b30991e] added a constructor to initialize instance variables
+    $ git commit -am 'added an initializer to initialize instance variables'
+    [master b30991e] added an initializer to initialize instance variables
      1 file changed, 5 insertions(+), 1 deletion(-)
 
 ---
@@ -198,6 +208,7 @@ Accessor methods expose the Objects instance variables refer to outside of the c
 
 ```ruby
 class Product
+  # Constructor omitted...
   def name
     @name
   end
@@ -220,7 +231,6 @@ product.name = "iPhone"
 product.price = 499
 
 puts product.inspect
-
 puts product.name
 puts product.price
 ```
@@ -234,6 +244,11 @@ Have Ruby generate readers and writers for you with `attr_accessor`
 ```ruby
 class Product
   attr_accessor :name, :price
+  
+  def initialize(name, price)
+    @name = name
+    @price = price
+  end  
 end
 
 product = Product.new
@@ -284,6 +299,73 @@ catalog.add Product.new("T-Shirt", 19)
 
 ---
 
+# Inheritance
+
+You can subclass a class to override or extend behavior
+
+```ruby
+class CatalogDatabase < Catalog
+  def add(product)
+    super
+    add_to_database(product)
+  end
+  
+  def add_to_database(product)
+    puts "Adding #{product.inspect} to the database"
+    # TODO: Add code to add to database
+  end
+end
+```
+
+    .terminal
+    $ irb -r ./my_program
+    >> catalog = CatalogDatabase.new
+    => #<CatalogDatabase:0x007f98acabd370>
+    >> catalog.add Product.new("iPhone", 499)
+    Adding #<Product:0x007f98acaa6328 @name="iPhone", @price=499> to the database
+    >> catalog.add Product.new("T-Shirt", 19)
+    Adding #<Product:0x007f98aca8d530 @name="T-Shirt", @price=19> to the database
+    >> catalog
+    => #<CatalogDatabase:0x007f98acabd370 @products=[#<Product:0x007f98acaa6328 ...
+    >> catalog.class.ancestors
+    => [CatalogDatabase, Catalog, Object, Kernel, BasicObject]
+
+---
+
+# Modules
+
+Modules are used to share behavior
+
+```ruby
+module DatabasePersistence
+  def add_to_database
+    puts "Adding #{inspect} to the database"
+  end
+end
+
+class Product
+  include DatabasePersistence
+end
+
+class CatalogDatabase < Catalog
+  def add(product)
+    super
+    product.add_to_database
+  end
+end
+```
+
+    .terminal
+    $ irb -r ./my_program
+    >> catalog = CatalogDatabase.new
+    => #<CatalogDatabase:0x007fcf59b51758>
+    >> catalog.add Product.new("T-Shirt", 19)
+    Adding #<Product:0x007fcf59b3a490 @name="T-Shirt", @price=19> to the database
+    >> Product.ancestors
+    => [Product, DatabasePersistence, Object, Kernel, BasicObject]
+
+---
+
 # Blocks
 
 Used for iteration, but also much more
@@ -317,6 +399,245 @@ This is shorter and much more common
     .terminal
     >> catalog.products.map{|p| p.price }
     => [499, 19]
+
+---
+
+# Enumerable
+
+Return only elements that the block evaluates to truthy for
+
+    .terminal
+    >> [1,2,3,4,5].select{|e| e.even? }
+    => [2, 4]
+
+Return the first element that the block evaluates to truthy for
+
+    .terminal
+    >> [1,2,3,4,5].detect{|e| e.even? }
+    => 2
+
+Sort the elements based on what is returned by the block
+    
+    .terminal
+    >> people = [{ name: 'Peter' }, { name: 'Paul' }, { name: 'Mary' }]
+    => [{:name=>"Peter"}, {:name=>"Paul"}, {:name=>"Mary"}]
+    >> people.sort_by{|p| p[:name] }
+    => [{:name=>"Mary"}, {:name=>"Paul"}, {:name=>"Peter"}]
+
+See more at [http://ruby-doc.org/core-2.0.0/Enumerable.html](http://ruby-doc.org/core-2.0.0/Enumerable.html)
+
+---
+
+# self
+
+```ruby
+class Product
+  DISCOUNT_RATE = 0.2
+
+  attr_accessor :name, :price
+
+  def discount
+    price * DISCOUNT_RATE
+  end
+end
+```
+
+In this example, because there is no local variable price, it calls the `price` method of the instance
+
+---
+
+# Gotchas
+
+Local variables take precedence of methods. This doesn't work:
+
+```ruby
+class Product
+  def reduce_price(amount)
+    price = price - amount
+  end
+end
+```
+
+Because it creates a local variable price that is then unused. This is how to do that:
+
+```ruby
+class Product
+  def reduce_price(amount)
+    self.price = price - amount
+  end
+end
+```
+
+---
+
+# Shadowing methods with local variables
+
+Be careful of shadowing a method with a local variable
+
+```ruby
+class Product
+  def discount
+    price = 99
+    price * DISCOUNT_RATE
+  end
+end
+```
+
+You can always call the method instead of the local variable if you use self
+
+```ruby
+class Product
+  def discount
+    price = 99
+    self.price * DISCOUNT_RATE
+  end
+end
+```
+
+
+---
+
+# Flexible Initializer
+
+It would be nice to be able to create products like this
+
+    .terminal
+    $ irb -r ./my_program
+    >> Product.new(name: 'iPhone', price: 499)
+    => #<Product:0x007f89652b4878 @name="iPhone", @price=499>
+
+In this version, the Product initializer takes a single argument, a Hash, of the attributes and their values
+
+Using this, we could add more attributes and not have to modify all code using Product
+
+Also, if there are a lot of attributes, we can omit some, put them in any order and it is still clear what they are
+
+How do we do this?
+
+---
+
+# Dynamically calling a writer
+
+A writer is just syntactic sugar for calling a method than ends in `=`
+
+    .terminal
+    >> product.name = 'iPhone'
+    => "iPhone"
+    >> product.name=('iPhone')
+    => "iPhone"
+
+If it's just a method, then we can call it with send
+
+    .terminal
+    >> product.send('name=', 'iPhone')
+    => "iPhone"
+
+If we can call it with send, we can dynamically create the name of the writer
+
+    .terminal
+    >> attr = 'name'
+    => "name"
+    >> product.send("#{attr}=", 'iPhone')
+    => "iPhone"
+
+---
+
+# Putting it together
+
+The `each` method yields each key and value to it's block
+
+```Ruby
+class Product
+  attr_accessor :name, :price
+  
+  def initialize(attrs={})
+    attrs.each do |attr, value|
+      send("#{attr}=", value)
+    end
+  end
+end
+```
+
+    .terminal
+    $ irb -r ./my_program
+    >> Product.new(name: 'iPhone', price: 499)
+    => #<Product:0x007f89652b4878 @name="iPhone", @price=499>
+
+---
+
+# Class Methods
+
+If you prefix the method name with `self.`, it makes it a method of the Class, instead of an instance methods
+
+```ruby
+class Product
+  def self.find(name)
+    # TODO: Make this work
+    puts "I'm supposed to find the product named '#{name}'"
+  end
+end
+```
+
+    .terminal
+    $ irb -r ./my_program
+    >> Product.find('iPhone')
+    I'm supposed to find the product named 'iPhone'
+    => nil
+    >> Product.new.find
+    NoMethodError: undefined method `find' for #<Product:0x007f8223ae59a0>
+    	from (irb):7
+    	from /Users/pbarry/.rbenv/versions/2.0.0-p247/bin/irb:12:in `<main>'    
+
+---
+
+# Classes can have instance variables
+
+Because Classes are Objects, instances of the Class Class, they have instance variables
+
+```ruby
+class Product
+  attr_accessor :name, :price
+end
+```
+
+is equivalent to
+
+```ruby
+Product = Class.new do
+  attr_accessor :name, :price
+end
+```
+
+A Class is just an instance of Class that is assigned to a Constant
+
+---
+
+# Pulling It Together
+
+```ruby
+class Product
+  def self.catalog
+    @catalog ||= Catalog.new
+  end
+
+  def self.add(attrs={})
+    catalog.add(new(attrs))
+  end
+
+  def self.find(name)
+    catalog.products.detect{|p| p.name == name }
+  end
+end
+```
+
+    .terminal
+    $ irb -r ./my_program
+    >> Product.add(name: 'T-Shirt')
+    => [#<Product:0x007f8223b46e30 @name="T-Shirt">]
+    >> Product.add(name: 'iPhone', price: 499)
+    => [#<Product:0x007f8223b46e30 @name="T-Shirt">, ...]
+    >> Product.find('iPhone')
+    => #<Product:0x007f8223b25870 @name="iPhone", @price=499>
 
 ---
 
@@ -357,12 +678,15 @@ require 'minitest/autorun'
 
 class OrderTest < Minitest::Test
   def test_total_price
-    order = Order.new
-    order.tax_rate = 0.05
+    Product.add(name: "Muffin", price: 2.99)
+    Product.add(name: "Coffee", price: 3.75)
+    Product.add(name: "Smoothie", price: 3.99)
+  
+    order = Order.new(tax_rate: 0.05)
 
-    order.add(2, Product.new("Muffin", 2.99))
-    order.add(1, Product.new("Coffee", 3.75))
-    order.add(1, Product.new("Smoothie", 3.99))
+    order.add 2, "Muffin"
+    order.add 1, "Coffee"
+    order.add 1, "Smoothie"
 
     assert_equal 14.41, order.total_price
   end
