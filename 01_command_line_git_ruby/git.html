@@ -71,38 +71,250 @@ class: center
 
 ---
 
-# Basic Git
+# Git
 
-TODO: Break this out into multiple slides with explanations
+Git is a version control system
+
+Used for keeping track of changes to code
+
+---
+
+# Install Git
+
+## Mac
 
     .terminal
-    echo 'Hello' > README.md
-    ls
-    cat README.md
-    git init
-    git status
-    git add README.md
-    git status
-    git commit -m 'First commit!'
-    git log
-    echo 'Goodbye' > README.md
-    git status
-    git diff
-    git add README.md
-    git status
-    git config --global core.editor 'subl -w'
-    git commit
-    git status
-    git log
-    git revert <sha>
+    $ brew install git
+    
+## Windows
 
+[http://msysgit.github.io](http://msysgit.github.io)
+
+---
+
+# Sample Project
+
+Create a file in a directory
+
+    .terminal
+    $ mkdir hello
+    $ cd hello
+    $ echo '# Hello' > README.md
+    $ ls
+    README.md
+    $ cat README.md
+    # Hello
+
+Initialize a Git repository
+
+    .terminal
+    $ git init
+    Initialized empty Git repository in /Users/pbarry/dev/hello/.git/
+
+Note that the repository is stored in a hidden directory called `.git`
+
+---
+
+# Status
+
+Use git status to view the state of your working directory compared to your repository
+
+    .terminal
+    $ git status
+    # On branch master
+    #
+    # Initial commit
+    #
+    # Untracked files:
+    #   (use "git add <file>..." to include in what will be committed)
+    #
+    #	README.md
+    nothing added to commit but untracked files present (use "git add" to track)
+
+---
+
+# Add a file
+
+    .terminal
+    $ git add README.md
+
+That change is staged, but not commited  
+  
+    .terminal
+    $ git status
+    # On branch master
+    #
+    # Initial commit
+    #
+    # Changes to be committed:
+    #   (use "git rm --cached <file>..." to unstage)
+    #
+    #	new file:   README.md
+    #    
+
+---
+
+# Commit changes
+
+Use git commit 
+
+    .terminal
+    $ git commit -m 'First commit!'
+    [master (root-commit) b4d2429] First commit!
+     1 file changed, 1 insertion(+)
+     create mode 100644 README.md    
+
+---
+
+# Log
+
+View your changes with `git log`
+
+    .terminal
+    $ git log
+    commit b4d2429f0b1b77393824472feaf68a4cec3147d5
+    Author: Paul Barry <mail@paulbarry.com>
+    Date:   Thu Sep 19 12:02:04 2013 -0400
+
+        First commit!
+
+---
+
+# Make some changes
+
+    .terminal
+    $ echo 'Goodbye' > README.md
+    $ git status
+    # On branch master
+    # Changes not staged for commit:
+    #   (use "git add <file>..." to update what will be committed)
+    #   (use "git checkout -- <file>..." to discard changes in working directory)
+    #
+    #	modified:   README.md
+    #
+    no changes added to commit (use "git add" and/or "git commit -a")
+
+---
+
+# View diff
+
+See what changed
+
+    .terminal
+    $ git diff
+    diff --git a/README.md b/README.md
+    index fec5601..2b60207 100644
+    --- a/README.md
+    +++ b/README.md
+    @@ -1 +1 @@
+    -# Hello
+    +Goodbye
+
+---
+
+# Add the changes
+
+    .terminal
+    $ git add README.md
+    $ git status
+    # On branch master
+    # Changes to be committed:
+    #   (use "git reset HEAD <file>..." to unstage)
+    #
+    #	modified:   README.md
+    #
+
+---
+
+# Use Sublime Text for editing commit messages
+
+    .terminal
+    $ git config --global core.editor 'subl -w'
+    $ git commit
+    [master 7e9d0c2] Made some changes
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+Working directory is now clean
+
+    .terminal
+    $ git status
+    # On branch master
+    nothing to commit, working directory clean
+    
+View commits
+    
+    .terminal
+    $ git log
+     commit 7e9d0c212c11965d9a4d1be391d8dc76441b595d
+     Author: Paul Barry <mail@paulbarry.com>
+     Date:   Thu Sep 19 14:20:56 2013 -0400
+
+         Made some changes
+
+     commit b4d2429f0b1b77393824472feaf68a4cec3147d5
+     Author: Paul Barry <mail@paulbarry.com>
+     Date:   Thu Sep 19 12:02:04 2013 -0400
+
+         First commit!
+
+---
+
+# Undoing changes
+
+Use revert to undo changes
+
+    .terminal
+    $ git revert 7e9d0c212c11965d9a4d1be391d8dc76441b595d
+    [master fe537d4] Revert "Made some changes"
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+A new commit that undid the changes was created
+
+    .terminal
+    $ git log
+    commit fe537d47dbbe59653c130843ae0c5c0d65021fc9
+    Author: Paul Barry <mail@paulbarry.com>
+    Date:   Thu Sep 19 14:24:28 2013 -0400
+
+        Revert "Made some changes"
+
+        This reverts commit 7e9d0c212c11965d9a4d1be391d8dc76441b595d.
+
+    commit 7e9d0c212c11965d9a4d1be391d8dc76441b595d
+    Author: Paul Barry <mail@paulbarry.com>
+    Date:   Thu Sep 19 14:20:56 2013 -0400
+
+        Made some changes
+    ...
 ---
 
 # GitX
 
+Graphical tool for using git - [http://gitx.frim.nl](http://gitx.frim.nl)
+
+.center[![GitX](img/gitx.png)]
+
 ---
 
 # Github
+
+A website that hosts git repositories
+
+.center[![Github](img/github.png)]
+
+---
+
+class: center, middle
+
+# Learn More
+
+![Git Immersion](img/git_immersion.png)
+
+http://try.github.io
+
+http://gitimmersion.com
+
+http://git-scm.com/book
 
   </textarea><div id="slideshow"></div>
   </body>
