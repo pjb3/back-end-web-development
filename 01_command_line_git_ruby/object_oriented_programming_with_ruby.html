@@ -246,11 +246,11 @@ Have Ruby generate readers and writers for you with `attr_accessor`
 ```ruby
 class Product
   attr_accessor :name, :price
-  
-  def initialize(name, price)
+
+  def initialize(name=nil, price=nil)
     @name = name
     @price = price
-  end  
+  end
 end
 
 product = Product.new
