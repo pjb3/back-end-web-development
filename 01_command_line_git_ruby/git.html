@@ -65,6 +65,8 @@ class: center
 
 ![Command Line](img/git.png)
 
+[http://pjb3.me/bewd-git](http://pjb3.me/bewd-git)
+
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
@@ -85,7 +87,7 @@ Used for keeping track of changes to code
 
     .terminal
     $ brew install git
-    
+
 ## Windows
 
 [http://msysgit.github.io](http://msysgit.github.io)
@@ -128,7 +130,7 @@ Use git status to view the state of your working directory compared to your repo
     # Untracked files:
     #   (use "git add <file>..." to include in what will be committed)
     #
-    #	README.md
+    #  README.md
     nothing added to commit but untracked files present (use "git add" to track)
 
 ---
@@ -138,8 +140,8 @@ Use git status to view the state of your working directory compared to your repo
     .terminal
     $ git add README.md
 
-That change is staged, but not commited  
-  
+That change is staged, but not commited
+
     .terminal
     $ git status
     # On branch master
@@ -149,20 +151,20 @@ That change is staged, but not commited
     # Changes to be committed:
     #   (use "git rm --cached <file>..." to unstage)
     #
-    #	new file:   README.md
-    #    
+    #  new file:   README.md
+    #
 
 ---
 
 # Commit changes
 
-Use git commit 
+Use git commit
 
     .terminal
     $ git commit -m 'First commit!'
     [master (root-commit) b4d2429] First commit!
      1 file changed, 1 insertion(+)
-     create mode 100644 README.md    
+     create mode 100644 README.md
 
 ---
 
@@ -190,7 +192,7 @@ View your changes with `git log`
     #   (use "git add <file>..." to update what will be committed)
     #   (use "git checkout -- <file>..." to discard changes in working directory)
     #
-    #	modified:   README.md
+    #  modified:   README.md
     #
     no changes added to commit (use "git add" and/or "git commit -a")
 
@@ -221,7 +223,7 @@ See what changed
     # Changes to be committed:
     #   (use "git reset HEAD <file>..." to unstage)
     #
-    #	modified:   README.md
+    #  modified:   README.md
     #
 
 ---
@@ -240,9 +242,9 @@ Working directory is now clean
     $ git status
     # On branch master
     nothing to commit, working directory clean
-    
+
 View commits
-    
+
     .terminal
     $ git log
      commit 7e9d0c212c11965d9a4d1be391d8dc76441b595d

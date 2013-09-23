@@ -65,6 +65,8 @@ class: center
 
 ![Ruby](img/ruby-logo.png)
 
+[http://pjb3.me/bewd-ruby-oo](http://pjb3.me/bewd-ruby-oo)
+
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
@@ -78,9 +80,9 @@ Initialize a git repo
     .terminal
     ~/bewd $ git init
     Initialized empty Git repository in /Users/pbarry/bewd/.git/
-    
+
 Add a file
-    
+
     .terminal
     ~/bewd $ echo 'puts "Hello World"' > my_program.rb
     ~/bewd $ cat my_program.rb
@@ -89,7 +91,7 @@ Add a file
     Hello World
     ~/bewd $ git add my_program.rb
 
-Commit it    
+Commit it
 
     .terminal
     ~/bewd $ git commit -m 'Hello, World!'
@@ -131,7 +133,7 @@ puts product.inspect
     #<Product:0x007fd9b29f5c48>
 
 Commit it
-    
+
     .terminal
     $ git commit -am 'defined a class'
     [master ea24f40] defined a class
@@ -272,7 +274,7 @@ class Catalog
   def products
     @products ||= []
   end
-  
+
   def add(product)
     products << product
   end
@@ -309,7 +311,7 @@ class CatalogDatabase < Catalog
     super
     add_to_database(product)
   end
-  
+
   def add_to_database(product)
     puts "Adding #{product.inspect} to the database"
     # TODO: Add code to add to database
@@ -417,7 +419,7 @@ Return the first element that the block evaluates to truthy for
     => 2
 
 Sort the elements based on what is returned by the block
-    
+
     .terminal
     >> people = [{ name: 'Peter' }, { name: 'Paul' }, { name: 'Mary' }]
     => [{:name=>"Peter"}, {:name=>"Paul"}, {:name=>"Mary"}]
@@ -549,7 +551,7 @@ The `each` method yields each key and value to it's block
 ```Ruby
 class Product
   attr_accessor :name, :price
-  
+
   def initialize(attrs={})
     attrs.each do |attr, value|
       send("#{attr}=", value)
@@ -585,8 +587,8 @@ end
     => nil
     >> Product.new.find
     NoMethodError: undefined method `find' for #<Product:0x007f8223ae59a0>
-    	from (irb):7
-    	from /Users/pbarry/.rbenv/versions/2.0.0-p247/bin/irb:12:in `<main>'    
+      from (irb):7
+      from /Users/pbarry/.rbenv/versions/2.0.0-p247/bin/irb:12:in `<main>'
 
 ---
 
@@ -689,7 +691,7 @@ class OrderTest < Minitest::Test
     Product.add(name: "Muffin", price: 2.99)
     Product.add(name: "Coffee", price: 3.75)
     Product.add(name: "Smoothie", price: 3.99)
-  
+
     order = Order.new(tax_rate: 0.05)
 
     order.add 2, "Muffin"
