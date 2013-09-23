@@ -616,16 +616,24 @@ A Class is just an instance of Class that is assigned to a Constant
 
 ```ruby
 class Product
-  def self.catalog
-    @catalog ||= Catalog.new
+  attr_accessor :name, :price
+
+  def initialize(attrs={})
+    attrs.each do |attr, value|
+      send("#{attr}=", value)
+    end
   end
 
-  def self.add(attrs={})
-    catalog.add(new(attrs))
+  def self.products
+    @products ||= []
+  end
+
+  def self.add(attrs)
+    products << new(attrs)
   end
 
   def self.find(name)
-    catalog.products.detect{|p| p.name == name }
+    products.detect{|p| p.name == name }
   end
 end
 ```
