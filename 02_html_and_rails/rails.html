@@ -112,6 +112,87 @@ Follow post-install steps
 
 # Create A New Project
 
+Create a new Rails app using the Postgresql database
+
+    .terminal
+    $ rails new betastore -d postgresql
+          create
+          create  README.rdoc
+          create  Rakefile
+          create  config.ru
+          create  .gitignore
+          create  Gemfile
+          create  app
+          create  app/assets/javascripts/application.js
+          create  app/assets/stylesheets/application.css
+          create  app/controllers/application_controller.rb
+          create  app/helpers/application_helper.rb
+          create  app/views/layouts/application.html.erb
+          create  app/assets/images/.keep
+          create  app/mailers/.keep
+          create  app/models/.keep
+          create  app/controllers/concerns/.keep
+          create  app/models/concerns/.keep
+          ...
+
+---
+
+# Project Structure
+
+    .terminal
+    betastore
+    ├── app - Application code
+    ├── config - Configuration code
+    ├── db - Database modifications
+    ├── lib - Generic code
+    ├── log - Log files
+    ├── public - HTML/CSS/JavaScript/Images
+    ├── test - Test code
+    └── vendor - 3rd party code
+
+---
+
+# Model-View-Controller (MVC)
+
+The MVC pattern keeps persistence and presentation code separate
+
+    .terminal
+    ├── app
+    │   ├── controllers
+    │   ├── models
+    │   └── views
+    └── config
+        └── routes.rb
+
+## Routes
+
+Control which controller action handles the request
+
+## Controller
+
+Coordinates between models and views
+
+## Model (persistence)
+
+Used by the controller to store/retrieve data from the database
+
+## View (presentation)
+
+Templates used to generate HTML
+
+---
+
+# How Requests Are Handled in Rails Apps
+
+![MVC](img/request_diagram.png)
+
+1.  Browser makes a request
+2.  Router determines which controller action should handle the request
+3.  Controller uses models to store/retrieve data
+4.  Models make SQL calls to store/retrieve data from the database
+5.  Controller passes data to the view templates to generate an HTML page
+6.  Controller returns the HTML page to the browser to be rendered
+
   </textarea><div id="slideshow"></div>
   </body>
 </html>
