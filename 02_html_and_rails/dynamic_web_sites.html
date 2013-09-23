@@ -63,6 +63,8 @@ class: middle, center
 
 # Dynamic Web Sites
 
+[http://pjb3.me/bewd-dynamic-web-sites](http://pjb3.me/bewd-dynamic-web-sites)
+
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
@@ -95,10 +97,8 @@ class MyServer
     body = env['REQUEST_PATH']
     [
       200,
-      {
-        'Content-Type' => 'text/plain',
-        'Content-Length' => body.length.to_s
-      },
+      { 'Content-Type' => 'text/plain',
+        'Content-Length' => body.length.to_s },
       [body]
     ]
   end
@@ -141,19 +141,17 @@ class MyServer
   def initialize(document_root)
     @document_root = document_root
   end
-  
+
   def call(env)
     file_path = File.join(@document_root, env['REQUEST_PATH'])
     respond 200, File.read(file_path)
   end
-  
+
   def respond(status_code, body)
     [
       status_code,
-      {
-        'Content-Type' => 'text/html',
-        'Content-Length' => body.length.to_s
-      },
+      { 'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s },
       [body]
     ]
   end
@@ -179,7 +177,7 @@ What happens if we ask for a file that doesn't exist?
       <meta name="robots" content="NONE,NOARCHIVE" />
       <title>Errno::ENOENT at &#x2F;something_else.html</title>
       ...
-  
+
 ]
 
 Stack trace
@@ -208,7 +206,7 @@ class MyServer
   def initialize(document_root)
     @document_root = document_root
   end
-  
+
   def call(env)
     file_path = File.join(@document_root, env['REQUEST_PATH'])
     if File.exists?(file_path)
@@ -217,14 +215,12 @@ class MyServer
       respond 404, File.read('not_found.html')
     end
   end
-  
+
   def respond(status_code, body)
     [ status_code,
-      {
-        'Content-Type' => 'text/html',
-        'Content-Length' => body.length.to_s
-      },
-      [body] 
+      { 'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s },
+      [body]
     ]
   end
 end
@@ -281,14 +277,14 @@ class MyServer
     body = "<h1>#{path_name.to_s.capitalize}</h1>\n"
     respond 200, body
   end
-  
+
   def respond(status_code, body)
-    [ status_code,
-      {
-        'Content-Type' => 'text/html',
-        'Content-Length' => body.length.to_s
-      },
-      [body] ]
+    [
+      status_code,
+      { 'Content-Type' => 'text/html',
+        'Content-Length' => body.length.to_s },
+      [body]
+    ]
   end
 end
 
