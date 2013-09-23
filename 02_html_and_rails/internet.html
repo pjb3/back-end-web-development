@@ -65,6 +65,8 @@ class: middle, center
 
 ![The Internet](img/internet.jpg)
 
+[http://pjb3.me/bewd-internet](http://pjb3.me/bewd-internet)
+
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
@@ -235,7 +237,7 @@ Cookies can have an expiration date, which looks like this:
     Set-Cookie: session_id=abc123; expires=Thu, 13-Mar-2014 12:02:59 GMT
 
 Once the `expires` time has passed, the cookie will not be sent by the browser anymore
-    
+
 If there is no `expires`, the cookie will be cleared when the user closes their browser
 
 ---
@@ -311,9 +313,9 @@ Generate your own public/private key pair
     ...++++++++++++
     .....++++++++++++
     e is 65537 (0x10001)
-    
+
 Extract the public key from the key pair
-    
+
     .terminal
     $ openssl rsa -in mykey.pem -pubout > mykey.pub
     writing RSA key
@@ -321,7 +323,7 @@ Extract the public key from the key pair
 ---
 
 # Public / Private Key Encryption
-    
+
 The private key
 
     .terminal
@@ -335,7 +337,7 @@ The private key
     Lk/U6yG9PWSBAiAkOSZ1YmuSFEB5FUBMYWvRrBbs5RWdEkoDBaNx3BVzMQIgLc/x
     V2gHi0Rexg2rUlrO9lprEIUwLKNAHHnubImGISY=
     -----END RSA PRIVATE KEY-----
-    
+
 The public key
 
     .terminal
