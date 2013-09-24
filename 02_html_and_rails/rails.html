@@ -164,9 +164,9 @@ The MVC pattern keeps persistence and presentation code separate
     └── config
         └── routes.rb
 
-## Routes
+## Router
 
-Control which controller action handles the request
+Controls which controller action handles the request
 
 ## Controller
 
@@ -186,13 +186,234 @@ Templates used to generate HTML
 
 ![MVC](img/request_diagram.png)
 
-1.  Browser makes a request
+1.  Browser makes an HTTP request
+
 2.  Router determines which controller action should handle the request
-3.  Controller uses models to store/retrieve data
-4.  Models make SQL calls to store/retrieve data from the database
+
+3.  Controller action uses models to store/retrieve data
+
+4.  Models make SQL queries to store/retrieve data from the database
+
 5.  Controller passes data to the view templates to generate an HTML page
+
 6.  Controller returns the HTML page to the browser to be rendered
 
+---
+
+# Rails Generators
+
+The scaffold generators will generate code for you
+
+For our application, let's generate a "coming soon" page where we collect email addresses
+    
+    .terminal
+    $ rails generate scaffold subscription email
+    invoke  active_record
+    create    db/migrate/20130923234940_create_subscriptions.rb
+    create    app/models/subscription.rb
+    invoke    test_unit
+    create      test/models/subscription_test.rb
+    create      test/fixtures/subscriptions.yml
+    invoke  resource_route
+     route    resources :subscriptions
+    invoke  scaffold_controller
+    create    app/controllers/subscriptions_controller.rb
+    invoke    erb
+    create      app/views/subscriptions
+    create      app/views/subscriptions/index.html.erb
+    create      app/views/subscriptions/edit.html.erb
+    create      app/views/subscriptions/show.html.erb
+    create      app/views/subscriptions/new.html.erb
+    create      app/views/subscriptions/_form.html.erb
+    ...
+
+---
+
+# Database Setup
+
+## Config database
+
+In `config/database.yml`, change username from `betastore` to `postgres`
+
+```yml
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: betastore_development
+  pool: 5
+  username: postgres
+  password:
+```
+
+## Run migrations
+
+    .terminal
+    $ rake db:create
+    $ rake db:migrate
+    ==  CreateSubscriptions: migrating ============================================
+    -- create_table(:subscriptions)
+       -> 0.0044s
+    ==  CreateSubscriptions: migrated (0.0045s) ===================================
+
+---
+
+# Running the server
+
+    .terminal
+    $ rails server
+    => Booting WEBrick
+    => Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+    => Run `rails server -h` for more startup options
+    => Ctrl-C to shutdown server
+    [2013-09-23 19:56:40] INFO  WEBrick 1.3.1
+    [2013-09-23 19:56:40] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+    [2013-09-23 19:56:40] INFO  WEBrick::HTTPServer#start: pid=387 port=3000    
+
+---
+
+.center[![Welcome](img/welcome.png)]
+
+---
+
+# Root Route
+
+`config/routes.rb`
+
+```ruby
+Betastore::Application.routes.draw do
+  resources :subscriptions
+  root :to => 'subscriptions#index'
+end
+```
+
+Remove comments and add root route
+
+---
+
+# Subscriptions Index
+
+.center[![Scaffold Index](img/scaffold_index.png)]
+
+---
+
+# Subscriptions New
+
+.center[![Scaffold New](img/scaffold_new.png)]
+
+---
+
+# What We Want
+
+.center[![Betamore Sign Up](img/betamore_sign_up.png)]
+
+---
+
+# New view
+
+`app/views/subscriptions/new.html.erb`
+
+```erb
+<%= render 'form' %>
+```
+
+---
+
+# Form Partial
+
+`app/views/subscriptions/_form.html.erb`
+
+```erb
+<%= form_for(@subscription) do |f| %>
+  <% if @subscription.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@subscription.errors.count, "error") %> 
+        prohibited this subscription from being saved:</h2>
+
+      <ul>
+      <% @subscription.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :email, "Find out when we go live:" %>
+    <%= f.text_field :email %>
+    <%= f.submit "Sign Up" %>
+  </div>
+<% end %>
+```
+
+---
+
+# Layout
+
+```erb
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Betastore</title>
+  <%= stylesheet_link_tag "application" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <div style="margin: 0 auto; text-align: center">
+    <%= image_tag "logo.jpg", width: 600 %>
+    <%= yield %>
+  </div>
+</body>
+</html>
+```
+
+---
+
+# Change Root Route
+
+```ruby
+Betastore::Application.routes.draw do
+  resources :subscriptions
+  root :to => 'subscriptions#new'
+end
+```
+
+---
+
+# Sign Up Form
+
+.center[![Betamore Sign Up](img/betamore_sign_up.png)]
+
+---
+
+# Success
+
+.center[![Betamore Sign Up Success](img/betamore_sign_up_success.png)]
+
+---
+
+# Valentina
+
+We can view our data in a database GUI
+
+.center[![Valentina](img/valentina.png)]
+
+---
+
+# psql
+
+or from the `psql` console
+
+    .terminal
+    $ psql -U postgres -d betastore_development
+    psql (9.2.1)
+    Type "help" for help.
+
+    betastore_development=# select * from subscriptions;
+     id |      email       |         created_at         |         updated_at
+    ----+------------------+----------------------------+----------------------------
+      1 | test@example.com | 2013-09-24 00:45:24.755576 | 2013-09-24 00:45:24.755576
+    (1 row)
   </textarea><div id="slideshow"></div>
   </body>
 </html>
