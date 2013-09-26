@@ -255,6 +255,10 @@ development:
        -> 0.0044s
     ==  CreateSubscriptions: migrated (0.0045s) ===================================
 
+`rake` is command for running tasks, run `rake -T` to see the list
+
+You can create your own, we will cover that later
+
 ---
 
 # Running the server
@@ -290,6 +294,29 @@ Remove comments and add root route
 
 ---
 
+# View The Routes
+
+    .terminal
+    $ rake routes
+               Prefix Verb   URI Pattern                       Controller#Action
+        subscriptions GET    /subscriptions(.:format)          subscriptions#index
+                      POST   /subscriptions(.:format)          subscriptions#create
+     new_subscription GET    /subscriptions/new(.:format)      subscriptions#new
+    edit_subscription GET    /subscriptions/:id/edit(.:format) subscriptions#edit
+         subscription GET    /subscriptions/:id(.:format)      subscriptions#show
+                      PATCH  /subscriptions/:id(.:format)      subscriptions#update
+                      PUT    /subscriptions/:id(.:format)      subscriptions#update
+                      DELETE /subscriptions/:id(.:format)      subscriptions#destroy
+                 root GET    /                                 subscriptions#new
+
+Routes are executed in order until a match is found
+
+`:` in a URI pattern represents a variable, so `/subscriptions/:id` matches `/subscriptions/1`
+
+The format of `subscriptions#index` means the `index` method of the `SubscriptionsController`
+
+---
+
 # Subscriptions Index
 
 .center[![Scaffold Index](img/scaffold_index.png)]
@@ -308,13 +335,81 @@ Remove comments and add root route
 
 ---
 
+# Subscriptions Controller
+
+`app/controllers/subscriptions_controller.rb` _(simplified)_
+
+```ruby
+class SubscriptionsController < ApplicationController
+  def index
+    @subscriptions = Subscription.all
+  end
+
+  def create
+    @subscription = Subscription.new(subscription_params)
+    
+    if @subscription.save
+      redirect_to @subscription, notice: 'Subscription was successfully created.'
+    else
+      render action: 'new'
+    end
+  end
+end
+```
+
+---
+
+# Redirects
+
+A redirect is an HTTP response with no body abut a `Location` header that instructs the browser to load a different URL
+
+    .terminal
+    $ curl -I http://google.com
+    HTTP/1.1 301 Moved Permanently
+    Location: http://www.google.com/
+    Content-Type: text/html; charset=UTF-8
+    Date: Thu, 26 Sep 2013 20:59:44 GMT
+    Expires: Sat, 26 Oct 2013 20:59:44 GMT
+    Cache-Control: public, max-age=2592000
+    Server: gws
+    Content-Length: 219
+    X-XSS-Protection: 1; mode=block
+    X-Frame-Options: SAMEORIGIN
+    Alternate-Protocol: 80:quic
+
+---
+
+# Views
+
+Views in Rails are templates written in Embedded Ruby (ERB), which is similar to PHP
+
+    .terminal
+    Hello, <%= @name %>
+
+if name is set to `"Paul"`, that becomes
+
+    .terminal
+    Hello, Paul
+
+`<% %>` are used for expressions that don't return a value
+
+    .terminal
+    <% if @name %>
+      Hello, <%= @name %>
+    <% else %>
+      Welcome, Guest
+    <% end %>
+
+The code between the `<% %>` and `<%= %>` is Ruby
+
+---
+
 # New view
 
 `app/views/subscriptions/new.html.erb`
 
-```erb
-<%= render 'form' %>
-```
+    .terminal
+    <%= render 'form' %>
 
 ---
 
@@ -322,61 +417,48 @@ Remove comments and add root route
 
 `app/views/subscriptions/_form.html.erb`
 
-```erb
-<%= form_for(@subscription) do |f| %>
-  <% if @subscription.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@subscription.errors.count, "error") %>
-        prohibited this subscription from being saved:</h2>
+    .terminal
+    <%= form_for(@subscription) do |f| %>
+      <% if @subscription.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@subscription.errors.count, "error") %>
+            prohibited this subscription from being saved:</h2>
 
-      <ul>
-      <% @subscription.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
+          <ul>
+          <% @subscription.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
       <% end %>
-      </ul>
-    </div>
-  <% end %>
 
-  <div class="field">
-    <%= f.label :email, "Find out when we go live:" %>
-    <%= f.text_field :email %>
-    <%= f.submit "Sign Up" %>
-  </div>
-<% end %>
-```
+      <div class="field">
+        <%= f.label :email, "Find out when we go live:" %>
+        <%= f.text_field :email %>
+        <%= f.submit "Sign Up" %>
+      </div>
+    <% end %>
 
 ---
 
 # Layout
 
-```erb
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Betastore</title>
-  <%= stylesheet_link_tag "application" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-  <div style="margin: 0 auto; text-align: center">
-    <%= image_tag "logo.jpg", width: 600 %>
-    <%= yield %>
-  </div>
-</body>
-</html>
-```
-
----
-
-# Change Root Route
-
-```ruby
-Betastore::Application.routes.draw do
-  resources :subscriptions
-  root :to => 'subscriptions#new'
-end
-```
+    .terminal
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Betastore</title>
+      <%= stylesheet_link_tag "application" %>
+      <%= javascript_include_tag "application" %>
+      <%= csrf_meta_tags %>
+    </head>
+    <body>
+      <div style="margin: 0 auto; text-align: center">
+        <%= image_tag "logo.jpg", width: 600 %>
+        <%= yield %>
+      </div>
+    </body>
+    </html>
 
 ---
 
@@ -433,7 +515,35 @@ or from the `psql` console
 
 6.  Controller returns the HTML page to the browser to be rendered
 
+---
 
+# Homework
+
+Create a ProductsController with an index action and an index template that shows the same product listing from the previous homework
+
+Deploy app to heroku
+
+[https://devcenter.heroku.com/articles/quickstart](https://devcenter.heroku.com/articles/quickstart)
+
+---
+
+# Install Heroku Toolbelt
+
+.center[,![Heroku Toolbelt](img/heroku-toolbelt.png)]
+
+.center[[http://heroku.toolbelt.com](http://toolbelt.heroku.com)]
+
+---
+
+# Deploying a Heroku App
+
+    .terminal
+    $ heroku login
+    $ heroku create
+    $ git push heroku master
+    $ heroku run rake db:migrate
+    $ heroku ps:scale web=1
+    $ heroku open
 
   </textarea><div id="slideshow"></div>
   </body>
