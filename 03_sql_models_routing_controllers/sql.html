@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SQL</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# SQL
+
+[http://pjb3.me/bewd-sql](http://pjb3.me/bewd-sql)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# SQL
+
+Structured Query Language (SQL) is a language for querying Relational DataBase Management Systems (RDBMS) tables for data
+
+---
+
+# RDBMS
+
+A Relational DataBase Management System is a server that stores data in related tables
+
+.center[![Popular RDMBSs](img/rdbms.png)]
+
+---
+
+# Clients for Postgres
+
+## Command Line
+
+    .terminal
+    $ psql -U postgres -d betastore_development
+    
+or launch it based on the database configuration in your Rails app
+
+    .terminal
+    $ rails dbconsole
+
+## Graphical
+
+[PGAdmin - http://www.pgadmin.org](http://www.pgadmin.org) - Clunky on a Mac, maybe good on Windows?
+
+[Valentina](http://www.valentina-db.com/valentina-studio-overview) - Available in the Mac App Store
+
+![Valentina Mac App Store](img/valentina.png)
+
+---
+
+# Tables
+
+A table is a like a spreadsheet with data organized in rows and columns
+
+    .terminal
+    betastore_development=# SELECT * from subscriptions;
+     id |      email       |         created_at         |         updated_at
+    ----+------------------+----------------------------+----------------------------
+      1 | test@example.com | 2013-09-24 00:45:24.755576 | 2013-09-24 00:45:24.755576
+    (1 row)
+
+A database can have multiple tables and data is organized into tables that relate to each other
+
+## Primary Keys
+
+A primary key is a value that is unique within the table
+
+In Rails, this is always a auto-incrementing integer called `id`, as is the case in this example
+
+---
+
+# Database Normalization
+
+Organizing data into tables in a way that minimizes duplication
+
+## First version of our orders table
+
+    .terminal
+    id | customer_name | customer_email     | placed_at  | products         |
+    ---+---------------+--------------------+------------+------------------+
+    1  | Paul Barry    | mail@paulbarry.com | 2013-09-27 | Muffin, Smoothie |
+    2  | Paul Barry    | mail@paulbarry.com | 2013-09-30 | Smoothie         |
+    2  | John Doe      | test@example.com   | 2013-09-30 | Muffin, Coffee   |
+
+## Problems
+
+There are multiple products in the products column, which will make it hard to query
+
+The customer name and email are repeated in multiple rows
+
+Database normalization to the rescue!
+
+---
+
+# Each column should contain only one value
+
+    .terminal
+    orders
+    id | customer_name | customer_email     | placed_at
+    ---+---------------+--------------------+-----------
+    1  | Paul Barry    | mail@paulbarry.com | 2013-09-27
+    2  | Paul Barry    | mail@paulbarry.com | 2013-09-30
+    3  | John Doe      | test@example.com   | 2013-09-30
+
+    line_items
+    id | order_id | product_name | product_price 
+    ---+----------+--------------+--------------
+    1  | 1        | Muffin       | 2.99
+    2  | 1        | Smoothie     | 3.75
+    3  | 2        | Smoothie     | 3.75
+    4  | 3        | Muffin       | 2.99
+    5  | 3        | Coffee       | 3.99
+
+The `order_id` is called a **foreign key**
+
+Foreign keys are commonly used to create relationships between tables
+
+    .terminal
+                        line_items   
+    orders              ----------
+    --------------      id
+    id             <--- order_id
+    customer_name       product_name
+    customer_email
+    placed_at
+
+---
+
+# Remove Product Duplication
+
+    .terminal
+    orders
+    id | customer_name | customer_email     | placed_at
+    ---+---------------+--------------------+-----------
+    1  | Paul Barry    | mail@paulbarry.com | 2013-09-27
+    2  | Paul Barry    | mail@paulbarry.com | 2013-09-30
+    3  | John Doe      | test@example.com   | 2013-09-30
+
+    line_items
+    id | order_id | product_id
+    ---+----------+--------------
+    1  | 1        | 1
+    2  | 1        | 2
+    3  | 2        | 2
+    4  | 3        | 1
+    5  | 3        | 3
+
+    products
+    id | name      | price
+    ---+-----------+-------
+    1  |  Muffin   | 2.99
+    2  |  Smoothie | 3.75     
+    3  |  Coffee   | 3.99
+
+---
+
+# Relationship Diagram
+
+    .terminal
+                        line_items   
+    orders              ----------    
+    --------------      id              products
+    id             <--- order_id        --------
+    customer_name       product_id ---> id
+    customer_email                      name
+    placed_at                           price
+
+
+---
+
+# Remove Customer Duplication
+
+    .terminal
+    customers
+    id | name       | email
+    ---+------------+--------------------
+    1  | Paul Barry | mail@paulbarry.com
+    2  | John Doe   | test@example.com
+
+    orders                              line_items
+    id | customer_id | placed_at        id | order_id | product_id
+    ---+-------------+------------      ---+----------+--------------
+    1  | 1           | 2013-09-27       1  | 1        | 1
+    2  | 1           | 2013-09-30       2  | 1        | 2
+    3  | 2           | 2013-09-30       3  | 2        | 2
+                                        4  | 3        | 1
+                                        5  | 3        | 3
+    products
+    id | name      | price
+    ---+-----------+-------
+    1  |  Muffin   | 2.99
+    2  |  Smoothie | 3.75     
+    3  |  Coffee   | 3.99
+
+---
+
+# Relationship Diagram
+
+    .terminal
+                                       line_items   
+                   orders              ----------    
+    customers      --------------      id              products
+    ---------      id             <--- order_id        --------
+    id        <--- customer_id         product_id ---> id
+    name           placed_at                           name
+    email                                              price
+
+---
+
+# Denormalization
+
+    .terminal
+                                       line_items   
+                   orders              ----------    
+    customers      --------------      id              products
+    ---------      id             <--- order_id        --------
+    id        <--- customer_id         product_id ---> id
+    name           placed_at           quantity        name
+    email          total_amount        price           price
+
+Some values will change over time, so you might want to denormalize to record the value that time, as is the case with the `price` column on `line_items`
+
+Sometimes even though values can be calculated, it's better to store them for performance reasons to avoid having to calculate them, as is the case with `total_amount` in `orders`
+
+---
+
+class: center, middle
+
+![ERD](img/erd.png)
+
+---
+
+# Creating Tables with Rails
+
+    .terminal
+                                       line_items   
+                   orders              ----------    
+    customers      --------------      id              products
+    ---------      id             <--- order_id        --------
+    id        <--- customer_id         product_id ---> id
+    name           placed_at           quantity        name
+    email          total_amount        price           price
+
+Use Rails Generators
+
+.small[
+
+    .terminal
+    $ rails generate model customer name email
+    $ rails generate model product name price:decimal
+    $ rails generate model order customer:belongs_to placed_at:datetime total_amount:decimal
+    $ rails generate model line_item order:belongs_to product:belongs_to quantity:integer price:decimal
+    $ rake db:migrate
+
+]
+
+---
+
+# Creating Data with Rails
+
+Put this into `db/seeds.rb`
+
+```ruby
+me = Customer.create(name: 'Paul Barry', email: 'mail@paulbarry.com')
+test = Customer.create(name: 'John Doe', email: 'test@example.com')
+Customer.create(name: 'Nowhere Man', email: 'man@nowhere.com')
+
+muffin = Product.create(name: 'Muffin', price: 2.99)
+smoothie = Product.create(name: 'Smoothie', price: 3.75)
+coffee = Product.create(name: 'Coffee', price: 3.99)
+
+order = Order.create(customer: me, placed_at: '2013-09-27')
+LineItem.create(order: order, quantity: 1, product: muffin)
+LineItem.create(order: order, quantity: 1, product: smoothie)
+
+order = Order.create(customer: me, placed_at: Time.current)
+LineItem.create(order: order, quantity: 1, product: smoothie)
+
+order = Order.create(customer: test, placed_at: Time.current)
+LineItem.create(order: order, quantity: 1, product: muffin)
+LineItem.create(order: order, quantity: 1, product: coffee)
+```
+
+---
+
+# Let's Write Some SQL!
+
+Use `rails dbconsole` to bring up the command line client, or use a GUI client
+
+    .terminal
+    $ rails dbconsole
+    psql (9.2.1)
+    Type "help" for help.
+    betastore_development=# help
+    You are using psql, the command-line interface to PostgreSQL.
+    Type:  \copyright for distribution terms
+           \h for help with SQL commands
+           \? for help with psql commands
+           \g or terminate with semicolon to execute query
+           \q to quit
+
+---
+
+# See what a table looks like
+
+Use the `\?` command to get a list of psql commands:
+
+    .terminal
+    betastore_development=# \?
+    ...
+           \d[S+]                 list tables, views, and sequences
+           \d[S+]  NAME           describe table, view, sequence, or index           
+    ...
+
+These are psql-specific commands, other clients and databases have different ones.
+
+See what the **orders** table looks like:
+
+.small[
+
+    .terminal
+    betastore_development=# \d orders;
+                                          Table "public.orders"
+        Column    |            Type             |                      Modifiers
+    --------------+-----------------------------+-----------------------------------------------------
+     id           | integer                     | not null default nextval('orders_id_seq'::regclass)
+     customer_id  | integer                     |
+     placed_at    | timestamp without time zone |
+     total_amount | numeric                     |
+     created_at   | timestamp without time zone |
+     updated_at   | timestamp without time zone |
+    Indexes:
+        "orders_pkey" PRIMARY KEY, btree (id)
+        "index_orders_on_customer_id" btree (customer_id)
+
+]
+
+---
+
+# Queries
+
+Queries are made up of keywords, which I've put in CAPITAL LETTERS in the examples, which is a convention some people follow when writing SQL by hand. The 4 main types are queries are:
+
+1. SELECT - For retrieving data
+
+2. INSERT - For creating new rows
+
+3. UPDATE - For updating existing rows
+
+4. DELETE - For removing rows
+
+---
+
+# Select
+
+`SELECT` queries are used to retrieve data
+
+```sql
+SELECT <column_names> FROM <table_name>
+```
+
+Use a `SELECT` query to get all of the orders
+
+```sql
+SELECT id, customer_id, placed_at FROM orders
+```
+
+Execute the query in `psql`:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at FROM orders;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      1 |           1 | 2013-09-27 00:00:00
+      2 |           1 | 2013-09-30 18:17:46.112671
+      3 |           2 | 2013-09-30 18:17:46.117622
+    (3 rows)
+    betastore_development=# SELECT * FROM orders;
+    ...
+
+You can use `*` in place of column names to get them all
+
+---
+
+# Where
+
+Use the `WHERE` clause to filter the rows that are returned
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders WHERE placed_at > '2013-09-30';
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      2 |           1 | 2013-09-30 18:17:46.112671
+      3 |           2 | 2013-09-30 18:17:46.117622
+    (2 rows)
+    
+A query can be separated on multiple lines and must end with a `;`
+
+---
+
+# Limit
+
+Use `LIMIT` to control how many rows are returned:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders LIMIT 1;
+     id | customer_id |      placed_at
+    ----+-------------+---------------------
+      1 |           1 | 2013-09-27 00:00:00
+    (1 row)
+
+`LIMIT` can be combined with `WHERE`:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders WHERE placed_at > '2013-09-30'
+    betastore_development-# LIMIT 1;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      2 |           1 | 2013-09-30 18:17:46.112671
+    (1 row)
+
+---
+
+# Order
+
+Use `order` to control the order the rows are returned in
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders ORDER BY placed_at desc;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      3 |           2 | 2013-09-30 18:17:46.117622
+      2 |           1 | 2013-09-30 18:17:46.112671
+      1 |           1 | 2013-09-27 00:00:00
+    (3 rows)
+
+The opposite of `desc` is `asc`, but it is the default and can be omitted:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders ORDER BY placed_at;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      1 |           1 | 2013-09-27 00:00:00
+      2 |           1 | 2013-09-30 18:17:46.112671
+      3 |           2 | 2013-09-30 18:17:46.117622
+    (3 rows)
+
+---
+
+# Order
+
+Can also be combined with WHERE and LIMIT:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders WHERE placed_at > '2013-09-30'
+    betastore_development-# ORDER BY placed_at LIMIT 1;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      2 |           1 | 2013-09-30 18:17:46.112671
+    (1 row)
+
+You can order by multiple columns:
+
+    .terminal
+    betastore_development=# SELECT id, customer_id, placed_at
+    betastore_development-# FROM orders ORDER BY customer_id desc, placed_at;
+     id | customer_id |         placed_at
+    ----+-------------+----------------------------
+      3 |           2 | 2013-09-30 18:17:46.117622
+      1 |           1 | 2013-09-27 00:00:00
+      2 |           1 | 2013-09-30 18:17:46.112671
+    (3 rows)
+
+---
+
+# Joins
+
+Each order is related to a customer via the the `customer_id` foreign key:
+
+    .terminal
+                   orders
+    customers      ------
+    ---------      id
+    id        <--- customer_id
+    name           placed_at
+    email
+
+We want to get data from both of these tables in one query:
+
+    .terminal
+    customers                            
+     id |    name      
+    ----+------------  
+      1 | Paul Barry   
+      2 | John Doe     
+      3 | Nowhere Man  
+
+    orders
+     id | customer_id | placed_at 
+    ----+-------------+--------------------
+      1 |           1 | 2013-09-27 00:00:00
+      2 |           1 | 2013-09-30 18:17:46.112671
+      3 |           2 | 2013-09-30 18:17:46.117622
+
+---
+
+# Inner Join
+
+Use `LEFT INNER JOIN` to combine data from multiple tables:
+
+```sql
+SELECT c.id as customer_id,
+       o.id as order_id,
+       c.name as customer_name,
+       o.placed_at as ordered_at
+FROM customers c
+LEFT INNER JOIN orders o on c.id = o.customer_id;
+```
+
+    .terminal
+     customer_id | order_id | customer_name |         ordered_at
+    -------------+----------+---------------+----------------------------
+               1 |        1 | Paul Barry    | 2013-09-27 00:00:00
+               1 |        2 | Paul Barry    | 2013-09-30 18:17:46.112671
+               2 |        3 | John Doe      | 2013-09-30 18:17:46.117622
+    (3 rows)
+
+You can leave `left inner` out because it is the most common and the default
+
+Notice Customer 3, Nowhere Man, is not in the result set
+
+---
+
+# Outer Join
+
+Use `LEFT OUTER JOIN` to include rows where there is no match
+
+```sql
+SELECT c.id as customer_id,
+       o.id as order_id,
+       c.name as customer_name,
+       o.placed_at as ordered_at
+FROM customers c
+LEFT OUTER JOIN orders o on c.id = o.customer_id;
+```
+
+    .terminal
+     customer_id | order_id | customer_name |         ordered_at
+    -------------+----------+---------------+----------------------------
+               1 |        1 | Paul Barry    | 2013-09-27 00:00:00
+               1 |        2 | Paul Barry    | 2013-09-30 18:17:46.112671
+               2 |        3 | John Doe      | 2013-09-30 18:17:46.117622
+               3 |          | Nowhere Man   |
+    (4 rows)
+
+The value `NULL` is returned for all the columns from the orders table when there is no match
+
+---
+
+class: center, middle
+
+![Joins](img/joins.png)
+
+---
+
+# IS NULL
+
+You can use `IS NULL` to filter down the results to only rows where the column is null
+
+```sql
+SELECT c.id as customer_id,
+       c.name as customer_name
+FROM customers c
+LEFT OUTER JOIN orders o on c.id = o.customer_id
+WHERE o.id is null;
+```
+
+In this case, the effect is that we get customers who have not placed an order:
+
+    .terminal
+     customer_id | customer_name
+    -------------+---------------
+               3 | Nowhere Man
+           
+---
+
+# Distinct
+
+Switching back to an inner join we get a row for each order:
+
+```sql
+SELECT c.id as customer_id,
+       c.name as customer_name
+FROM customers c
+JOIN orders o on c.id = o.customer_id;
+```
+
+    .terminal
+     customer_id | customer_name
+    -------------+---------------
+               1 | Paul Barry
+               1 | Paul Barry
+               2 | John Doe
+
+Use `distinct` to eliminate duplicates:
+
+```sql
+SELECT DISTINCT c.id as customer_id,
+       c.name as customer_name
+FROM customers c
+JOIN orders o on c.id = o.customer_id;
+```
+
+    .terminal
+     customer_id | customer_name
+    -------------+---------------
+               2 | John Doe
+               1 | Paul Barry
+
+---
+
+# Count
+
+Use `count(*)` to count how many records match the criteria:
+
+    .terminal
+    betastore_development=# SELECT count(*) FROM orders;
+     count
+    -------
+         3
+    (1 row)
+
+    betastore_development=# SELECT count(*) FROM orders
+    betastore_development-# WHERE placed_at > '2013-09-30';
+     count
+    -------
+         2
+    (1 row)
+
+There are other aggregate functions available like `sum`, `avg`, `min` and `max`:
+
+    .terminal
+    betastore_development=# SELECT count(*), sum(price),
+    betastore_development-# avg(price), min(price), max(price) FROM products;
+     count |  sum  |        avg         | min  | max
+    -------+-------+--------------------+------+------
+         3 | 10.73 | 3.5766666666666667 | 2.99 | 3.99
+    (1 row)
+
+---
+
+# Grouping
+
+Use `GROUP BY` to group rows that have the same value together, useful for aggregate queries, such as this one that will give you the number of orders each customer has placed. 
+
+```sql
+SELECT count(*) as order_count, customer_id
+FROM orders
+GROUP BY customer_id
+ORDER BY order_count desc
+LIMIT 10;
+```
+
+    .terminal
+     order_count | customer_id
+    -------------+-------------
+               2 |           1
+               1 |           2
+    (2 rows)
+
+In this example, `GROUP BY` is combined with `ORDER BY` and `LIMIT` to create a top 10 list, but that isn't necessary, you can use `GROUP BY` by itself if you choose.
+
+---
+
+# Having
+
+If you are looking for all customers with multiple orders, this doesn't work:
+
+```sql
+SELECT count(*) as order_count, customer_id
+FROM orders
+WHERE order_count > 1
+GROUP BY customer_id
+ORDER BY order_count desc;
+```
+
+If you want to filter based on the result of an aggregation, use `HAVING` instead:
+
+```sql
+SELECT count(*) as order_count, customer_id
+FROM orders
+GROUP BY customer_id
+HAVING count(*) > 1
+ORDER BY order_count desc;
+```
+
+You can use a combination of `WHERE` and `HAVING` to get, for example, all customers with multiple orders since 2013-09-30:
+
+```sql
+SELECT count(*) as order_count, customer_id
+FROM orders
+WHERE placed_at > '2013-09-30'
+GROUP BY customer_id
+HAVING count(*) > 1
+ORDER BY order_count desc;
+```
+
+---
+
+# In
+
+You can use `IN` to match multiple values.
+
+```sql
+SELECT *
+FROM products
+WHERE name in ('Muffin', 'Coffee')
+```
+
+This example returns all products named `'Smoothie'` or `'Coffee'`:
+
+    .terminal
+     id |  name  | price |         created_at         |         updated_at
+    ----+--------+-------+----------------------------+----------------------------
+      1 | Muffin |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
+      3 | Coffee |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+
+---
+
+# Like
+
+You can use `LIKE` to do partial string matches, with `%` as the wildcard character:
+
+```sql
+SELECT *
+FROM products
+WHERE name LIKE '%o%';
+```
+
+This example returns all products with an `o` in their name:
+
+    .terminal 
+     id |   name   | price |         created_at         |         updated_at
+    ----+----------+-------+----------------------------+----------------------------
+      2 | Smoothie |  3.75 | 2013-09-30 18:17:46.03724  | 2013-09-30 18:17:46.03724
+      3 | Coffee   |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+
+---
+
+# And
+
+You can combine multiple conditions together to for a WHERE clause with `AND`:
+
+```sql
+SELECT *
+FROM products
+WHERE name LIKE '%o%'
+AND price > 3.75
+```
+
+This example returns all products whose name contains an `o` and have a price greater than 3.75:
+
+    .terminal
+     id |  name  | price |         created_at         |         updated_at
+    ----+--------+-------+----------------------------+----------------------------
+      3 | Coffee |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+
+---
+
+# Or
+
+Similar to `AND`, but only one of the conditions has to be met for the row to be included
+
+```sql
+SELECT *
+FROM products
+WHERE name LIKE '%o%'
+OR price < 3
+```
+
+This example returns all products whose name contains an `o` or have a price less than 3:
+
+    .terminal
+     id |   name   | price |         created_at         |         updated_at
+    ----+----------+-------+----------------------------+----------------------------
+      1 | Muffin   |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
+      2 | Smoothie |  3.75 | 2013-09-30 18:17:46.03724  | 2013-09-30 18:17:46.03724
+      3 | Coffee   |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+
+---
+
+# Nested Conditions
+
+You can combine `AND` and `OR` to build more complex queries. Use parentheses to control the precedence.
+
+```sql
+SELECT *
+FROM products
+WHERE price < 3
+AND (name = 'Muffin' OR name = 'Coffee')
+```
+
+This example returns all products that have a price less than 3 and are named either `Muffin` or `Coffee`:
+
+    .terminal
+     id |  name  | price |         created_at         |         updated_at
+    ----+--------+-------+----------------------------+----------------------------
+      1 | Muffin |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
+
+---
+
+# Subqueries
+
+You can use the results of one query to filter the results of another using a subquery:
+
+```sql
+SELECT *
+FROM customers
+WHERE id in (SELECT customer_id FROM orders)
+```
+
+This example will return all customers who have placed an order:
+
+.small[
+
+    .terminal
+     id |    name    |       email        |         created_at         |         updated_at
+    ----+------------+--------------------+----------------------------+----------------------------
+      1 | Paul Barry | mail@paulbarry.com | 2013-09-30 18:17:45.974852 | 2013-09-30 18:17:45.974852
+      2 | John Doe   | test@example.com   | 2013-09-30 18:17:45.983197 | 2013-09-30 18:17:45.983197
+
+]
+
+Subqueries can often be expressed as a join instead, I recommend that whenever possible
+
+---
+
+# Insert
+
+You can create new record using insert:
+
+```sql
+INSERT INTO customers (name, email, created_at) 
+VALUES ('New Guy', 'new@example.com', now());
+```
+
+You can see the record was created and the id was auto-generated even though we didn't provide a value for it:
+
+    .terminal
+    betastore_development=# select * from customers order by id desc limit 1;
+     id |  name   |      email      |         created_at         | updated_at
+    ----+---------+-----------------+----------------------------+------------
+      4 | New Guy | new@example.com | 2013-09-30 17:44:51.074779 |
+    (1 row)
+
+---
+
+# Update
+
+We can change that record with an UPDATE
+
+```sql
+UPDATE customers
+SET name = 'New Person',
+    updated_at = now()
+WHERE id = 4;
+```
+
+After we run that statement, you can see the record has been updated if you select it again:
+
+.small[
+
+    .terminal
+    betastore_development=# select * from customers order by id desc limit 1;
+     id |    name    |      email      |         created_at         |         updated_at
+    ----+------------+-----------------+----------------------------+----------------------------
+      4 | New Person | new@example.com | 2013-09-30 17:44:51.074779 | 2013-09-30 17:50:55.170811
+    (1 row)
+
+]
+
+---
+
+# Delete
+
+We can remove the record from the database with a DELETE:
+
+```sql
+DELETE FROM customers WHERE id = 4;
+```
+
+Now we can see that the most recent user is back to Nowhere Man:
+
+.small[
+
+    .terminal
+    betastore_development=# select * from customers order by id desc limit 1;
+     id |    name     |      email      |        created_at         |        updated_at
+    ----+-------------+-----------------+---------------------------+---------------------------
+      3 | Nowhere Man | man@nowhere.com | 2013-09-30 19:37:17.41708 | 2013-09-30 19:37:17.41708
+    (1 row)
+
+]
+
+---
+
+# Summary
+
+* Use **SELECT** with **WHERE**, **ORDER**, **LIMIT** to retrieve data
+
+* Use **JOIN** to combine data from multiple tables
+
+* Use **GROUP BY** to aggregate data, **HAVING** to filter results
+
+* Use `count()`, `avg()`, `sum()`, `min()` and `max()`
+
+* Use **INSERT** to create new rows
+
+* Use **UPDATE** to modify existing rows
+
+* Use **DELETE** to remove existing rows
+
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
