@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Controllers</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Controllers
+
+[http://pjb3.me/bewd-controllers](http://pjb3.me/bewd-controllers)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Controllers
+
+Controllers use information from the request, such as the parameters, cookies, headers, etc., to create, retrieve, update or delete data via models and then pass data to the view so an HTML page can be rendered
+
+Controllers go in `app/controllers` in a file that matches the name of the controller. For example, the products controller would go in `app/controllers/products_controller.rb` and look like this:
+
+```ruby
+class ProductsController < ApplicationController
+end
+```
+
+---
+
+# Actions
+
+All public methods of controllers are eligible to be actions, but they can only be called if there is at least one route that exposes the action. An empty action that gets no data and just renders a view would look like this:
+
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+  end
+end
+```
+
+Because the name of the action being called is `index` and the name of the controller is `products`, Rails will render the view at `app/views/products/index.html.erb`. If that file does not exist, you will see a missing template error.
+
+---
+
+# Actions Are Optional, Controllers Are Not
+
+If you have an empty controller like this:
+
+```ruby
+class ProductsController < ApplicationController
+end
+```
+
+And you do have a template at `app/views/products/index.html.erb`, when the router tries to call the index action, it will work by just rendering the view. You don't have to have an action defined if it doesn't do anything.
+
+---
+
+# Making Data Available To Views
+
+All instance variables set in the controller are available to the action. For example, if you set an instance variable like this in the controller:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    @page_title = "Products"
+  end
+end
+```
+
+You can then use it in the view like this:
+
+    .terminal
+    <h1><%= @page_title %></h1>
+
+---
+
+# Layouts
+
+The view for an action is specifically for rendering the main content of the page. You page will be a full HTML document, with a head section and probably some header, navigation and footer than are consistent between all or many different pages. After the main content for the action is rendered, as in the previous example, the layout is then rendered:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Betastore</title>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>
+```
+
+The `<%= yield %>` expression controls where the main content is put in the layout
+
+---
+
+# Layouts
+
+The default layout is in `app/views/layouts/application.html.erb`. You can have a different layout per controller by having a layout that matches the controller name, which would be `app/views/layouts/products.html.erb`. The controller-specific layout takes precedence over the application-specific layout, if the controller-specific layout exists.
+
+You can also have any specific action use a custom layout:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    @page_title = "Products"
+    render layout: 'whatever'
+  end
+end
+```
+
+This would use `app/views/layouts/whatever.html.erb` for the layout. You can set the custom layout at the controller level as well:
+
+```ruby
+class ProductsController < ApplicationController
+  layout 'whatever'
+  
+  def index
+    @page_title = "Products"
+  end
+end
+```
+
+---
+
+# Excluding The Layout
+
+If you would rather not use a layout, you can set the layout to false:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    @page_title = "Products"
+    render layout: false
+  end
+end
+```
+
+And only the result of the rendering the view will be returned. You can specific this at the controller level as well:
+
+```ruby
+class ProductsController < ApplicationController
+  layout false
+  
+  def index
+    @page_title = "Products"
+  end
+end
+```
+
+---
+
+# Conditionally Excluding The Layout
+
+You might want to use the layout depending on some attribute of the request. A common technique is to not use a layout on AJAX requests. You can do that like this:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    @page_title = "Products"
+    render layout: request.xhr?
+  end
+end
+```
+
+`xhr?` returns true if it is an XMLHttpRequest, which is the case when making an AJAX request. At the controller level, you can use a symbol to indicate that a method should be called to check to see if a layout should be used:
+
+```ruby
+class ProductsController < ApplicationController
+  layout :use_layout?
+  
+  def index
+    @page_title = "Products"
+  end
+  
+  private
+  def use_layout?
+    !request.xhr?
+  end
+end
+```
+
+---
+
+# Logging
+
+When working with controller, you may want to print some things out to see what it going on. You do that via the logger. The logger has 4 levels and a method that corresponds to each level.  Here's an example of a controller using all for levels:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    logger.debug "You will only see this message in development"
+    logger.info "You will see this message in development and production"
+    logger.warn "This means there could be a problem"
+    logger.error "This means there is a problem"
+  end
+end
+```
+
+---
+
+# Environment
+
+When you run your Rails application on your computer to do development, the application runs in a different mode called **development** that configures things appropriately for development, such as auto-reloading code when it changes and showing debug log messages. 
+
+When your application runs on a production server like at Heroku, it runs in **production** mode, which does not automatically load changes to improve performance and does not log debug messages that could unnecessarily fill up log files.
+
+You can check while your programming is running which `environment` it is using:
+
+    .terminal
+    $ rails c
+    Rails.env
+    Loading development environment (Rails 4.0.0)
+    >> Rails.env
+    => "development"
+    >> Rails.env.development?
+    => true
+    >> Rails.env.production?
+    => false
+
+---
+
+# Parameters
+
+Controllers have access to a Hash called `params` which has values that allow the action to respond differently based on the way it was called. you can access it from a controller action simply by calling `params`.
+
+In the simplest case, the params hash will only have the name of the controller and the action being called. An action like this:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    logger.debug "PARAMS: #{params.inspect}"
+  end
+end
+```
+
+Will log a message that looks like this:
+
+    .terminal
+    PARAMS: {"action"=>"index", "controller"=>"products"}
+
+---
+
+# Using Symbols To Access Parameters
+
+One important thing to know about the params Hash is that it the keys look like Strings, and they are, but you can also access them using symbols. This:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    logger.debug "CONTROLLER: " + params[:controller]
+    logger.debug "ACTION: " + params[:action]
+    logger.debug "PARAMS CLASS: " + params.class.name
+  end
+end
+```
+
+Will log this:
+
+    .terminal
+    CONTROLLER: products
+    ACTION: index
+    PARAMS CLASS: ActionController::Parameters
+    
+The important things to note are that accessing the values of this Hash using symbols worked and the reason why is because `params` is not a Hash, it is a `ActionController::Parameters`
+
+---
+
+# HashWithIndifferentAccess
+
+If you look at the ancestors of `ActionController::Parameters` in a rails console:
+
+    .terminal
+    >> puts ActionController::Parameters.ancestors
+    ActionController::Parameters
+    ActiveSupport::HashWithIndifferentAccess
+    Hash
+    ...
+
+You can see that it is a subclass of `Hash` called `HashWithIndifferentAccess` and it provides the special behavior that allows you to access the value for a `String` key using a `Symbol`. The normal Ruby `Hash` does not allow that.
+
+---
+
+# Query String Parameters
+
+If we restore our controller to just printing the params hash:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    logger.debug "PARAMS: #{params.inspect}"
+  end
+end
+```
+
+and bring up the URL http://localhost:3000/products?ref=test in our browser, we will see this in the server output:
+
+    .terminal
+      Parameters: {"ref"=>"test"}
+    PARAMS: {"ref"=>"test", "action"=>"index", "controller"=>"products"}
+
+So here we can see two things. First, if we have more than just a controller and an action in our params, Rails automatically logs the parameters for us, so we can remove our code that does it manually.
+
+Second, when we pass parameters via the query string, they are added to the parameters automatically by Rails.
+
+---
+
+# Multiple Query String Parameters
+
+You can pass multiple parameters in the query string separated by an `&`.  Accessing http://localhost:3000/products?ref=test&src=whatever results in these parameters in our action:
+
+    .terminal
+    {"ref"=>"test", "src"=>"whatever"}
+
+Query string parameters cannot have special characters in them like `=`, `&`, `'` or spaces. If you want to use those, you must URL encode the value. Rails can automatically do that for you when generating a link with query string parameters.
+
+---
+
+# Redirect
+
+A redirect is something the controller can do when you want to tell the browser to load another page instead of rendering an HTML page. You do this in a Rails app by using redirect_to.
+
+If you want, you can redirect_to the same controller and action with different parameters, like this:
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    if params[:status].blank?
+      redirect_to url_for(:status => "Paul's status is 2 + 2 = 4")
+    else
+      logger.debug "STATUS: #{params[:status]}"
+      @page_title = "Products"
+    end
+  end
+end
+```
+
+If you visit http://localhost:3000/products in your browser, you will see that you are redirected to http://localhost:3000/products?status=Paul%27s+status+is+2+%2B+2+%3D+4
+
+Then you will see this in your log:
+
+    .terminal
+    STATUS: Paul's status is 2 + 2 = 4
+
+You can see what a URL encoded query string parameter value looks like and also that Rails takes care of automatically decoding it for you, because it is logged in the decoded format.
+
+---
+
+# Before Filters
+
+Before filters usually go hand in hand redirects. Having conditional logic in our action, as we did in the previous example is messy. We can refactor our previous example to look like this:
+
+```ruby
+class ProductsController < ApplicationController
+  before_filter :set_default_status
+
+  def index
+    logger.debug "STATUS: #{params[:status]}"
+    @page_title = "Products"
+  end
+  
+  private
+  def set_default_status
+    if params[:status].blank?
+      redirect_to url_for(:status => "Paul's status is 2 + 2 = 4")
+    end
+  end
+end
+```
+
+In this example, the line that starts with `before_filter` tells our controller that we want to call a method before the action is called. In this case, the method is named `set_default_status`.
+
+In the `set_default_status` method, we do a redirect if there is no status parameters. If a before filter does a redirect, rails knows not to call the action, but instead instruct the browser to redirect, which results in a new request. If the before filter does not do a redirect, then the action is called.
+
+---
+
+# Inheritance
+
+Controllers are just Ruby classes and therefore they make use of inheritance. Your Rails app comes with a controller named `ApplicationController` in `app/controllers/application_controller.rb` that all of your controllers should be a subclass of. This gives you a place to put site-wide behavior.
+
+We are going to take advantage of this to implement authentication into our application.
+
+---
+
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
