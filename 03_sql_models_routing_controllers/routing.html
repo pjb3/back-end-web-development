@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Routing & REST</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Routing & REST
+
+[http://pjb3.me/bewd-routing](http://pjb3.me/bewd-routing)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Routing
+
+For each incoming request, the router determines the appropriate controller action to handle the request
+
+For example, if an HTTP request looks like this:
+
+    .terminal
+    GET /orders
+    
+If would match a route like this:
+
+```ruby
+get '/orders' => 'orders#index'
+```
+
+This means if the HTTP method of the request is a GET, which it is, and the path is `/orders`, which it is, then the request should be handled by instantiating the `OrdersController` and calling the `index` method.
+
+```ruby
+class OrdersController < ApplicationController
+  def index
+    # Do Something
+  end
+end
+```
+
+---
+
+# Matching Routes
+
+Routes are defined in an order. The routers checks each route in order until it finds one that matches. Once if finds a match, it stops checking routes, instantiates the controller and calls the method that matches the action.
+
+If the routes look like this:
+
+```ruby
+get '/subscriptions' => 'subscriptions#index'
+post '/orders' => 'orders#create'
+get '/orders' => 'orders#index'
+root :to => 'site#index'
+```
+
+If the request is an HTTP GET with the path of `/orders`, the router does the following steps:
+
+1. Is the request a GET? Yes, then is the path `/subscriptions`? No, try the next route
+2. Is the request a POST? No, try the next route
+3. Is the request a GET? Yes, then is the path `/subscriptions`? Yes, instantiate `OrdersController` and call `index`
+
+The last route isn't checked
+
+Multiple routes could match a request, the first match is the one that is used
+
+---
+
+# Variables in paths
+
+You can define a route which has a placeholder for any value, which looks like this:
+
+```ruby
+get '/orders/:id' => 'orders#show'
+```
+
+The means that if the request has a URL that starts with `/orders/` followed by anything, it will match.
+
+For example, `/orders/1` matches, so does `/orders/hello`. The value that matches the id part of the route, which are `"1"` and `"hello"` in this case, are stored in a parameter that the controller will be able to access.
+
+FYI, `/orders` does not match this route, 
+
+---
+
+# Optional variables in paths
+
+If you surround the variable part of a route with parentheses, that means that part is optional:
+
+```ruby
+get '/orders/(:id)' => 'orders#show`
+```
+
+This means a request will match this route even if the path doesn't have an id, it will match
+
+So `/orders` does match this route
+
+---
+
+# Named Routes
+
+You can give routes a name:
+
+```ruby
+get '/orders' => 'orders#index', as: 'orders'
+```
+
+This means that in our code, controller, view, etc., we can construct a URL that will match this route by calling the method `orders_path`
+
+---
+
+# RESTful Design
+
+Representational State Transfer (REST) is a design pattern that states that you should design of your web application as an application that exposes resources to its clients in the form of URLs and allows those clients to interact with those resources using standard the HTTP verbs:
+
+* **GET** - Retrieve the current state of the resource
+
+* **POST** - Create a new resource
+
+* **PUT** - Replace a resource
+
+* **PATCH** - Partially update a resource
+
+* **DELETE** - Remove a resource
+
+Rails fits this pattern in spirit, if not by strict detail, therefore this Rails apps are often referred to as RESTful
+
+---
+
+# Types of Resources
+
+In Rails applications, the two main types of resources are **collections** and **members**. One controller typically handles all actions related to a collection resource and all members of that collection.
+
+The 7 routes for a RESTful controller typically are:
+
+```ruby
+   get '/orders'          => 'orders#index', as: 'orders'
+  post '/orders'          => 'orders#create'
+   get '/orders/new'      => 'orders#new',   as: 'new_order'
+   get '/orders/:id/edit' => 'orders#edit',  as: 'edit_order'
+   get '/orders/:id'      => 'orders#show',  as: 'order'
+ patch '/orders/:id'      => 'orders#update'
+delete '/orders/:id'      => 'orders#destroy
+```
+
+Previous to Rails 4, `put` was commonly used for update
+
+---
+
+# Role of RESTful Actions
+
+    .terminal
+      index - Show the list of all orders
+       show - Show the details for a order
+        new - Show the form to create a new order
+     create - Create the new order
+       edit - Show the form to edit an existing order
+     update - Update an existing order
+    destroy - Remove an existing order 
+
+Not every controller will allow for all of these actions, but most actions will map to one of these actions
+
+If you are naming an action anything other than `index`, `show`, `new`, `create`, `edit`, `update` or `destroy`, you should consider if you could alter your design so that you could use one of the standard names
+
+Adhering to this pattern as much as possible is a very useful design tool
+
+---
+
+# Non-RESTful Example
+
+Say you have your RESTful controller for orders:
+
+```ruby
+   get '/orders'          => 'orders#index', as: 'orders'
+  post '/orders'          => 'orders#create'
+   get '/orders/new'      => 'orders#new',   as: 'new_order'
+   get '/orders/edit/:id' => 'orders#edit',  as: 'edit_order'
+   get '/orders/:id'      => 'orders#show',  as: 'order'
+ patch '/orders/:id'      => 'orders#update'
+delete '/orders/:id'      => 'orders#destroy
+```
+
+This is very nice and RESTful. In your application, say that customers are allowed to cancel an order up until it is shipped, but once it has shipped, they must get a refund. You might implement this by just starting to tack some actions onto your orders controller:
+
+```ruby
+   get '/orders/refund'      => 'orders#refund_status', as: 'refund_status'
+  post '/orders/refund'      => 'orders#create_refund'
+```
+
+This design leads down the path of controllers with many actions and it harder to understand and test
+
+---
+
+# RESTful Example
+
+Instead of thinking of a refund as a modification to an order, think of refunds as a resource itself:
+
+```ruby
+   get '/refunds'          => 'refunds#index',  as: 'refunds'
+  post '/refunds'          => 'refunds#create'
+   get '/refunds/new'      => 'refunds#new',    as: 'new_refund'
+   get '/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
+   get '/refunds/:id'      => 'refunds#show',   as: 'refund'
+ patch '/refunds/:id'      => 'refunds#update'
+delete '/refunds/:id'      => 'refunds#destroy'
+```
+
+This is a nice design that allows us to add extra information to refund is necessary and keeps it separate from the order
+
+---
+
+# Nested Resources
+
+We haven't created the model for the Refund yet, but you can imagine at a minimum that it would belong to an Order. A Refund without an Order doesn't make any sense.
+
+For this type of situation, Rails allows us to use nested routes to include which order the refund is for in the route. That looks like this:
+
+```ruby
+   get '/orders/:order_id/refunds'          => 'refunds#index',  as: 'refunds'
+  post '/orders/:order_id/refunds'          => 'refunds#create'
+   get '/orders/:order_id/refunds/new'      => 'refunds#new',    as: 'new_refund'
+   get '/orders/:order_id/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
+   get '/orders/:order_id/refunds/:id'      => 'refunds#show',   as: 'refund'
+ patch '/orders/:order_id/refunds/:id'      => 'refunds#update'
+delete '/orders/:order_id/refunds/:id'      => 'refunds#destroy'
+```
+
+---
+
+# Singular Resources
+
+This design allows for multiple refunds per order, but that doesn't make sense, an order can only have one refund. To support this, we can switch our design to a singular resource, that looks like this:
+
+```ruby
+  post '/orders/:order_id/refund'      => 'refunds#create'
+   get '/orders/:order_id/refund/new'  => 'refunds#new',    as: 'new_refund'
+   get '/orders/:order_id/refund/edit' => 'refunds#edit',   as: 'edit_refund'
+   get '/orders/:order_id/refund'      => 'refunds#show',   as: 'refund'
+ patch '/orders/:order_id/refund'      => 'refunds#update'
+delete '/orders/:order_id/refund'      => 'refunds#destroy'
+```
+
+Notice that the refund ids are no longer needed, but once we know which order we are dealing with, we know which refund we are dealing with
+
+---
+
+# resources
+
+Have you noticed we've been doing a lot of typing for these routes? Well it turns out that since this pattern is baked into rails, there is support for automatically generating all of these routes.
+
+First, for our orders resource, the full routes look like this:
+
+```ruby
+   get '/orders'          => 'orders#index', as: 'orders'
+  post '/orders'          => 'orders#create'
+   get '/orders/new'      => 'orders#new',   as: 'new_order'
+   get '/orders/:id/edit' => 'orders#edit',  as: 'edit_order'
+   get '/orders/:id'      => 'orders#show',  as: 'order'
+ patch '/orders/:id'      => 'orders#update'
+delete '/orders/:id'      => 'orders#destroy
+```
+
+But we can abbreviate that to just:
+
+```ruby
+resources :orders
+```
+
+That's a lot shorter and a lot more typo-proof as well
+
+---
+
+# Partial Resources
+
+You application isn't going to allow users to do everything to every resource. For example, for an e-commerce store, it would not make sense for customers to be able to create, update or delete products.
+
+You can limit which routes are defined when using `resources` by using the `only` option:
+
+reous
+
+---
+
+# Nested Resources
+
+To handle our refund, first if we were doing the original version of refund where we could have multiple refunds per order, if you recall those routes looked like this:
+
+```ruby
+   get '/orders/:order_id/refunds'          => 'refunds#index',  as: 'refunds'
+  post '/orders/:order_id/refunds'          => 'refunds#create'
+   get '/orders/:order_id/refunds/new'      => 'refunds#new',    as: 'new_refund'
+   get '/orders/:order_id/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
+   get '/orders/:order_id/refunds/:id'      => 'refunds#show',   as: 'refund'
+ patch '/orders/:order_id/refunds/:id'      => 'refunds#update'
+delete '/orders/:order_id/refunds/:id'      => 'refunds#destroy'
+```
+
+We can shorten that to:
+
+```ruby
+resources :orders do
+  resources :refunds
+end
+```
+
+---
+
+# Nested Singular Resource
+
+Now to switch our refund resource to be a singular resource that only allows for one refund per order, where we had routes like this:
+
+```ruby
+  post '/orders/:order_id/refund'      => 'refunds#create'
+   get '/orders/:order_id/refund/new'  => 'refunds#new',    as: 'new_refund'
+   get '/orders/:order_id/refund/edit' => 'refunds#edit',   as: 'edit_refund'
+   get '/orders/:order_id/refund'      => 'refunds#show',   as: 'refund'
+ patch '/orders/:order_id/refund'      => 'refunds#update'
+delete '/orders/:order_id/refund'      => 'refunds#destroy'
+```
+
+We simply change the route to use `resource` (singular) instead of `resources` (plural)
+
+```ruby
+resources :orders do
+  resource :refund
+end
+```
+
+Note that the controller name is still the plural form `RefundsController`, which is the convention in Rails. The controller name is always plural even if the route is singular.
+
+---
+
+# Summary
+
+Make your design as RESTful as possible
+
+## More Info
+
+[http://guides.rubyonrails.org/routing.html](http://guides.rubyonrails.org/routing.html)
+
+## Good Cheat Sheet - Print this out!
+
+[http://envylabs.com/uploads/Rails_3_Cheat_Sheets.pdf](http://envylabs.com/uploads/Rails_3_Cheat_Sheets.pdf)
+
+---
+
+# Homework
+
+Add the Refund model, which belongs to Order and Order has one refund
+
+Define the routes to allow the application to:
+
+* list products
+* view product details
+* place an order
+* edit an order
+* list your orders
+* view order details
+* cancel an order
+* create a refund for an order
+* view the status of a refund
+
+---
+
+# Routes
+
+Check the output of `rake routes` to verify the routes looks like this:
+
+.small[
+
+    .terminal
+               Prefix Verb   URI Pattern                             Controller#Action
+             products GET    /products(.:format)                     products#index
+              product GET    /products/:id(.:format)                 products#show
+        subscriptions POST   /subscriptions(.:format)                subscriptions#create
+     new_subscription GET    /subscriptions/new(.:format)            subscriptions#new
+         subscription GET    /subscriptions/:id(.:format)            subscriptions#show
+         order_refund POST   /orders/:order_id/refund(.:format)      refunds#create
+     new_order_refund GET    /orders/:order_id/refund/new(.:format)  refunds#new
+    edit_order_refund GET    /orders/:order_id/refund/edit(.:format) refunds#edit
+                      GET    /orders/:order_id/refund(.:format)      refunds#show
+                      PATCH  /orders/:order_id/refund(.:format)      refunds#update
+                      PUT    /orders/:order_id/refund(.:format)      refunds#update
+                      DELETE /orders/:order_id/refund(.:format)      refunds#destroy
+               orders GET    /orders(.:format)                       orders#index
+                      POST   /orders(.:format)                       orders#create
+            new_order GET    /orders/new(.:format)                   orders#new
+           edit_order GET    /orders/:id/edit(.:format)              orders#edit
+                order GET    /orders/:id(.:format)                   orders#show
+                      PATCH  /orders/:id(.:format)                   orders#update
+                      PUT    /orders/:id(.:format)                   orders#update
+                      DELETE /orders/:id(.:format)                   orders#destroy
+                 root GET    /                                       subscriptions#new
+
+]
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
