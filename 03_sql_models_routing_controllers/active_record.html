@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ActiveRecord</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Active Record
+
+![Clean Data](img/clean_data.png)
+
+[http://pjb3.me/bewd-ar](http://pjb3.me/bewd-ar)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Active Record
+
+Active Record is the framework in Rails for mapping ruby objects to tables in your RDBMS, therefore it is called an Object-Relational Mapper, or ORM for short.
+
+**Active Record writes SQL so you don't have to**
+
+---
+
+# Migrations
+
+Migrations are Ruby code that modifies your database schema.
+
+Migrations generate Data-Definition Language (DDL) SQL statements like `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`, etc.
+
+    .terminal
+    $ ls -1 db/migrate/*.rb
+    db/migrate/20130923234940_create_subscriptions.rb
+    db/migrate/20130930181500_create_customers.rb
+    db/migrate/20130930181506_create_products.rb
+    db/migrate/20130930181521_create_line_items.rb
+    db/migrate/20130930181618_create_orders.rb
+
+These are generated for us when we generate a model
+
+The timestamps are used to force the migrations to be run in order
+
+---
+
+# Create Table
+
+A migration that creates a table looks like this:
+
+```ruby
+class CreateSubscriptions < ActiveRecord::Migration
+  def change
+    create_table :subscriptions do |t|
+      t.string :email
+
+      t.timestamps
+    end
+  end
+end
+```
+
+The specific SQL used to create tables differs between RDBMSs (Postgres, MySQL, SQLite, etc.)
+
+Active Record migration provide a Ruby Domain-Specific Language (DSL) that allows you to not have to worry about differences between RDBMSs
+
+---
+
+# Modify A Table
+
+If you want to change a table that you have already created, you can generate a migration like this:
+
+    .terminal
+    $ rails generate migration add_zip_code_to_customers zip_code
+          invoke  active_record
+          create    db/migrate/20130930231835_add_zip_code_to_customers.rb
+
+and it will generate this:
+
+```ruby
+class AddZipCodeToCustomers < ActiveRecord::Migration
+  def change
+    add_column :customers, :zip_code, :string
+  end
+end
+```
+
+You run your migrations with
+
+    .terminal
+    $ rake db:migrate
+
+---
+
+# Models
+
+Models generate Data-Manipulation Language (DML) SQL statements, such as `SELECT`, `INSERT`, `UPDATE` and `DELETE`.
+
+There is one `ActiveRecord::Base` subclass per table. In our app now, the models are:
+
+    .terminal
+    $ ls -1 app/models/*.rb
+    app/models/customer.rb
+    app/models/line_item.rb
+    app/models/order.rb
+    app/models/product.rb
+    app/models/subscription.rb
+
+And the tables are:
+    
+    .terminal
+     Schema |       Name        | Type  |  Owner
+    --------+-------------------+-------+----------
+     public | customers         | table | postgres
+     public | line_items        | table | postgres
+     public | orders            | table | postgres
+     public | products          | table | postgres
+     public | schema_migrations | table | postgres
+     public | subscriptions     | table | postgres
+
+The `schema_migrations` table is used to keep track of which migrations have been run
+
+---
+
+# Defining an Active Record Model
+
+`app/models/subscription.rb`
+
+```ruby
+class Subscription < ActiveRecord::Base
+end
+```
+
+All we have to do is subclass `ActiveRecord::Base` and we've got a model that can do a lot for us
+
+---
+
+# Finding Records
+
+.small[
+
+    .terminal
+    $ rails console
+
+    >> subscription = Subscription.first
+      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions" 
+      ORDER BY "subscriptions"."id" ASC LIMIT 1
+    => #<Subscription id: 1, email: "test@example.com", 
+           created_at: "2013-10-01 00:27:54", updated_at: "2013-10-01 00:27:54">
+]
+
+The `first` class method returns the first Subscription created
+
+---
+
+# HIRB
+
+Make your terminal output a little easier to read, add this to `Gemfile`
+
+```ruby
+group :development do
+  gem 'hirb'
+end
+```
+
+Run `bundle` to get the gem
+
+    .terminal
+    $ bundle
+
+Modify your `~/.irbrc` to enable HIRB:
+
+    .terminal
+    echo 'begin; require "hirb"; Hirb::View.enable; rescue; end' >> ~/.irbrc
+
+The output looks like a table, which is easier to read
+
+    .terminal
+    $ rails c
+    Loading development environment (Rails 4.0.0)
+    >> Subscription.first
+      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions" 
+      ORDER BY "subscriptions"."id" ASC LIMIT 1
+    +----+------------------+-------------------------+-------------------------+
+    | id | email            | created_at              | updated_at              |
+    +----+------------------+-------------------------+-------------------------+
+    | 1  | test@example.com | 2013-10-01 00:27:54 UTC | 2013-10-01 00:27:54 UTC |
+    +----+------------------+-------------------------+-------------------------+
+
+---
+
+# Using Active Record Objects
+
+    .terminal
+    >> subscription = Subscription.first
+
+The subscription objects have methods that map to the columns of the table
+
+    .terminal
+    >> subscription.email
+    => "test@example.com"
+
+You can modify the database record by changing the state of the object
+
+    .terminal
+    >> subscription.email = "something.else@example.com"
+    => "something.else@example.com"
+
+And calling `save` to persist the changes to the database    
+
+    .terminal
+    >> subscription.save
+       (0.5ms)  BEGIN
+      SQL (9.3ms)  UPDATE "subscriptions" SET "email" = $1, "updated_at" = $2 
+      WHERE "subscriptions"."id" = 1  [["email", "something.else@example.com"], 
+      ["updated_at", Tue, 01 Oct 2013 00:51:23 UTC +00:00]]
+       (4.6ms)  COMMIT
+    => true
+
+---
+
+# How does it work?
+
+If the definition of the model looks like this:
+
+```ruby
+class Subscription < ActiveRecord::Base
+end
+```
+
+Where do the methods like `email` come from?
+
+---
+
+# Table Name
+
+The table name is determined by pluralizing the model's class name
+
+    .terminal
+    >> Subscription.name.pluralize.downcase
+    => "subscriptions"
+
+That is used to generate the SQL to get the data:
+
+```sql
+SELECT * FROM subscriptions
+```
+
+---
+
+# Method Missing
+
+If you try to call a method on an Object that does not exist, `method_missing` is called:
+
+```ruby
+class Thing
+  def method_missing(name, *args)
+    puts "Tried to call #{name} with the arguments #{args.inspect}"
+  end
+end
+```
+
+    .terminal
+    >> thing = Thing.new
+    => #<Thing:0x007f92ecce0ff0>
+    >> thing.whoops
+    Tried to call whoops with the arguments []
+    => nil
+    >> thing.whoops = 'hello'
+    Tried to call whoops= with the arguments ["hello"]
+    => "hello"
+
+---
+
+# Define Method
+
+You can define a method on an object while your program is running:
+
+    .terminal
+    >> Thing.send(:define_method, :whoops){ @whoops }
+    => #<Proc:0x007f92ecd09ef0@(irb):19 (lambda)>
+    >> Thing.send(:define_method, :whoops=){|w| @whoops = w }
+    => #<Proc:0x007f92ecd1b650@(irb):20 (lambda)>
+
+We must use `send` because `define_method` is private
+
+Now we can call whoops without hitting `method_missing`
+
+    .terminal
+    >> thing.whoops = 'hello'
+    => "hello"
+    >> thing.whoops
+    => "hello"
+
+---
+
+# Columns
+
+You can query the database (DDL) to ask what columns a table has:
+
+    .terminal
+    >> Subscription.column_names
+    => ["id", "email", "created_at", "updated_at"]
+
+---
+
+# Pulling It Together
+
+When a method is called on an instance of an ActiveRecord::Base object, if the table has a column that matches the name of the method being called, then define the method for that object and then call it
+
+```ruby
+class MyActiveRecord
+  def method_missing(name, *args)
+    if args.length == 0 && self.class.column_names.include?(name)
+      self.class.send(:define_method, name) do
+        instance_variable_get("@#{name}")
+      end
+      send(name)
+    elsif args.length == 1 && 
+          self.class.column_names.include?(name.to_s.sub(/=$/,'').to_sym)
+      self.class.send(:define_method, name) do |arg|
+        instance_variable_set("@#{name.to_s.sub(/=$/,'')}", arg)
+      end
+      send(name, args.first)
+    else
+      super
+    end
+  end
+end
+
+class Thing < MyActiveRecord
+  def self.column_names
+    [:whoops] # Real method would query the database
+  end
+end```
+
+---
+
+# What it means
+
+It's as of all subclasses of `ActiveRecord::Base` have a reader and a writer that match the name of each column in the database. So if you have a table like this:
+
+    .terminal
+    subscriptions
+    +----+------------------+-------------------------+-------------------------+
+    | id | email            | created_at              | updated_at              |
+    +----+------------------+-------------------------+-------------------------+
+    | 1  | test@example.com | 2013-10-01 00:27:54 UTC | 2013-10-01 00:27:54 UTC |
+    +----+------------------+-------------------------+-------------------------+
+
+You can think of your model as if it looked like this:
+
+```ruby
+class Subscription < ActiveRecord::Base
+  attr_accessor :id, :email, :created_at, :updated_at
+end
+```
+
+---
+
+# Retrieving Instances
+
+There are several ActiveRecord::Base class methods that allow you retrieve instances
+
+* find
+* find_by
+* first
+* last
+
+---
+
+# find
+
+If you pass an id to the `find` class method, you get an instance of  `Product` that matches that ID
+
+    .terminal
+    >> product = Product.find(1)
+      Product Load (3.7ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."id" = $1 LIMIT 1  [["id", 1]]
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+    >> product.class
+    => Product(id: integer, name: string, price: decimal, ...
+
+If you pass an Array of ids to the `find` class method, you get an Array of `Product` instances
+
+    .terminal
+    >> Product.find([1,2])
+      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."id" IN (1, 2)
+    +----+----------+-------+-------------------------+-------------------------+
+    | id | name     | price | created_at              | updated_at              |
+    +----+----------+-------+-------------------------+-------------------------+
+    | 1  | Muffin   | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    | 2  | Smoothie | 3.75  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+----------+-------+-------------------------+-------------------------+
+    >> products.class
+    => Array
+
+---
+
+# find_by
+
+The `find_by` class method accepts a Hash of columns and value to match:
+
+    .terminal
+    >> product = Product.find_by(name: 'Muffin')
+      Product Load (4.6ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."name" = 'Muffin' LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+    >> product.class
+    => Product(id: integer, name: string, price: decimal, ...
+
+Like `find`, `find_by` returns an instance of `Product`
+
+You can pass multiple column/value pairs:
+
+    .terminal
+    >> product = Product.find_by(name: 'Muffin', price: 2.99)
+      Product Load (2.9ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."name" = 'Muffin' AND "products"."price" = 2.99 LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# first
+
+Get the first object created
+
+    .terminal
+    >> Product.first
+      Product Load (0.5ms)  SELECT "products".* FROM "products" 
+      ORDER BY "products"."id" ASC LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+# last
+
+Get the most recently created object
+
+    .terminal
+    >> Product.last
+      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      ORDER BY "products"."id" DESC LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 3  | Coffee | 3.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# Querying
+
+There are several methods that return an `ActiveRelation::Relation`
+
+* where
+* limit
+* order
+* includes
+* joins
+
+---
+
+# Where
+
+Adds a where clause in the query
+
+    .terminal
+    >> Product.where(name: 'Muffin')
+      Product Load (0.9ms)  SELECT "products".* FROM "products"
+      WHERE "products"."name" = 'Muffin'
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# Where
+
+Use multiple arguments for conditions besides equals
+
+    .terminal
+    >> Product.where("name like ? AND price > ?", '%o%', 3)
+      Product Load (4.4ms)  SELECT "products".* FROM "products" 
+      WHERE (name like '%o%' AND price > 3)
+    +----+----------+-------+-------------------------+-------------------------+
+    | id | name     | price | created_at              | updated_at              |
+    +----+----------+-------+-------------------------+-------------------------+
+    | 2  | Smoothie | 3.75  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    | 3  | Coffee   | 3.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+----------+-------+-------------------------+-------------------------+
+
+Each `?` is replaced with the subsequent value from the arguments
+
+---
+
+# Limit
+
+Adds a limit clause to the query
+
+    .terminal
+    >> Product.limit(1)
+      Product Load (0.8ms)  SELECT "products".* FROM "products" LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# Order
+
+Adds an order by to the query
+
+    .terminal
+    >> Product.order('name')
+      Product Load (1.3ms)  SELECT "products".* FROM "products" ORDER BY name
+    +----+----------+-------+-------------------------+-------------------------+
+    | id | name     | price | created_at              | updated_at              |
+    +----+----------+-------+-------------------------+-------------------------+
+    | 3  | Coffee   | 3.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    | 1  | Muffin   | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    | 2  | Smoothie | 3.75  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+----------+-------+-------------------------+-------------------------+
+
+---
+
+# Includes
+
+Creates a second query to load related objects
+
+    .terminal
+    >> Order.includes(:customer)
+      Order Load (0.9ms)  SELECT "orders".* FROM "orders"
+      Customer Load (1.5ms)  SELECT "customers".* FROM "customers" 
+      WHERE "customers"."id" IN (1, 2)
+    +----+-------------+-------------------------+--------------+
+    | id | customer_id | placed_at               | total_amount |
+    +----+-------------+-------------------------+--------------+
+    | 1  | 1           | 2013-09-27 00:00:00 UTC |              |
+    | 2  | 1           | 2013-09-30 18:17:46 UTC |              |
+    | 3  | 2           | 2013-09-30 18:17:46 UTC |              |
+    +----+-------------+-------------------------+--------------+
+
+---
+
+# Joins
+
+Adds an inner join to the query
+
+    .terminal
+    >> Order.joins(:customer)
+      Order Load (0.7ms)  SELECT "orders".* FROM "orders" 
+      INNER JOIN "customers" ON "customers"."id" = "orders"."customer_id"
+    +----+-------------+-------------------------+--------------+
+    | id | customer_id | placed_at               | total_amount |
+    +----+-------------+-------------------------+--------------+
+    | 1  | 1           | 2013-09-27 00:00:00 UTC |              |
+    | 2  | 1           | 2013-09-30 18:17:46 UTC |              |
+    | 3  | 2           | 2013-09-30 18:17:46 UTC |              |
+    +----+-------------+-------------------------+--------------+
+
+---
+
+# Relation
+
+No query is executed when the relation is created
+
+    .terminal
+    >> relation = Product.where(name: 'Muffin'); nil
+    => nil
+
+Returning nil from the expression in IRB prevents the query from being executed
+
+    .terminal
+    >> relation.class
+    => ActiveRecord::Relation::ActiveRecord_Relation_Product
+
+When you try to "use" the relation as an Array, the query is then executed
+
+    .terminal
+    >> relation
+      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."name" = 'Muffin'
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# Chaining
+
+This allows you to combine methods into a single query
+
+    .terminal
+    >> Product.where('price > 3').order('name desc').limit(1)
+      Product Load (5.1ms)  SELECT "products".* FROM "products" 
+      WHERE (price > 3) ORDER BY name desc LIMIT 1
+    +----+----------+-------+-------------------------+-------------------------+
+    | id | name     | price | created_at              | updated_at              |
+    +----+----------+-------+-------------------------+-------------------------+
+    | 2  | Smoothie | 3.75  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+----------+-------+-------------------------+-------------------------+
+
+Only works on methods that return a relation:
+
+    .terminal
+    >> Product.first.order('name')
+      Product Load (9.9ms)  SELECT "products".* FROM "products" 
+      ORDER BY "products"."id" ASC LIMIT 1
+    NoMethodError: undefined method `order' for #<Product:0x007f9cdc3110c0>
+
+Works if you call `find`, `find_by`, `first` or `last` on a relation:
+
+    .terminal
+    >> Product.order('name').first
+      Product Load (2.6ms)  SELECT "products".* FROM "products" ORDER BY name LIMIT 1
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 3  | Coffee | 3.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+
+---
+
+# Review
+
+## Finder methods immediately returns an instance
+
+* `find`
+* `find_by`
+* `first`
+* `last`
+
+## Finder methods that return a relation
+
+* `where`
+* `order`
+* `limit`
+* `includes`
+* `joins`
+
+---
+
+# Custom Finders
+
+You can define your own class methods that return a relation
+
+```ruby
+class Order < ActiveRecord::Base
+  def self.recent
+    where("placed_at > ?", 7.days.ago)
+  end
+
+  def self.by(customer)
+    where(customer_id: customer.id)
+  end
+end
+```
+
+Can be combined with other methods
+
+    .terminal
+    >> me = Customer.first
+    #<Customer id: 1, name: "Paul Barry", ...
+    >> Order.recent.by(me).order('placed_at').limit(1)
+      Order Load (4.9ms)  SELECT "orders".* FROM "orders" 
+      WHERE "orders"."customer_id" = 1 
+      AND (placed_at > '2013-09-24 02:54:29.590871') 
+      ORDER BY placed_at LIMIT 1
+    +----+-------------+-------------------------+
+    | id | customer_id | placed_at               |
+    +----+-------------+-------------------------+
+    | 1  | 1           | 2013-09-27 00:00:00 UTC |
+    +----+-------------+-------------------------+
+
+---
+
+# Associations
+
+Associations are used in Active Record to define relationships between models
+
+They are based on the foreign keys in the database
+
+Types:
+
+* Belongs To
+* Has Many
+* Has One
+
+---
+
+# belongs_to
+
+The `line_items` table has an order_id foreign key and a product_id foreign_key
+
+    .terminal
+    betastore_development=# \d line_items;
+       Column   |            Type             
+    ------------+-----------------------------
+     id         | integer                     
+     order_id   | integer                     
+     product_id | integer                     
+     quantity   | integer                     
+     price      | numeric                     
+
+We use the `belongs_to` method in the class to define the associations that represents those relationships
+
+```ruby
+  class LineItem < ActiveRecord::Base
+    belongs_to :order
+    belongs_to :product
+  end
+```
+
+---
+
+# belongs_to
+
+The `belongs_to` association gives the model a method to access the associated object
+
+    .terminal
+    >> line_item = LineItem.first
+
+    >> line_item.order
+      Order Load (5.8ms)  SELECT "orders".* FROM "orders" 
+      WHERE "orders"."id" = $1 
+      ORDER BY "orders"."id" ASC LIMIT 1  [["id", 1]]
+    +----+-------------+-------------------------+
+    | id | customer_id | placed_at               |
+    +----+-------------+-------------------------+
+    | 1  | 1           | 2013-09-27 00:00:00 UTC |
+    +----+-------------+-------------------------+
+
+    >> line_item.product
+      Product Load (2.7ms)  SELECT "products".* FROM "products" 
+      WHERE "products"."id" = $1 
+      ORDER BY "products"."id" ASC LIMIT 1  [["id", 1]]
+    +----+--------+-------+
+    | id | name   | price |
+    +----+--------+-------+
+    | 1  | Muffin | 2.99  |
+    +----+--------+-------+
+
+---
+
+# has_many
+
+There may be multiple records in the `line_items` table that have the same value for `product_id`, so that means a product can have many, or multiple, line items
+
+Since a line item also belongs to an order, we can get the orders for a products through the line item association
+
+    .terminal
+                        line_items   
+    orders              ----------    
+    --------------      id              products
+    id             <--- order_id        --------
+    customer_id         product_id ---> id
+    placed_at                           name
+                                        price
+
+```ruby
+class Product < ActiveRecord::Base
+  has_many :line_items
+  has_many :orders, :through => :line_items
+end
+```
+
+---
+
+# has_many
+
+`has_many` adds methods to allow you to access the associated objects
+
+    .terminal
+    >> product = Product.first
+
+    >> product.orders
+      Order Load (6.0ms)  SELECT "orders".* FROM "orders" 
+      INNER JOIN "line_items" ON "orders"."id" = "line_items"."order_id" 
+      WHERE "line_items"."product_id" = $1  [["product_id", 1]]
+    +----+-------------+-------------------------+
+    | id | customer_id | placed_at               |
+    +----+-------------+-------------------------+
+    | 1  | 1           | 2013-09-27 00:00:00 UTC |
+    | 3  | 2           | 2013-09-30 18:17:46 UTC |
+    +----+-------------+-------------------------+
+
+`product.orders` returns an Array of Order instances
+
+---
+
+# Complete Associations
+
+```ruby
+class Customer < ActiveRecord::Base
+  has_many :orders
+  has_many :line_items, :through => :orders
+  has_many :products, :through => :line_items
+end
+
+class Order < ActiveRecord::Base
+  belongs_to :customer
+  has_many :line_items
+  has_many :products, :through => :line_items
+end
+
+class LineItem < ActiveRecord::Base
+  belongs_to :order
+  belongs_to :product
+end
+
+class Product < ActiveRecord::Base
+  has_many :line_items
+  has_many :orders, :through => :line_items
+end
+```
+
+Full documentation at [http://guides.rubyonrails.org/association_basics.html](http://guides.rubyonrails.org/association_basics.html)
+
+---
+
+# Saving Objects
+
+    .terminal
+    >> product = Product.new(name: 'Cookie', price: 1.79)
+    +----+--------+-------+------------+------------+
+    | id | name   | price | created_at | updated_at |
+    +----+--------+-------+------------+------------+
+    |    | Cookie | 1.79  |            |            |
+    +----+--------+-------+------------+------------+
+
+    >> product.save
+       (0.4ms)  BEGIN
+      SQL (2.2ms)  INSERT INTO "products" 
+      ("created_at", "name", "price", "updated_at") 
+      VALUES ($1, $2, $3, $4) RETURNING "id"  
+      [["created_at", Tue, 01 Oct 2013 03:48:44 UTC +00:00], 
+      ["name", "Cookie"], 
+      ["price", #<BigDecimal:7f8b0e35ebc0,'0.179E1',18(45)>], 
+      ["updated_at", Tue, 01 Oct 2013 03:48:44 UTC +00:00]]
+       (1.8ms)  COMMIT
+    => true
+
+---
+
+# Updating Objects
+
+You can change the attributes of the object and then save it
+
+    .terminal
+    >> product.price = 1.99
+    => 1.99
+    >> product.save
+       (0.4ms)  BEGIN
+      SQL (1.1ms)  UPDATE "products" 
+      SET "price" = $1, 
+      "updated_at" = $2 
+      WHERE "products"."id" = 4  
+      [["price", #<BigDecimal:7f8b0c29b0c8,'0.199E1',18(45)>], 
+      ["updated_at", Tue, 01 Oct 2013 03:49:09 UTC +00:00]]
+       (2.1ms)  COMMIT
+    => true
+
+---
+
+# Updating Objects
+
+You can change the object and save it in one method with `update_attributes`
+
+    .terminal
+    >> product.update_attributes(price: 1.89)
+       (0.4ms)  BEGIN
+      SQL (0.8ms)  UPDATE "products" 
+      SET "price" = $1, "updated_at" = $2 
+      WHERE "products"."id" = 4  
+      [["price", #<BigDecimal:7f8b0c33b258,'0.189E1',18(45)>], 
+      ["updated_at", Tue, 01 Oct 2013 03:51:46 UTC +00:00]]
+       (2.1ms)  COMMIT
+    => true
+
+---
+
+# Invalid Data
+
+What happens if we try to save a Product with no name or price?
+
+    .terminal
+    >> Product.new.save
+       (0.3ms)  BEGIN
+      SQL (3.3ms)  INSERT INTO "products" ("created_at", "updated_at") 
+      VALUES ($1, $2) RETURNING "id"  
+      [["created_at", Tue, 01 Oct 2013 03:58:21 UTC +00:00], 
+      ["updated_at", Tue, 01 Oct 2013 03:58:21 UTC +00:00]]
+       (0.6ms)  COMMIT
+    => true
+    >> Product.last
+      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      ORDER BY "products"."id" DESC LIMIT 1
+    +----+------+-------+-------------------------+-------------------------+
+    | id | name | price | created_at              | updated_at              |
+    +----+------+-------+-------------------------+-------------------------+
+    | 5  |      |       | 2013-10-01 03:58:21 UTC | 2013-10-01 03:58:21 UTC |
+    +----+------+-------+-------------------------+-------------------------+
+
+How do we prevent invalid data from getting into our database?
+
+---
+
+# Validations
+
+Validations allow use to specify the conditions that must be met in order to save an object
+
+```ruby
+class Product < ActiveRecord::Base
+  has_many :line_items
+  has_many :orders, :through => :line_items
+  
+  validates :name, presence: true
+  validates :price, numericality: { greater_than_or_equal_to: 0 }
+end
+```
+
+Documentation for all validation options:
+
+[http://guides.rubyonrails.org/active_record_validations.html](http://guides.rubyonrails.org/active_record_validations.html)
+
+---
+
+# Errors
+
+Now if we try to save an object, it will return false:
+
+    .terminal
+    >> product = Product.new
+
+    >> product.save
+    => false
+
+This means it did not save and there are errors:
+
+    .terminal
+    >> product.errors.full_messages
+    => ["Name can't be blank", "Price is not a number"]
+
+---
+
+# Callbacks
+
+Callbacks allow you trigger a method at various points in the process of saving an object
+
+    .terminal
+    (-) save
+    (-) valid
+    (1) before_validation
+    (-) validate
+    (2) after_validation
+    (3) before_save
+    (4) before_create
+    (-) create
+    (5) after_create
+    (6) after_save
+    (7) after_commit
+
+Taken from [http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html](http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html)
+
+---
+
+# Callbacks Example
+
+```ruby
+class LineItem < ActiveRecord::Base
+  before_validation :set_price
+  
+  def set_price
+    self.price = product.price
+  end
+end
+```
+
+Full documentation at [http://guides.rubyonrails.org/active_record_callbacks.html](http://guides.rubyonrails.org/active_record_callbacks.html)
+
+---
+
+# Homework
+
+Update the Betastore product list to use the models and the data from the database
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
