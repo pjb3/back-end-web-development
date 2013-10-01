@@ -332,7 +332,11 @@ You application isn't going to allow users to do everything to every resource. F
 
 You can limit which routes are defined when using `resources` by using the `only` option:
 
-reous
+```ruby
+resources :products, only: [:index, :show]
+```
+
+This will make it so only the index and show routes are generated for the products resource, instead of the typical full set of 7 routes
 
 ---
 
