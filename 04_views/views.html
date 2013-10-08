@@ -238,7 +238,7 @@ Now we will have an HTML document with a title of `Checkout` and a heading in th
 
 # Partials
 
-You might find that you have some bits of view code that you would like to share between different views. You can do this with partials. Partials differ normal views in that their name starts with an `_`. For example, say we have an order summary that we want to show when some is checking out, but then we want to display the same information on the confirmation page once the customer's order been placed. To do that, first we would put this in the view:
+You might find that you have some bits of view code that you would like to share between different views. You can do this with partials. Partials differ from normal views in that their name starts with an `_`. For example, say we have an order summary that we want to show when someone is checking out, but then we want to display the same information on the confirmation page once the customer's order been placed. To do that, first we would put this in the view:
 
 ```html
 <%= render 'order' %>
