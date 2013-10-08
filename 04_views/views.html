@@ -852,6 +852,88 @@ Our form works, but this pattern of creating a form to create a model is common 
 <% end %>
 ```
 
+---
+
+# Form For
+
+First is the `form_for` helper, which we are using in place of `form_tag`. If we try to use `form_for` in the same way as we did with `form_tag`, like this:
+
+```html
+<%= form_for @customer do |f| %>
+```
+
+We would get an error about `customers_path` not being defined. This is because `form_for` assumes you are using the RESTful convention by default, but in our case we are not, so that is why we specify the url via an option:
+
+```html
+<%= form_for @customer, url: sign_up_path do |f| %>
+```
+
+Also notice that compared to `form_tag`, which uses a block with no argument, `form_for` has a block argument, which is commonly named `f`, short for "form'. This argument to the block is then used in the form, where we call a method on that object that matches up to the other helpers, except it doesn't have `_tag` on the end.
+
+The benefit of these helpers is that the value of the field is set based on the object the form is bound to, so instead of this:
+
+```html
+<%= text_field_tag 'customer[name]', @customer.name %>
+```
+
+We do this:
+
+```html
+<%= f.text_field :name %>
+```
+
+---
+
+# Custom Helpers
+
+We have been using a variety of helpers built in to Rails throughout this lesson, but you can also create your own helper methods. This is what the `app/helpers` directory is for. It contains modules that have methods that you can use as helpers in the views. There can be many files/modules in this directory and all methods defined in there will be accessible via the views. Separate files are just used for organization purposes.
+
+For example, in our footer, we currently have the copyright year displayed using:
+
+```html
+<%= Time.current.year %>
+```
+
+But imagine we anticipate having a more complex method of determining what year should be used and possibly we needed to refer to it from multiple places throughout the application. We can create a helper in `app/helpers/application_helper.rb` like this:
+
+```ruby
+module ApplicationHelper
+  def copyright_year
+    Time.current.year
+  end
+end
+```
+
+We can now call this form the view simply by calling the method:
+
+```html
+<%= copyright_year %>
+```
+
+---
+
+# Homework
+
+Use some helpers to make some enhancements to the page that lists all products:
+
+* Use `number_to_currency` to display the price for each product
+* Use `time_ago_in_words` to display how long ago the product was created
+* Create a custom helper to display the product name as "product name - #product id"
+
+Let's also improve the log in / sign up flow
+
+* On the log in page, add a link to sign up that says something like "Don't have an account yet? Sign Up"
+* Do the reverse on the sign up page, add a link to log in that says something like "Already have an account? Log In"
+* Make so that upon completing the sign up, you are automatically logged in and taken to the product listing, instead of having to log in
+
+## Extra Credit
+
+* Storing password as plain text in the database is insecure. Rails has a built in mechanism to solve that problem, called `has_secure_password`. The documentation for it is here:
+
+http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password
+
+Update the application to use `has_secure_password` instead of a plain text password
+
   </textarea><div id="slideshow"></div>
   </body>
 </html>
