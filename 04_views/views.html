@@ -404,27 +404,100 @@ Will output `This is a string that is mo...`
 <p>second paragraph</p>
 ```
 
-pluralize
-singularize
-titleize
+---
+
+# Formatting Text
+
+Sometimes you might want to display a word in singular if there is just 1 and pluralize it otherwise. The `pluralize` method does that for you if `@products.size` is 1, then:
+
+    .terminal
+    <%= pluralize @products.size, 'product' %>
+
+Would print:
+
+    .terminal
+    1 product
+
+But if `@products.size` is more than 1, it would print:
+
+    .terminal
+    2 products
+
+---
+
+# Formatting Text
+
+Although not technically helper, a good method to know about is `titleize`. Sometimes you might have the name of a class or an attribute in a variable and you might want to print it out in a human readable way.
+
+    .terminal
+    <%= 'LineItem'.titleize %>
+
+Will output:
+
+    .terminal
+    Line Item
+    
+This will output the same thing:
+
+    .terminal
+    <%= 'line_item'.titleize %>
 
 ---
 
 # Formatting Dates
 
-strftime
-distance_of_time_in_words
+There is a helper that you can use to translate a time to a distance of time. For example, if you have a product that was created 5 days ago, this:
+
+    .terminal
+    <%= time_ago_in_words product.created_at %>
+
+Will output `5 days`. It will work for a variety of time ranges, like "less than a minute", "about an hour", etc.
+
+You can use `strftime` to format a date or a time into a string:
+
+    .terminal
+    <%= Time.current.strftime('%a, %b %e') %>
+
+That will output:
+
+    Tue, Oct  8
+
+`strftime` uses a little language which you can find more about at [http://www.foragoodstrftime.com](http://www.foragoodstrftime.com)
 
 ---
 
 # Formatting Numbers
 
-number_to_currency
-number_to_human
-number_to_human_size
-number_to_percentage
-number_with_delimiter
-number_with_precision
+Print a number as a dollar amount
+
+```ruby
+number_to_currency(2.99) # => $2.99
+```
+
+Print a number in words
+
+```ruby
+number_to_human(1000000) # => 1 Million
+```
+
+Print a number of bytes
+
+```ruby
+number_to_human_size(1234567) # => 1.18 MB
+```
+
+Add commas to a large number
+
+```ruby
+number_with_delimiter(1000000) # => 1,000,000
+```
+
+Round a number, defaults to 3 decimal places, you can control it with precision:
+
+```ruby
+number_with_precision(1.2345) # => 1.235
+number_with_precision(1.2345, precision: 2) # => 1.23
+```
 
 ---
 
