@@ -501,11 +501,43 @@ number_with_precision(1.2345, precision: 2) # => 1.23
 
 ---
 
-# HTML Escaping
+# Form Tags
+
+Our log in form contains just HTML:
+
+```html
+<form method="POST" action="/log_in">
+  <label for="email">Email</label>
+  <input type="email" name="email" id="email" />
+  
+  <label for="password">Password</label>
+  <input type="password" name="password" id="password" />
+  
+  <button type="submit">Log In</button>
+</form>
+```
+
+Rails provides several form helpers that you can use to build the same form.
 
 ---
 
 # Form Tags
+
+This will generate equivalent HTML:
+
+```html
+<%= form_tag do %>
+  <%= label_tag :email %>
+  <%= email_field_tag :email %>
+  
+  <%= label_tag :password %>
+  <%= password_field_tag :password %>
+
+  <%= button_tag "Log In" %>
+<% end %>
+```
+
+`form_tag` takes a Hash with the same arguments as `url_for`. The form defaults to a `POST`, so in this case, we don't have to pass any arguments.
 
 ---
 
