@@ -541,7 +541,316 @@ This will generate equivalent HTML:
 
 ---
 
+# Pre-filling Values
+
+If you want a field to have a value already entered when you show the form, you make that the second argument to the tag helper:
+
+```html
+<%= email_field_tag :email, params[:email] %>
+```
+
+In this case we are using the value of the param named email. If there is one, the value will appear there, if not, the form field will be blank
+
+---
+
+# Add a Password
+
+In many cases, you will have a form that maps directly to the attributes of a model. For example, let's say we want to create a form to allow customers to sign up. There a few things we need to have in place so we can do that. First, we want users to be able to specify a password when they create their account, but we don't have a field for that yet, so let's add that using a migration:
+
+    .terminal
+    $ rails g migration add_password_to_customers password:string
+      invoke  active_record
+      create    db/migrate/20131008134833_add_password_to_customers.rb
+
+This will create a migration that looks like this:
+
+```ruby    
+class AddPasswordToCustomers < ActiveRecord::Migration
+  def change
+    add_column :customers, :password, :string
+  end
+end
+```
+
+We can run `rake db:migrate` to make the column actually be added to the database:
+
+    .terminal
+    $ rake db:migrate
+    ==  AddPasswordToCustomers: migrating =========================================
+    -- add_column(:customers, :password, :string)
+       -> 0.0094s
+    ==  AddPasswordToCustomers: migrated (0.0095s) ================================
+
+---
+
+# Customers Table
+
+Our `customers` table should now look like this:
+
+    .terminal
+    $ rails dbconsole
+    psql (9.2.1)
+    Type "help" for help.
+
+    betastore_development=# \d customers
+                                         Table "public.customers"
+       Column   |            Type             |                       Modifiers
+    ------------+-----------------------------+--------------------------------------------------------
+     id         | integer                     | not null default nextval('customers_id_seq'::regclass)
+     name       | character varying(255)      |
+     email      | character varying(255)      |
+     created_at | timestamp without time zone |
+     updated_at | timestamp without time zone |
+     password   | character varying(255)      |
+    Indexes:
+        "customers_pkey" PRIMARY KEY, btree (id)
+
+---
+
+# Adding Routes
+
+Since we are making a form to create a `Customer`, we know we are going to need a `CustomersController` with a `new` action to display the form and a `create` action to actually create the customer. Following the REST convention, our routes would look like this:
+
+```ruby
+resources :customers, only: [:new, :create]
+```
+
+And although this would work, the routes would be a bit odd, because customers don't think of this as creating a customer record, they think of it as signing up, so let's use some custom routes instead:
+
+```ruby
+ get '/sign_up' => 'customers#new', as: 'sign_up'
+post '/sign_up' => 'customers#create'
+```
+
+Now we have our routes but we need a controller
+
+---
+
+# Controller
+
+Here what the `new` and `create` actions are going to look like for customers controller:
+
+```ruby
+class CustomersController < ApplicationController
+  skip_before_filter :require_log_in, only: [:new, :create]
+  
+  def new
+    @customer = Customer.new
+  end
+  
+  def create
+    @customer = Customer.new(customer_params)
+    if @customer.save
+      redirect_to log_in_path
+    else
+      render 'new'
+    end
+  end
+
+  private
+  def customer_params
+    params.require(:customer).permit(:name, :email)
+  end
+end
+```
+
+Let's go through each part step by step
+
+---
+
+# New Action
+
+First, we see we are skipping the `require_log_in` before filter:
+
+```ruby
+skip_before_filter :require_log_in, only: [:new, :create]
+```
+
+It doesn't make sense to require the customer to be logged in to sign up, so we'll just skip that on our `new` and `create` actions. We could have left the `only` off, because currently `new` and `create` are the only actions the controller has, but it's a better practice to list the actions individually, because if we add another action, we don't want to accidentally allow non-logged in users to access it.
+
+The `new` action looks like this:
+
+```ruby
+def new
+  @customer = Customer.new
+end
+```
+
+Here we set up an empty `Customer` instance to work with in the view. As you will see shortly, it is going to be easy to create our form in the view if we always have a `@customer` to use.
+
+---
+
+# Create Action
+
+The create action looks like this:
+
+```ruby
+def create
+  @customer = Customer.new(customer_params)
+  if @customer.save
+    redirect_to log_in_path, notice: 'Your account was created, please log in'
+  else
+    render 'new'
+  end
+end
+```
+
+First we create a `@customer` instance that is initialized using the customer params, we'll look at `customer_params` in a minute, but know it's import to know that it will return a Hash that will look something like:
+
+```ruby
+{ :name => 'Paul Barry', :email => 'mail@paulbarry.com', :password => 'secret' }
+```
+
+Assuming that `customer_params` does return that, or something similar based on whatever is actually entered into the form, that will populate the attributes of the `@customer` object, so the next thing we will do is save it.
+
+If the object is saved, `@customer.save` will return true, at which point we will redirect the log in form. If the object is not saved, presumably there is some kind of validation error, we we will show the user the form again, but with the form fields filled in to whatever they entered.
+
+It's an important to know that calling `render 'new'` means render the `new` template, it does not mean call the `new` action.
+
+---
+
+# Customer Params
+
+In our create action, we call the `customer_params` method, which looks like this:
+
+```ruby
+private
+def customer_params
+  params.require(:customer).permit(:name, :email, :password)
+end
+```
+
+First, we make this method private just to indicate that this method is not an action that should be called directly, it is a method used by other actions.
+
+Next, we call `params.require(:customer)`, which means that there needs to be a `:customer` key in the params, which there will be based on the way we set up our form shortly.
+
+Then we call `permit` on the result of that `require` call. The arguments to `permit` are attributes that we will allow to be set via the form post. This is a security measure to prevent someone from submitting a value for an attribute other than the ones that we specify here.
+
+We will cover this in more detail when we go over security, but for know we need to know that this means we expect the form to submit parameters that look like this:
+
+```ruby
+:customer => { 
+  :name => 'Paul Barry', 
+  :email => 'mail@paulbarry.com', 
+  :password => 'secret' 
+}
+```
+
+There is a `customer` key in params that has a Hash as it's value
+
+---
+
+# Validations
+
+One last thing we need to do before moving on to the form is make sure the `Customer` model has validations that make each attribute a required value. We've seen how to do that already, so we know that we can add this to the model in `app/models/customer.rb`, so the whole model should look like this:
+
+```ruby
+class Customer < ActiveRecord::Base
+  has_many :orders
+  has_many :line_items, :through => :orders
+  has_many :products, :through => :line_items
+
+  validates_presence_of :name, :email, :password
+end
+```
+
+---
+
+# Form
+
+First we are going to do a version of our form that uses the `form_tag` and other tag helpers that we've already looked at. Our form will look like this:
+
+```html
+<%= form_tag do %>
+  <div>
+    <%= label_tag 'customer_name', 'Name' %>
+    <%= text_field_tag 'customer[name]', @customer.name %>
+  </div>
+  
+  <div>
+    <%= label_tag 'customer_email', 'Email'  %>
+    <%= email_field_tag 'customer[email]', @customer.email %>
+  </div>
+  
+  <div>
+    <%= label_tag 'customer_password', 'Password'  %>
+    <%= password_field_tag 'customer[password]', @customer.password %> 
+  </div>
+
+  <%= button_tag 'Sign Up' %>
+<% end %>
+```
+
+The thing that looks different here is the name of our tags start with `customer` and have the name of the attribute in square brackets. Submit the form with no values and you should be taken right back to the form.
+
+---
+
+# Parameters
+
+If you look at the output from `rails server`, should should see something like this:
+
+    .terminal
+    Started POST "/sign_up" for 127.0.0.1 at 2013-10-08 09:37:55 -0500
+    Processing by CustomersController#create as HTML
+    Parameters: {"customer"=>{"name"=>"", "email"=>"", "password"=>"[FILTERED]"}}
+    Rendered customers/new.html.erb within layouts/application (1.1ms)
+    Completed 200 OK in 19ms (Views: 8.9ms | ActiveRecord: 0.5ms)
+
+I've cut out some of the non-essential parts to make it easier to read. The key thing to note is that the parameters does have a key of `customer` with a value of a Hash with keys for `name`, `email` and `password`. This happened because of how we used square brackets in the names of our fields. When Rails sees parameters named like this:
+
+    .terminal
+    customer[name]
+    customer[email]
+    customer[password]
+
+Because the first part of all those names before the square brackets match up, Rails knows to combined them into one Hash.
+
+This makes it easy to group parameters together. In this case, we know all parameters related to the customer will be in that Hash.
+
+---
+
+# Displaying Errors
+
+When we submitted the form, it immediately displayed the form again. This was because `@customer` did not save due to validation errors, but we did not display our validation errors anywhere in the view, so it's hard to understand what happened. Add this in the template just above the `form_tag`:
+
+```html
+<% if @customer.errors.present? %>
+  <ul>
+    <% @customer.errors.full_messages.each do |error| %>
+      <li><%= error %></li>
+    <% end %>
+  </ul>
+<% end %>
+```
+
+Now in the form, fill in a value for name and email, but leave password blank, and then submit the form again. You will see the error for the missing password displayed and the name and the email form fields will be populated with the values that you originally entered.
+
+---
+
 # Form For
+
+Our form works, but this pattern of creating a form to create a model is common enough that Rails has a helper specifically for this. There is a helper called `form_for` and here's what our form looks like when we convert it to use that:
+
+```html
+<%= form_for @customer, url: sign_up_path do |f| %>
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  
+  <div>
+    <%= f.label :email %>
+    <%= f.email_field :email %>
+  </div>
+  
+  <div>
+    <%= f.label :password %>
+    <%= f.password_field :password %> 
+  </div>
+
+  <%= f.submit 'Sign Up' %>
+<% end %>
+```
 
   </textarea><div id="slideshow"></div>
   </body>
