@@ -157,6 +157,86 @@ You should see something like this:
 
 ![Mail Catcher](img/mailcatcher.png)
 
+---
+
+# Password Reset
+
+To implement password reset, we want to generate a token, then send the user that token in an email, and then if they come back to the site with a valid token, then we mark it as used and allow them to change their password.
+
+So let's generate a model:
+
+    .terminal
+    $ rails g model PasswordReset customer:belongs_to token used_at:timestamp
+      invoke  active_record
+      create    db/migrate/20131010204333_create_password_resets.rb
+      create    app/models/password_reset.rb
+      invoke    test_unit
+      create      test/models/password_reset_test.rb
+      create      test/fixtures/password_resets.yml
+
+---
+
+# Token Generation
+
+Next we can add a method and a before_validation callback to generate a token when a PasswordReset is created:
+
+```ruby
+class PasswordReset < ActiveRecord::Base
+  belongs_to :customer
+
+  before_validation :generate_token
+  
+  def generate_token
+    self.token ||= SecureRandom.hex(16)
+  end
+end
+```
+
+Also add the `has_many` association to the `Customer` model:
+
+```ruby
+has_many :password_resets
+```
+
+Run `rake db:migrate` to create the `password_resets` database table:
+
+    .terminal
+    $ rake db:migrate
+    ==  CreatePasswordResets: migrating ===========================================
+    -- create_table(:password_resets)
+       -> 0.0634s
+    ==  CreatePasswordResets: migrated (0.0635s) ==================================
+
+---
+
+# Password Reset
+
+Now let's try out creating a password reset in the console:
+
+    .terminal
+    $ rails c
+    >> password_reset = Customer.first.password_resets.create
+    ...
+    >> password_reset.token
+    => "05ff0e6a6bfdb0563ad8bf37d5496930"
+
+Looks good!
+
+---
+
+# In-Class / Homework
+
+Create a `PasswordResetsController` with the following routes/actions:
+
+* GET /forgot_password => new, displays a form with a field to enter your email address to have a password reset created
+
+* POST /forgot_password => create, generates a password reset for the customer is one is found for the given email address, if found, redirects to the form again with a notice saying you should receive an email with instructions on how to reset your password, it not found, renders the form with an alert saying the email was not found
+
+* Update the content of the mailer to have a link to reset the password
+
+* GET /reset_password/:id/:token => edit, displays a form with a password field allowing the user to choose a new one
+
+* POST /reset_password/:id/:token => update, changes the user's password, set the used_at on the password reset to the current time
 
 
   </textarea><div id="slideshow"></div>
