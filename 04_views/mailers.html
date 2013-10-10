@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mailers</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Mailers
+
+[http://pjb3.me/bewd-mailers](http://pjb3.me/bewd-mailers)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Action Mailer
+
+Action Mailer is the part of Rails that allows you to send emails.
+
+Mailers go in `app/mailers`. They are similar to controllers and uses views in `app/views`.
+
+For more info:
+
+[http://guides.rubyonrails.org/action_mailer_basics.html](http://guides.rubyonrails.org/action_mailer_basics.html)
+
+---
+
+# Generating A Mailer
+
+We are going to use mailers to implement a forgot password feature for our site.
+
+    .terminal
+    $ rails g mailer CustomerMailer password_reset
+
+You can execute this mailer in the rails console like this:
+
+    .terminal
+    $ rails c
+    Loading development environment (Rails 4.0.0)
+    >> CustomerMailer.password_reset.deliver
+
+You will see the email message printed out in the console, but this isn't a very good way to preview email. Let's install mailcatcher to make this better.
+
+---
+
+# Mail Catcher
+
+Mail Catcher is a server that runs on your machine that receives email and then allows you to preview those messages. This is useful fore development and testing because it doesn't matter who these emails are from or to, they all end up in mail catcher.
+
+Mail Catcher is packages as a gem, so to install it, you simply install the gem:
+
+    .terminal
+    $ gem install mailcatcher
+
+Then, you have to start up mail catcher:
+
+    .terminal
+    $ mailcatcher
+    Starting MailCatcher
+    ==> smtp://127.0.0.1:1025
+    ==> http://127.0.0.1:1080
+    *** MailCatcher runs as a daemon by default. Go to the web interface to quit.
+
+If you restart your computer, it will stop running, so you may have to do this again. It's ok if you try to start it again, you will just get this message:
+
+    .terminal
+    $ mailcatcher
+    Starting MailCatcher
+    ~~> ERROR: Something's using port 1025. Are you already running MailCatcher?
+
+Before we can use this, we need to configure Rails to use it.
+
+---
+
+# Configuring Action Mailer
+
+The documentation at [http://mailcatcher.me](http://mailcatcher.me) actually has instructions on how to do this, but all you need to do is add these two lines before the end of the configure block in `config/environments/development.rb`:
+
+```ruby
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = { :address => "localhost", :port => 1025 }
+```
+
+Now start a new rails console and send the `password_reset` message again:
+
+    .terminal
+    $ rails c
+    Loading development environment (Rails 4.0.0)
+    >> CustomerMailer.password_reset.deliver
+      Rendered customer_mailer/password_reset.text.erb (1.8ms)
+
+Open http://localhost:1080 in another tab
+
+---
+
+# Mail Catcher
+
+You should see something like this:
+
+![Mail Catcher](img/mailcatcher.png)
+
+
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
