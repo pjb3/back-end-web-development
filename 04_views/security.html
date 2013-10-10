@@ -222,7 +222,7 @@ class LogInsController < ApplicationController
   def create
     customer = Customer.find_by(email: params[:email])
     if customer && customer.authenticate(params[:password])
-      cookies[:email] = customer.email
+      cookies[:customer_id] = customer.id
       redirect_to products_path
     else
       redirect_to log_in_path, alert: 'Log In Failed'
@@ -231,11 +231,97 @@ class LogInsController < ApplicationController
 end
 ```
 
-In this version, we look up the `Customer` using the email and then if we find one and if successfully authenticates using the password that was supplied, then the `Customer` is logged in.
+In this version, we look up the `Customer` using the email and then if we find one and if successfully authenticates using the password that was supplied, then we set the ID of the `Customer` in a cookie.
+
+We were previous using email as the cookie, but we're switching it to `customer_id` now that we have a database record for the customer. This is a better choice in case our customer changes their email address, they won't have to log out and log back in.
+
+Search for `cookies` in the project make sure it is using `customer_id` instead of `email`
+
+---
+
+# Don't Trust Cookies
+
+The next security problem that we have in our application is that to be logged in as a `Customer`, all you have to do is set a cookie called `customer_id` with the value of the Customer ID that you want to be logged in as. One of the key things about security of web applications to keep is mind is...
+
+# Never Trust User Input
+
+Any user who knows a little bit about how web applications work can set cookies or other parameters to any value they want. For example, if we get the home page without the email cookie:
+
+    .terminal
+    $ curl -I http://localhost:3000
+    HTTP/1.1 302 Found
+    Location: http://localhost:3000/log_in
+
+We are redirected to the log in page. But if we supply an email for the cookie:
+
+    .terminal
+    $ curl -I -H 'Cookie: customer_id=1' http://localhost:3000
+    HTTP/1.1 200 OK
+
+Then the application thinks we are logged in and we are not sent to the log in page. If our application allows users to view/modify customer information, this could be a serious problem
 
 ---
 
 # Signing Cookies
+
+One way to protect against this type of vulnerability is to sign the cookie. This means that instead of just the raw value, you add on a digest based on a key only you know and the value.
+
+A simple way to sign a value is to pick a key somehow that you keep a secret:
+
+    .terminal
+    >> key = "It's a Secret To Everybody"
+    => "It's a Secret To Everybody"
+
+Then, to set the value of the cookie, you combine the value (in this case the email) with the key and get the MD5 digest of that:
+
+    .terminal
+    >> customer_id = 1
+    => 1
+    >> digest = Digest::MD5.hexdigest("#{customer_id}-#{key}")
+    => "3297cc25fe3c7f13d2e0e40d9d886cab"
+
+Then, you combine the value with the digest and set that as a cookie with some known delimiter, like this:
+
+    .terminal
+    >> cookie = "#{customer_id}-#{digest}"
+    => "1-3297cc25fe3c7f13d2e0e40d9d886cab"
+
+---
+
+# Verifying a Signed Cookie
+
+Now to verify a signed cookie, you do the process in reverse. First, you split the value in the cookie based on the delimiter:
+
+    .terminal
+    >> customer_id, digest = cookie.split('-')
+    => ["1", "3297cc25fe3c7f13d2e0e40d9d886cab"]
+
+Then, you generate the digest for the customer_id and check that it matches the digest that was in the cookie:
+
+    .terminal
+    >> Digest::MD5.hexdigest("#{customer_id}-#{key}") == digest
+    => true
+
+If the values do not match, it means that the user modified or forged the cookie, therefore you would ignore the value and not log them in. If the values do match, then you can trust the cookie.
+
+---
+
+# Rails Signed Cookies
+
+Because signing cookies is a good security practice, Rails has support for them built in. All we have to do is change how we set the cookie in the `create` action in `LogInsController` to be like this:
+
+
+```ruby
+cookies\.signed[:customer_id] = customer.id
+```
+
+And change how we check it in the `logged_in?` method in `app/controllers/application_controller.rb` to be like this:
+
+```ruby
+cookies\.signed[:customer_id].present?
+```
+
+And that's it! If you are wondering where the key that the cookies are being signed with is, take a look at `config/initializers/secret_token.rb`
 
 ---
 
