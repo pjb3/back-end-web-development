@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Security</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: middle, center
+
+# Security
+
+[http://pjb3.me/bewd-security](http://pjb3.me/bewd-security)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Plain Text Password
+
+In our first implementation of sign up, where we collected a password from the user upon sign up and then store that password in the database in plain text:
+
+    .terminal
+    $ rails dbconsole
+    psql (9.2.1)
+    Type "help" for help.
+
+    betastore_development=# select email, password from customers;
+          email       | password
+    ------------------+----------
+     test@example.com | secret
+
+## Why is this bad?
+
+The most simple reason is that people frequently use the same email/password combination on multiple web sites. If someone ever gains access to your database, they could then use those email/password combinations at gmail.com, apple.com, amazon.com, etc. and some of them will work.
+
+---
+
+# Hashing Passwords
+
+To solve this problem, we hash the password when we store it. A hashing function is one where if we hash the same value, we get the same result, but given the result, we can't tell what value was used to create it.
+
+A common hashing function is MD5. Here's how you could use it:
+
+    .terminal
+    $ rails c
+    >> password_digest = Digest::MD5.hexdigest('secret')
+    => "5ebe2294ecd0e0f08eab7690d2a6ee69"
+    >> password_digest == Digest::MD5.hexdigest('fail')
+    => false
+    >> password_digest == Digest::MD5.hexdigest('secret')
+    => true
+
+First we hash the user's actual password, which is `"secret"` and we store that in a variable. Then we show how you would check when someone is logging in if the password is correct. You hash what they enter and then compare that to the original digest.
+
+Although MD5 would be better than nothing, there are still ways to "guess" the original password if you have the MD5 digest of the password. A more secure algorithm that is much harder to guess the original password is Bcrypt.
+
+More Info: [http://codahale.com/how-to-safely-store-a-password](http://codahale.com/how-to-safely-store-a-password)
+
+---
+
+# Bcrypt
+
+Because Bcrypt is a good choice for storing passwords, Rails has built-in support for it. To use it, first add the bcrypt gem to the `Gemfile`:
+
+```ruby
+gem 'bcrypt-ruby', '~> 3.0.0'
+```
+
+Then run `bundle` to install it:
+
+    .terminal
+    $ bundle
+
+---
+
+# Password Digest Column
+
+To use the built-in Bcrypt password functionality for our customer passwords, we need to drop the plain text password column from the database and add a password_digest column:
+
+    .terminal
+    $ rails g migration remove_password_from_customers password
+          invoke  active_record
+          create    db/migrate/20131010013848_remove_password_from_customers.rb
+    $ rails g migration add_password_digest_to_customers password_digest
+          invoke  active_record
+          create    db/migrate/20131010013921_add_password_digest_to_customers.rb
+    $ rake db:migrate
+    ==  RemovePasswordFromCustomers: migrating ====================================
+    -- remove_column(:customers, :password, :string)
+       -> 0.0120s
+    ==  RemovePasswordFromCustomers: migrated (0.0121s) ===========================
+
+    ==  AddPasswordDigestToCustomers: migrating ===================================
+    -- add_column(:customers, :password_digest, :string)
+       -> 0.0031s
+    ==  AddPasswordDigestToCustomers: migrated (0.0032s) ==========================
+
+---
+
+# Has Secure Password
+
+Next we have to do is add `has_secure_password` to the `Customer` model in `app/models/customer.rb`:
+
+```ruby
+class Customer < ActiveRecord::Base
+  has_many :orders
+  has_many :line_items, :through => :orders
+  has_many :products, :through => :line_items
+
+  validates_presence_of :name, :email
+
+  has_secure_password
+end
+```
+
+---
+
+# Setting Passwords
+
+If you have any existing customers, they won't have a password now:
+
+    .terminal
+    $ rails dbconsole
+    psql (9.2.1)
+    Type "help" for help.
+
+    betastore_development=# select email, password from customers;
+          email       | password
+    ------------------+----------
+     test@example.com |
+
+You can assign each customer a password in the `rails console` like this:
+
+    .terminal
+    $ rails console
+    >> Customer.where(password_digest: nil).each{|c| 
+      c.password = c.password_confirmation = 'secret'; c.save! }
+
+---
+
+# Dummy Authentication
+
+If you remember back to when we originally created `log_ins#create`, it looks like this:
+
+```ruby
+class LogInsController < ApplicationController
+  def create
+    if params[:password].present?
+      cookies[:email] = params[:email]
+      redirect_to products_path
+    else
+      redirect_to log_in_path, alert: 'Log In Failed'
+    end
+  end
+end
+```
+
+Because we are just checking if the password is present, this isn't a real log in, it will accept any email/password combination. Now we can update it to a real implementation
+
+---
+
+# Real Authentication
+
+```ruby
+class LogInsController < ApplicationController
+  def create
+    customer = Customer.find_by(email: params[:email])
+    if customer && customer.authenticate(params[:password])
+      cookies[:email] = customer.email
+      redirect_to products_path
+    else
+      redirect_to log_in_path, alert: 'Log In Failed'
+    end
+  end
+end
+```
+
+In this version, we look up the `Customer` using the email and then if we find one and if successfully authenticates using the password that was supplied, then the `Customer` is logged in.
+
+---
+
+# Signing Cookies
+
+---
+
+# Mass-Assignment
+
+---
+
+# Cross-Site Scripting
+
+---
+
+# SQL Injection
+
+---
+
+# Cross-Site Request Forgery
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
