@@ -201,7 +201,7 @@ In Unix, if you want to modify the output of a program, you can pipe the output 
 
 ]
 
-`sort` is a command that prints each line of it's input in alphabetically order. By using the `|`, we are piping the output of `env` to the input of `sort` and then we see the output of `sort` printed out.
+`sort` is a command that prints each line of its input in alphabetically order. By using the `|`, we are piping the output of `env` to the input of `sort` and then we see the output of `sort` printed out.
 
 This is helpful, but if what if we want to see the value of a specific variable, rather than look though the whole sorted list?
 
@@ -219,7 +219,7 @@ This is helpful, but if what if we want to see the value of a specific variable,
 
 In this example, we are using pipe again, but this time to pipe the output to a command called `grep`
 
-`grep` will search through it's input and only print the lines that match the string you give it.
+`grep` will search through its input and only print the lines that match the string you give it.
 
 Grep is definitely an odd name, google it if you are interested in the origin.
 
@@ -533,7 +533,7 @@ Since it is possible to have mutliple version of the same command installed, or 
 
 # tr
 
-The contents of the `PATH` variable can be hard to read in it's natural `:` separated format. Fortunately we can fix that with the help of another command called `tr`.
+The contents of the `PATH` variable can be hard to read in its natural `:` separated format. Fortunately we can fix that with the help of another command called `tr`.
 
 The `tr` command is used to translate the input and then print the result of the translation in the output. We can convert each `:` in the PATH into a new-line character. This has the result of printing each directory of your path one a separate line, making it much easier to read:
 
