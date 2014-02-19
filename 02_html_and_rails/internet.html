@@ -87,7 +87,7 @@ All computers on the Internet have an Internet Protocol (IP) Address
 
 They look like this:
 
-    50.62.65.162
+    50.57.195.189
 
 IP addresses are too hard to memorize and they change a lot anyway
 
@@ -101,7 +101,7 @@ The process of looking up the actual IP address for a domain name is called __re
 
     .terminal
     $ dig betamore.com +short
-    50.62.65.162
+    50.57.195.189
 
 `dig` is a command line tool that allows you to see what IP address a domain name resolves to
 
@@ -143,23 +143,21 @@ Directory structure
 __HyperText Transfer Protocol__ (HTTP) is the underlying protocol of the Internet
 
     .terminal
-    $ curl -v http://betamore.com/academy/back-end-web-development
-    * About to connect() to betamore.com port 80 (#0)
-    *   Trying 50.62.65.162...
-    * connected
-    * Connected to betamore.com (50.62.65.162) port 80 (#0)
-    > GET /academy/back-end-web-development HTTP/1.1
-    > User-Agent: curl/7.24.0
-    > Host: betamore.com
+    $ curl -v http://www.betamore.com/academy/d-web-development/
+    * About to connect() to www.betamore.com port 80 (#0)
+    *   Trying 50.57.195.189...
+    * Connected to www.betamore.com (50.57.195.189) port 80 (#0)
+    > GET /academy/back-end-web-development/ HTTP/1.1
+    > User-Agent: curl/7.30.0
+    > Host: www.betamore.com
     > Accept: */*
     >
     < HTTP/1.1 200 OK
-    < Date: Wed, 11 Sep 2013 11:44:20 GMT
-    < Server: Apache
-    < Vary: Accept-Encoding,User-Agent
-    < Last-Modified: Thu, 01 Jan 1970 00:00:00 GMT
+    < Server: nginx
+    < Date: Wed, 19 Feb 2014 04:11:12 GMT
+    < Content-Type: text/html; charset=UTF-8
     < Transfer-Encoding: chunked
-    < Content-Type: text/html
+    < Connection: keep-alive
 
 `curl` is a tool that allow you to send HTTP requests and receive the response
 
@@ -173,9 +171,9 @@ It is like a web browser that doesn't render the HTML document
 
     .terminal
     * About to connect() to betamore.com port 80 (#0)
-    *   Trying 50.62.65.162...
+    *   Trying 50.57.195.189...
     * connected
-    * Connected to betamore.com (50.62.65.162) port 80 (#0)
+    * Connected to betamore.com (50.57.195.189) port 80 (#0)
 
 Then it sends this HTTP Request:
 
@@ -244,9 +242,9 @@ If there is no `expires`, the cookie will be cleared when the user closes their 
 
 # HTTP POST
 
-Install Firefox & HTTPFox
+Install Firefox & HTTPFox (Tools > Add-ons). HTTPFox is an add on that allows you to see the HTTP traffic sent back and forth.
 
-post.html
+Put the following code into post.html
 
 ```html
 <html>
@@ -267,7 +265,7 @@ post.html
     .terminal
     $ open -a Firefox.app post.html
 
-Open HTTPFox in a new window, start and submit the form
+Open HTTPFox in a new window (Tools > Web Developer > HttpFox > Open In Own Window), start HTTPFox (green play button), and submit the form
 
 ---
 
@@ -278,6 +276,8 @@ Open HTTPFox in a new window, start and submit the form
 ---
 
 # Raw HTTP POST
+
+Doing the same thing in curl would look like this:
 
     .terminal
     POST / HTTP/1.1
@@ -300,6 +300,8 @@ HTTPS, also known as Secure HTTP, uses a Secure Socket Layer (SSL) to encrypt HT
 .center[![Pub/Priv Key Encryption](img/public-key.jpg)]
 
 The browser will use SSL for URLs with the `https` protocol
+
+We can build a demonstration of what encryption looks like using Ruby
 
 ---
 
@@ -351,6 +353,8 @@ The public key
 
 # Public / Private Key Encryption
 
+Put this code into `pub_priv_key.rb`:
+
 ```ruby
 require 'openssl'
 require 'base64'
@@ -398,6 +402,8 @@ puts
 ---
 
 # Making our form secure
+
+Use **https** as the protocol in the action instead of **http**:
 
 ```html
 <html>
