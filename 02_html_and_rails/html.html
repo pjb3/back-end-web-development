@@ -71,17 +71,43 @@ class: middle, center
 
 ---
 
-# Tags
+# HTML
+
+HTML stands for HyperText Markup Language. A markup language is not a programming language, it is a formatting language.
+
+HTML is the formatting language used by web browsers.
+
+A web browser typically loads HTML files from the internet, but it can also display HTML files that are on your local computer.
+
+Create a new file using Sublime Text:
 
     .terminal
-    $ echo '<h1>Hello World</h1>' > hello.html
+    $ subl hello.html
+
+Put the following code into the file:
+
+```html
+<h1>Hello, World!</h1>
+```
+
+Open the file in your default web browser:
+
+    .terminal
     $ open hello.html
+
+---
+
+# Hello, World!
+
+You should see this in your web browser:
 
 ![Hello World](img/hello_world.png)
 
 ---
 
 # Documents
+
+The previous HTML file was just a fragment of HTML. The browser can display it properly, but replace the contents of the file with this and then refresh your browser
 
 ```html
 <html>
@@ -94,9 +120,13 @@ class: middle, center
 </html>
 ```
 
+You should see the same thing, except that the title of the page is also set.
+
 The head is for information about the document
 
 The body is for the actual content that should be displayed
+
+Both the body and the head are tags that contain other tags. All opening tags are surrounded by `<` and `>` characters. The closing tags also have a `/` following the `<` character.
 
 ---
 
