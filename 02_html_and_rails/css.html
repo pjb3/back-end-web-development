@@ -114,6 +114,218 @@ A style attribute can have multiple properties, separate by semi-colons. Change 
 <h1 style="color: red; font-family: sans-serif; font-size: 48px">Hello, World</h1>
 ```
 
+The font should now be a different style and a larger size
+
+---
+
+# Cascading Styles
+
+Adding inline styles to every element is repetative and makes things hard to change an manage. To fix that, we can pull our styles out of the elements into a **style** tag in the **head**, like this:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      h1 {
+        color: red;
+        font-family: sans-serif;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, World!</h1>
+  </body>
+</html>
+```
+
+The page should look the same. This type of style has the format for properties and values as we used in the style attribute, except that they are in between the `{` and `}` curly braces.
+
+Before the curly braces we have what is called a **selector**. A selector is used to define which elements you want these styles applied to. In this case, the select is *h1*, so all `h1` tags in the document will have these styles applied.
+
+---
+
+# Multiple Tag Selectors
+
+You can use a comma to specify a list of tags that the styles should apply. Try this example:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      h1, h2 {
+        color: red;
+        font-family: sans-serif;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, World!</h1>
+    <h2>Something Else</h2>
+  </body>
+</html>
+```
+
+You will see that both the **h1** and the **h2** have the same style applied to them.
+
+---
+
+# ID selectors
+
+Any HTML tag can have an **id** attribute. The value of the id attribute should be unique to the whole document. You can use a `#` charater to refer to an element with a matching id, like this:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      #title {
+        color: red;
+        font-family: sans-serif;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="title">Hello, World!</h1>
+    <h1>Something Else</h1>
+  </body>
+</html>
+```
+
+In this example, the first `h1` has the styles applied, because it has an id of `title`, which matches what we used in the selector `#title`. The second `h1` does not have any styles applied.
+
+Be careful not to confuse tag and id selectors. If you used just `title` as the selector, that would apply the style to `title` tags, which doesn't make sense, instead of tags with an id of `title`.
+
+---
+
+# Class Selectors
+
+Another attribute that any HTML element can have is **class**. Unlike **id**, you can have multiple elements in the document with the same class, in fact that is exactly what they are designed for. Try this example:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      .title {
+        color: red;
+        font-family: sans-serif;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Hello, World!</h1>
+    <h2 class="title">Something Else</h1>
+  </body>
+</html>
+```
+
+In this case, we have 2 elements with a `class` of `title` so both of them have the styles applied.
+
+---
+
+# Combining selectors
+
+You can combine the tag, id and class selectors to narrow down which elements you would like the styles to be applied to. For example:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      h1.title {
+        color: red;
+        font-family: sans-serif;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Hello, World!</h1>
+    <h2 class="title">Something Else</h1>
+  </body>
+</html>
+```
+
+In this example, both the `h1` and the `h2` have a `class` of `title`, but the style is only applied to the `h1`. This is because the selector we are using `h1.title`, means `h1` elements with a class of `title`, as opposed to the example on the previous slide that had a selector of `.title`, which means any element with a class of `title`.
+
+---
+
+# Nested selectors
+
+We can also apply styles to child element of certain elements. For example:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <style>
+      .places li {
+        color: red;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <ul class="places">
+      <li>USA</li>
+      <li>Japan</li>
+    </ul>
+    <ul class="people">
+      <li>Dave Thomas</li>
+      <li>Yukihiro Matsumoto</li>
+    </ul>
+  </body>
+</html>
+```
+
+In this example, all the `li` elements that are children of a tag with the `places` class will have the styles applied. Notice the other `li` elements that are not children of a tag with the `places` class do not have the style applied.
+
+---
+
+# External Style Sheets
+
+Instead of a **style** tag in the head of the document, you can put your CSS in an external file, like this:
+
+```html
+<html>
+  <head>
+    <title>CSS</title>
+    <link href="hello.css" media="all" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <ul>
+      <li>USA</li>
+      <li>Japan</li>
+    </ul>
+  </body>
+</html>
+```
+
+Now put this in a file called `hello.css` in the same directory at the HTML file:
+
+```css
+li {
+  color: red;
+  font-family: sans-serif;
+}
+```
+---
+
+# More
+
+We've only scratched the surface of CSS. There are a lot of different properties that can be used, other advanced selectors, positioning, etc. These slides have provided you enough knowledge of the basics of CSS to know what it's purpose is and how to understand it.
+
+I recommend following [Shay Howe's Beginners Guide to HTML & CSS][shay] to learn more.
+
+[shay]: http://learn.shayhowe.com/html-css/
+
   </textarea><div id="slideshow"></div>
   </body>
 </html>
+
