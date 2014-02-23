@@ -422,6 +422,44 @@ but Symbols are not the same type as Strings, so they are not equal to Strings
 
 ---
 
+# Symbols vs. Strings
+
+The concept of Symbols vs. Strings is confusing to most people when first learnign Ruby. Another way to think of it is to think of Integers vs. Strings. As we said earlier, values must be of the same type to be considered equal:
+
+    .terminal
+    >> 42 == 42
+    => true
+    >> 42 == "42"
+    => false
+
+The Integer forty-two is equal to the Integer forty-two, but the Integer forty-42 is not equal to a string with the digits 4 and 2.
+
+Symbols and Strings have a similar relationship in that they are a like in a lot of ways, but still not the same class and therefore not equal. This can be confusing sometimes because you might have something like this, where you have a variable `name` that is declared elsewhere in the program:
+
+    .terminal
+    >> "Hello #{name}"
+    => "Hello paul"
+    >> name == "paul"
+    => false
+
+And you are expecting it to be a String, but it is actually a Symbol. Check the class of the Object to determine if that is the case:
+
+    .terminal
+    >> name.class
+    => Symbol
+
+---
+
+# When to use a Symbol instead of a String
+
+Once you understand the difference between Symbols and Strings, the next question you might have would be when should I use a Symbol instead of a String?
+
+Once you understand more about the Ruby language, it will be easier to explain the difference. For now, just understand that there is a difference and be able to recognize in code examples that `:this` is a Symbol and `"this"` is a String and they are not the same thing.
+
+If feel you are ready for a deep dive into this subject, try reading [this article](http://www.troubleshooters.com/codecorn/ruby/symbols.htm), but just being able to distinguish between the two is enough when you are getting started building Rails app. I suggest bookmarking that article for further reading after we've covered Ruby in more detail.
+
+---
+
 # Hashes
 
 A collection of objects named with keys
@@ -473,7 +511,7 @@ If there is no key, you get nil
 
 ---
 
-# Symbols vs. Strings
+# Symbol keys vs. Strings keys
 
 Since Symbols aren't equal to Strings, you can't get an object from a Hash using a Symbol if the keys are Strings:
 
