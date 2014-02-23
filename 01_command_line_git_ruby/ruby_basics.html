@@ -231,6 +231,33 @@ If you don't want interpolation to occur, use single quotes or precede the `#` w
 
 ---
 
+# String Formatting
+
+Another operator you can use with String is the [format operator][format], which is the `%` character. You use the format operator like this:
+
+    .terminal
+    >> "%.2f" % 9.9
+    => "9.90"
+
+In this example, the string on the left side of the `%` is treated as a format specification, which has special characters that start with a `%` in the string. On the right side of the `%` are the values you want used in the formatted string that is the result of the operation. In this case, we are saying that we want to have a floating point number always formatted with 2 decimal points.
+
+You can have multiple values interpolated into a format specification by supplying an Array, like this:
+
+    .terminal
+    >> "%-20s $%.2f" % ['Soap', 0.9]
+    => "Soap                 $0.90"
+
+In this example, we are saying we want the string printed and then padded with empty spaces up to 20 characters, and then a dollar sign followed by the floating point number with 2 decimal places.
+
+There is quite a bit you can do with the format, you can read more about in [the Ruby docs for the sprintf methods][sprintf].
+
+The formatting operator is used extensively in programs that will output text in the command line. Since almost everyone uses a [fixed-width font][fixed-width] in a terminal, the spacing can be used to produce alignment to make the output more readable.
+
+[format]: http://www.ruby-doc.org/core-2.1.0/String.html#method-i-25
+[sprintf]: http://www.ruby-doc.org/core-2.1.0/Kernel.html#method-i-sprintf
+[fixed-width]: http://en.wikipedia.org/wiki/Monospaced_font
+---
+
 # Variables
 
 Variables are named referenced to objects. You create a variable by assigning an Object to it.
