@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test-Driven Development with Ruby</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: center, middle
+
+# Test-Driven Development with Ruby
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Testing Code
+
+When you write code, you should always test that it works. The simplest way to test code is to simply run it and see if it produces the result you expect. Say you have developed a method to calculate the unit price of an order line item, and you put the following code into a file called `unit_price.rb`:
+
+```ruby
+def unit_price(line_item)
+  line_item[:total] / line_item[:quantity]
+end
+
+puts "$%.2f" % unit_price(quantity: 3, total: 6.75)
+```
+
+We know that to calculate the unit price for a line item, you divide the total cost by the quantity. If the total is $6.75 and the quantity is 3, the result should be 6.75 divided by 3, or 2.25, so the expected output of running this program is `$2.25`:
+
+    .terminal
+    $ ruby unit_price.rb
+    $2.25
+
+And now we see that the actual result was the same as the expected result, our program has "passed the test", so to speak, and we know that it works
+
+---
+
+# Automated Test
+
+The previous slide showed a manual way of testing that is easy to do and useful, but when working in larger programs, you will quickly end up with many different ways people might intereact with the program. It is useful to have a way to run a program to test the actual program to verify it work. We can also re-run the program once we make changes to verify that the program still works as expected. A simple way to do this would be to modify our program to look like this:
+
+```ruby
+def unit_price(line_item)
+  line_item[:total] / line_item[:quantity]
+end
+
+def test_unit_price(expected, line_item)
+  if unit_price(line_item) == expected
+    puts "OK"
+  else
+    raise "FAIL"
+  end
+end
+
+test_unit_price(2.25, quantity: 3, total: 6.75)
+```
+
+Now we still have our original `unit_price` method, but we've added a `test_unit_price` method. The `test_unit_price` method would not be used in the real program. It exists only so we can call it and verify that the program works as expected. If you run this program, you should see the following output:
+
+    .terminal
+    $ ruby unit_price.rb
+    OK
+
+---
+
+# A Failing Test
+
+Now let's modify our program to add another test case, where the quantity is 0. Add this line to the end of the program:
+
+    .terminal
+    test_unit_price(0, quantity: 0, total: 0)
+
+If you run it, you should see something like this:
+
+    .terminal
+    $ ruby unit_price.rb
+    OK
+    unit_price.rb:2:in `/': divided by 0 (ZeroDivisionError)
+      from unit_price.rb:2:in `unit_price'
+      from unit_price.rb:6:in `test_unit_price'
+      from unit_price.rb:14:in `<main>'
+
+Oh no, that's not what we expected! Let's go back to the fix the code.
+
+---
+
+# Fixing the failing test
+
+Modify the `unit_price` method to look like this:
+
+```ruby
+def unit_price(line_item)
+  if line_item[:quantity] > 0
+    line_item[:total] / line_item[:quantity]
+  else
+    0
+  end
+end
+```
+
+If you re-run the program, the tests should pass:
+
+    .terminal
+    $ ruby unit_price.rb
+    OK
+    OK
+
+---
+
+# Minitest
+
+If you tried to continue to use our little hand-written testing method, you would quickly run into a lot of other features that you would want. Fortunately, there is a library called `minitest` that is built right in to Ruby that we can use so we don't have to do that. Here's how we can convert our program to use miniwhat our program would look like if we convert it to use minitest. The first step is to remove all the test code from `unit_price.rb`. That file will only have the `unit_price` method now.
+
+Next, create a new file named `unit_price_test.rb` that has the following contents:
+
+```ruby
+require 'minitest/autorun'
+require './unit_price'
+
+class UnitPriceTest < MiniTest::Unit::TestCase
+  def test_with_quantity
+    assert_equal 2.25, unit_price(quantity: 3, total: 6.75)
+  end
+
+  def test_0_quantity
+    assert_equal 0, unit_price(quantity: 0, total: 0)
+  end
+end
+```
+
+We'll talk about each part of this on the following slides.
+
+---
+
+# Running the tests
+
+When you run the test, you should see the following output:
+
+    .terminal
+    $ ruby unit_price_test.rb
+    Run options: --seed 15552
+
+    # Running tests:
+
+    ..
+
+    Finished tests in 0.000407s, 4914.0049 tests/s, 4914.0049 assertions/s.
+
+    2 tests, 2 assertions, 0 failures, 0 errors, 0 skips
+
+In the output, each of the `.` dots represents one test that passed. If the test fails, you will see an `F` in it's place.
+
+---
+
+# Adding some color
+
+We can add a little color (literally) to our output be using a gem called `minitest-colorize`. To install the gem, run the following command:
+
+    .terminal
+    $ gem install minitest-colorize
+    Fetching: minitest-colorize-0.0.5.gem (100%)
+    Successfully installed minitest-colorize-0.0.5
+    1 gem installed
+
+Add the following line to `unit_price_test.rb` immediately after the line where we require `minitest/autorun`:
+
+```ruby
+require 'minitest/colorize'
+```
+
+You should now see the same output when you run `unit_price_test.rb`, except with the green color. Make a change to one of the tests to make it fail on purpose. Then run the test again and you will see red. Change the test back and run it again to make it pass and you should see green.
+
+---
+
+# Test First
+
+Having automated tests is great, but we can take it to next level with **test first** or **Test-Driven Development (TDD)**. The idea here is that we write a test first that we expect to pass when the real code is written and working, but we run the test before we have the working code, so that we see the test fail first. Once we have a failing test, we write the code we think will make it pass. If we do get a passing test, then we know we can either move on to the next thing, or improve the code (a.k.a refactor) by writing another failing test first, then writing the code to make that test pass.
+
+Take a look at the graphic on the next slide to get an idea about the flow of TDD.
+
+---
+
+class: center, middle
+
+![Ruby](img/tdd-flow.gif)
+
+---
+
+# Test-Driven Development (TDD)
+
+Let's redo the previous exercise in a TDD style. Comment out everything you have in the `unit_price.rb` file.
+
+In Sublime Text, press cmd+a to highlight all of the lines and then press cmd+/ to comment out the lines.
+
+cmd is short for command, the key with the ⌘ symbol on it, also called the Apple key. You can press cmd+/ again and again to toggle back and forth between commented out and uncommented.
+
+Make the `unit_price_test.rb` file looks like this:
+
+```ruby
+require 'minitest/autorun'
+require 'minitest/colorize'
+require './unit_price'
+
+class UnitPriceTest < Minitest::Unit::TestCase
+  def test_1_quantity
+    assert_equal 2.25, unit_price(quantity: 1, total: 2.25)
+  end
+end
+```
+
+When you run `ruby unit_price_test.rb`, you will get a error with a message that says `undefined method 'unit_price'`.
+
+One of the keys to TDD is to **write the minimum amount of code to make the failure or error message go away**. We will do that on the next slide.
+
+---
+
+# Change the message
+
+When following the TDD process, we want to get the "right" failure message before we start writing code. This gives us more confidence that the tests are testing the correct things. So in this case, go back to `unit_price.rb` and uncomment the first and last lines, so that `unit_price` is just an empty method. Run the test and you should see this in the output:
+
+    .terminal
+    UnitPriceTest#test_1_quantity [unit_price_test.rb:7]:
+    Expected: 2.25
+      Actual: nil
+
+Ok, now we have a failing test with a better message. Our method now exists, but it is returning the wrong value. Let's make this message go away in the simplest way possible. In the `unit_price` method, have it just return `2.25`, like this:
+
+```ruby
+def unit_price(line_item)
+  2.25
+end
+```
+
+If we run our tests now, they pass. We know just hard-coding `2.25` into our method doesn't mean that it actually works, so let's write another test that will fail. Add this to the test class:
+
+```ruby
+def test_2_quantity
+  assert_equal 2, unit_price(quantity: 2, total: 4)
+end
+```
+
+If you run the test, we now have a failing test. Our hard-coded implementation of `unit_price` is no longer good enough to make the tests pass.
+
+---
+
+# Add the real implementation
+
+Change the `unit_price` to look like this:
+
+```ruby
+def unit_price(line_item)
+  line_item[:total] / line_item[:quantity]
+end
+```
+
+Run the tests again and you will see that we ow we have passing tests. We've put back the version of the method though that doesn't handle quantity of 0 though, so let's add a failing test to expose that bug:
+
+```ruby
+def test_0_quantity
+  assert_equal 0, unit_price(quantity: 0, total: 0)
+end
+```
+
+And here's the code to make that pass:
+
+```ruby
+def unit_price(line_item)
+  if line_item[:quantity] > 0
+    line_item[:total] / line_item[:quantity]
+  else
+    0
+  end
+end
+```
+
+---
+
+# When should use TDD?
+
+The benefit of TDD is that it helps us write better tests that cover more edge cases. As you gain some development experience, you'll develop your own feel for what the appropriate amount of testing is for a given feature.
+
+Generally, whenever you are writing something complex enough that might not work the first time you write it, TDD is the best approach. On the other hand, when you are exploring new things and just trying to learn how things work, TDD can sometimes get in the way.
+
+For this reason, some people often write some code completely without tests that they will call "a spike", to get comfortable using a library or framework. Once you get to that point, you should start a new program and develop it in the TDD style, and only use the code in the spike as a reference.
+
+---
+
+# Wrapping Up
+
+In this lesson, we learned why and how we should write automated tests for our programs.
+
+Before leaving this lesson, take a look back once again at the unit price code we have. Can you write more tests that will fail or cause an error, maybe when they should produce a different result? Try to write a few more failing tests and then modify the implementation of the method to make the tests pass.
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
