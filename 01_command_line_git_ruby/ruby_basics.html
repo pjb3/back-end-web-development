@@ -485,7 +485,7 @@ Since Symbols aren't equal to Strings, you can't get an object from a Hash using
     >> person["name"]
     => nil
 
-or vice-versa:
+or vice-versa, if the keys are Strings, you can't access the values using Symbols:
 
     .terminal
     >> person = { "name" => "Paul" }
