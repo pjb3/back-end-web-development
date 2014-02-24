@@ -380,14 +380,14 @@ You can add elements to an Array
 An Array can hold values of any type of Object and they don't have to be of the same type:
 
     .terminal
-    >> a = [1, "Hello", nil, :foo]
-    => [1, "Hello", nil, :foo]
+    >> a = [1, "Hello", nil, false]
+    => [1, "Hello", nil, false]
 
-Because an Array can contain any Object, it can contain other Arrays, as well as more complex types that we learn about later like Hashes, Objects, Classes, etc:
+Because an Array can contain any Object, it can contain other Arrays, as well as more complex types that we learn about later like Symbols, Hashes, Objects, Classes, etc:
 
     .terminal
-    >> [[1,2], { x: 1, y: 2}, Object.new, Object]
-    => [[1, 2], {:x=>1, :y=>2}, #<Object:0x007feb121394a8>, Object]
+    >> [[1,2], :foo, { x: 1, y: 2}, Object.new, Object]
+    => [[1, 2], :foo, {:x=>1, :y=>2}, #<Object:0x007feb121394a8>, Object]
 
 ---
 
