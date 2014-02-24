@@ -201,6 +201,32 @@ Comparison
 
 ---
 
+# true and false
+
+Boolean expressions return an Object that is either `true` or `false`. Each of these objects have their own class:
+
+    .terminal
+    >> true.class
+    => TrueClass
+    >> false.class
+    => FalseClass
+
+These two objects are both commonly referred to as booleans even though they don't have the same Class.
+
+---
+
+# nil
+
+Another basic type is `nil`, which also has it's own class `NilClass`:
+
+    .terminal
+    >> nil.class
+    => NilClass
+
+`nil` is the value in Ruby that represents "nothing" or "no value". Even though it represents "nothing" or "no value", it still is an Object.
+
+---
+
 # Expressions
 
 ## String Operators
@@ -346,6 +372,22 @@ You can add elements to an Array
     => [42, 99, 100, 2001]
     >> some_numbers[3]
     => 2001
+
+---
+
+# Array Values
+
+An Array can hold values of any type of Object and they don't have to be of the same type:
+
+    .terminal
+    >> a = [1, "Hello", nil, :foo]
+    => [1, "Hello", nil, :foo]
+
+Because an Array can contain any Object, it can contain other Arrays, as well as more complex types that we learn about later like Hashes, Objects, Classes, etc:
+
+    .terminal
+    >> [[1,2], { x: 1, y: 2}, Object.new, Object]
+    => [[1, 2], {:x=>1, :y=>2}, #<Object:0x007feb121394a8>, Object]
 
 ---
 
