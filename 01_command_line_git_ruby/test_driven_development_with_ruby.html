@@ -165,7 +165,7 @@ If you re-run the program, the tests should pass:
 
 # Minitest
 
-If you tried to continue to use our little hand-written testing method, you would quickly run into a lot of other features that you would want. Fortunately, there is a library called `minitest` that is built right in to Ruby that we can use so we don't have to do that. Here's how we can convert our program to use miniwhat our program would look like if we convert it to use minitest. The first step is to remove all the test code from `unit_price.rb`. That file will only have the `unit_price` method now.
+If you tried to continue to use our little hand-written testing method, you would quickly run into a lot of other features that you would want. Fortunately, there is a library called `minitest` that is built right in to Ruby that we can use so we don't have to do that. Here's how we can convert our program to use minitest. The first step is to remove all the test code from `unit_price.rb`. That file will only have the `unit_price` method now.
 
 Next, create a new file named `unit_price_test.rb` that has the following contents:
 
@@ -204,7 +204,7 @@ When you run the test, you should see the following output:
 
     2 tests, 2 assertions, 0 failures, 0 errors, 0 skips
 
-In the output, each of the `.` dots represents one test that passed. If the test fails, you will see an `F` in it's place.
+In the output, each of the `.` dots represents one test that passed. If the test fails, you will see an `F` in its place.
 
 ---
 
@@ -264,7 +264,7 @@ class UnitPriceTest < Minitest::Unit::TestCase
 end
 ```
 
-When you run `ruby unit_price_test.rb`, you will get a error with a message that says `undefined method 'unit_price'`.
+When you run `ruby unit_price_test.rb`, you will get an error with a message that says `undefined method 'unit_price'`.
 
 One of the keys to TDD is to **write the minimum amount of code to make the failure or error message go away**. We will do that on the next slide.
 
@@ -309,7 +309,7 @@ def unit_price(line_item)
 end
 ```
 
-Run the tests again and you will see that we ow we have passing tests. We've put back the version of the method though that doesn't handle quantity of 0 though, so let's add a failing test to expose that bug:
+Run the tests again and you will see that we now we have passing tests. We've put back the version of the method though that doesn't handle quantity of 0 though, so let's add a failing test to expose that bug:
 
 ```ruby
 def test_0_quantity
@@ -331,7 +331,7 @@ end
 
 ---
 
-# When should use TDD?
+# When should you use TDD?
 
 The benefit of TDD is that it helps us write better tests that cover more edge cases. As you gain some development experience, you'll develop your own feel for what the appropriate amount of testing is for a given feature.
 
