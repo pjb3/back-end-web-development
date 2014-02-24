@@ -465,6 +465,36 @@ Although that is not typical
 
 ---
 
+# When to use constants
+
+Constants are good to use when you have a value that doesn't ever change and you might use in multiple places in your program. Even if you are only using it in one place, it's good to give a name to what the value represents, rather than using a [magic number][magic-number].
+
+For example, you could write this method like this:
+
+```ruby
+def circumference(radius)
+  2 * 3.141592653589793 * radius
+end
+```
+
+But it would better to do this:
+
+```ruby
+PI = 3.141592653589793
+
+def circumference(radius)
+  2 * PI * radius
+end
+```
+
+FYI, for this particular constant, Ruby already has it defined for you in the constant [Math::PI][pi].
+
+[magic-number]: http://en.wikipedia.org/wiki/Magic_number_(programming)#Unnamed_numerical_constants
+
+[pi]: http://www.ruby-doc.org/core-2.1.0/Math.html#PI
+
+---
+
 # Symbols
 
 Used for labeling things in code
