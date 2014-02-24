@@ -531,7 +531,7 @@ The concept of Symbols vs. Strings is confusing to most people when first learni
     >> 42 == "42"
     => false
 
-The Integer forty-two is equal to the Integer forty-two, but the Integer forty-42 is not equal to a string with the digits 4 and 2.
+The Integer forty-two is equal to the Integer forty-two, but the Integer forty-two is not equal to a string with the digits 4 and 2.
 
 Symbols and Strings have a similar relationship in that they are a like in a lot of ways, but still not the same class and therefore not equal. This can be confusing sometimes because you might have something like this, where you have a variable `name` that is declared elsewhere in the program:
 
@@ -766,7 +766,7 @@ Methods can have arguments
     >> 5.remainder(2)
     => 1
 
-The methods that an object has is determined by what type of Object it is
+The methods that an object has are determined by what type of Object it is
 
 # Methods Are Messages
 
@@ -965,6 +965,7 @@ Round a decimal
     >> 3.14159.round
     => 3
     >> 3.14159.round(2)
+    => 3.14
 
 ---
 
@@ -1018,6 +1019,7 @@ Add/remove an element from the front of the Array
     >> a.shift
     => 1
     >> a
+    => [42, 99, 100]
 
 ---
 
@@ -1026,7 +1028,7 @@ Add/remove an element from the front of the Array
 Remove an element from the Array
 
     .terminal
-    => [42, 99, 100]
+    => a = [42, 99, 100]
     >> a.delete 100
     => 100
     >> a
@@ -1113,7 +1115,7 @@ And run it from the bash command line (not IRB), like this:
     $ ruby code.rb
     2.1.0
 
-More conveinently, once you have saved the file in Sublime Text, you can press command-b to run the program from within Sublime Text. The output will look like this:
+More conveniently, once you have saved the file in Sublime Text, you can press command-b to run the program from within Sublime Text. The output will look like this:
 
     .terminal
     2.1.0
@@ -1199,7 +1201,7 @@ Run the program from the bash command line instead of from within Sublime Text a
 
 ]
 
-Before we go over local variables and scoping, lets go over how to read error messages like this.
+Before we go over local variables and scoping, let's go over how to read error messages like this.
 
 _(you can run this program from within Sublime Text and you will also get an error, but the output is a little more confusing, so I suggest running the program from the command line while learning about exceptions and exception handling)_
 ---
@@ -1224,7 +1226,7 @@ After that is the exception message, which in this case is:
     .terminal
     `<main>': undefined local variable or method `name' for main:Object
 
-These messages can be helpful for debugging the error. Before we discuss this specific error, lets go over errors in a little more detail.
+These messages can be helpful for debugging the error. Before we discuss this specific error, let's go over errors in a little more detail.
 
 The last part of the error message tells us which class the exception is. In this case it is a `NameError`.
 
@@ -1234,7 +1236,7 @@ The last part of the error message tells us which class the exception is. In thi
 
 Sometimes in programs we might have to call code where an exception could be raised. Imagine trying to download something from the Internet via Ruby code. If the network is down, the code will raise an exception.
 
-The way this code is written right now, this error is referred to as an **unhandled exception**. When you have an unhandled exception in your program, your program stops (a.k.a crashes). In this example, if we have more code after line 6, it would never be reached, because the program. Lets add some code to demonstrate that:
+The way this code is written right now, this error is referred to as an **unhandled exception**. When you have an unhandled exception in your program, your program stops (a.k.a crashes). In this example, if we have more code after line 6, it would never be reached, because the program would crash. Let's add some code to demonstrate that:
 
 ```ruby
 def say_hello(name)
@@ -1277,13 +1279,13 @@ The output will be:
 
 The `begin` keyword start a block of code that will be executed. If a NameError is raised in the begin block, the program will assign the exception to the variable `ex`, execute the contents of the rescue block and then continue executing the rest of the program.
 
-If a different class of Exception is raised in the begin block, the raise block will not be executed and the exception will be treated as a unhandled exception, meaning your program will crash.
+If a different class of Exception is raised in the begin block, the raise block will not be executed and the exception will be treated as an unhandled exception, meaning your program will crash.
 
 ---
 
 # Back to local variables
 
-So now that we know what happens when your program encounters and error, lets talk about why there is an error in this case. Lets simplify the program back the original example that caused the error:
+So now that we know what happens when your program encounters an error, let's talk about why there is an error in this case. Let's restore the program back the original example that caused the error:
 
 ```ruby
 def say_hello(name)
@@ -1296,7 +1298,7 @@ puts name
 
 When you follow the execution path of this code, you might think that in the first 3 lines, the `say_hello` method is defined, then when we call `say_hello` on line 5, the variable name is set to `"Paul"`, so on the next line, we should be able to refer to the name variable, right?
 
-No, what actually happens is that variables defined inside a method, include the ones defined as arguments, are called **local variables**. When the method starts executing, the `name` variable is set to `"Paul"` and it remains set while the `say_hello` method is executing, but once the method is done being executed the variable does **out of scope**, meaning the variable is no longer defined, which is why the `NameError` exception is raised.
+No, what actually happens is that variables defined inside a method, including the ones defined as arguments, are called **local variables**. When the method starts executing, the `name` variable is set to `"Paul"` and it remains set while the `say_hello` method is executing, but once the method is done being executed the variable goes **out of scope**, meaning the variable is no longer defined, which is why the `NameError` exception is raised.
 
 You can think of local variables as variables that temporarily exist while the method is being executed, but cease to exist once the method is finished being executed.
 
@@ -1330,7 +1332,7 @@ The output will look like this:
 
 ]
 
-The error method is multiple lines. The actual error is on line 2, but the following lines in the error method tell us how we got to the point where the exception occurred. The way to read this is that the error occurred on line 2 in the `foo` method, which was called on line 6 from the `bar` method, which was called on line 9 from the main part of the program.
+The error message is multiple lines. The actual error is on line 2, but the following lines in the error method tell us how we got to the point where the exception occurred. The way to read this is that the error occurred on line 2 in the `foo` method, which was called on line 6 from the `bar` method, which was called on line 9 from the main part of the program.
 
 These kinds of error messages are called **stack traces** and are invaluable when debugging larger programs.
 
@@ -1370,17 +1372,17 @@ for person in people
 end
 ```
 
-This will print the same output as the previous slide, but what happens here is that we create the Array with each of the names and then we use the `for` keyword to create a loop. `for` will assign the value in the first element of the array in the variable `people` to a **local variable** called `person` and then execute the body of the `for` loop. In the body of the for loop, we call the `say_hello` method, passing the value of `person`, which is `"Peter"`, as the argument.
+This will print the same output as the previous slide, but what happens here is that we create the Array with each of the names and then we use the `for` keyword to create a loop. `for` will assign the value in the first element of the array in the variable `people` to a **local variable** called `person` and then execute the body of the for loop. In the body of the for loop, we call the `say_hello` method, passing the value of `person`, which is `"Peter"`, as the argument.
 
-After the body is executed once, the next value in the array, `"Paul"`, is assigned to `person` and the body of the for loop is executed again. This process repeates until body of the for loop has been executed with the last element of the Array.
+After the body is executed once, the next value in the array, `"Paul"`, is assigned to `person` and the body of the for loop is executed again. This process repeats until the body of the for loop has been executed with the last element of the Array.
 
-For loops and methods are similar in that they both have local variables and a body that is executed with those local variables set. The difference is that the body a method is only executed once for each time your call it, whereas the body of a for loop is executed once for each element of the Array.
+For loops and methods are similar in that they both have local variables and a body that is executed with those local variables set. The difference is that the body of a method is only executed once for each time you call it, whereas the body of a for loop is executed once for each element of the Array.
 
 ---
 
 # Updating the Array
 
-Using a for loop instead of mutliple calls to the method is better because the code will work with any number of elements in the Array. Without a loop, we have to know ahead of time exactly how many names there will be and the program can only work with exactly those values. Here's an example where we add another element to the array
+Using a for loop instead of multiple calls to the method is better because the code will work with any number of elements in the Array. Without a loop, we have to know ahead of time exactly how many names there will be and the program can only work with exactly those values. Here's an example where we add another element to the array
 
 ```ruby
 def say_hello(name)
