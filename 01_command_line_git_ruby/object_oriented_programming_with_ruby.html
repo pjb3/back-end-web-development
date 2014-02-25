@@ -73,50 +73,16 @@ class: center
 
 ---
 
-# Seting up our project
-
-Initialize a git repo
-
-    .terminal
-    ~/bewd $ git init
-    Initialized empty Git repository in /Users/pbarry/bewd/.git/
-
-Add a file
-
-    .terminal
-    ~/bewd $ echo 'puts "Hello World"' > my_program.rb
-    ~/bewd $ cat my_program.rb
-    puts "Hello World"
-    ~/bewd $ ruby my_program.rb
-    Hello World
-    ~/bewd $ git add my_program.rb
-
-Commit it
-
-    .terminal
-    ~/bewd $ git commit -m 'Hello, World!'
-    [master (root-commit) 7e830fe] Hello, World!
-     1 file changed, 1 insertion(+)
-     create mode 100644 my_program.rb
-    ~/bewd $ git --no-pager log
-    commit 7e830fed3ff0ea51793d42d1e0c7367d28ad57a8
-    Author: Paul Barry <mail@paulbarry.com>
-    Date:   Mon Sep 9 05:38:09 2013 +0200
-
-        Hello, World!
-
----
-
 # Defining A Class
 
-All Objects have a Class. You can use the built in ones or create your own.
+All objects have a class. All class names in Ruby must be a constnact, so they must start with a capital letter. By convention, classes follow the **CamelCase** style instead of the **snake_case** style that is used for variable and method names or the **ALL_CAPS** style that is used for regular constants. You can use the built-in classes or create your own. Put this into a file named `my_program.rb`:
 
 ```ruby
 class Product
 end
 ```
 
-An Object is an instance of a Class.
+An object is an instance of a class. You can think of the class as a factory for making objects.
 
 You create an object by instantiating the class.
 
@@ -132,12 +98,7 @@ puts product.inspect
     $ ruby my_program.rb
     #<Product:0x007fd9b29f5c48>
 
-Commit it
-
-    .terminal
-    $ git commit -am 'defined a class'
-    [master ea24f40] defined a class
-     1 file changed, 3 insertions(+), 7 deletions(-)
+The weird looking numbers in the output here represent the object ID that Ruby assigns to every new object that is created while your program is running. Ruby uses this internally to keep track of your objects, but it also helpful to look at sometimes to determine if two variables are referring to the same object instance.
 
 ---
 
@@ -156,20 +117,15 @@ product = Product.new("iPhone", 499)
 puts product.inspect
 ```
 
-The `initialize` method is called the initializer (or constructor, in other languages).  It is run when the object is created with `new`
+The `initialize` method is called the initializer (or constructor, in other languages).  It is run when the object is created with the `new` method that you call on a class.
 
-Instance variables start with a `@` and can be accessed from within the class
+Instance variables start with a `@` and can be accessed from within the class.
 
     .terminal
     $ ruby my_program.rb
     #<Product:0x007fe0eb1f57d8 @name="iPhone", @price=499>
 
-Commit it
-
-    .terminal
-    $ git commit -am 'added an initializer to initialize instance variables'
-    [master b30991e] added an initializer to initialize instance variables
-     1 file changed, 5 insertions(+), 1 deletion(-)
+As you can see, the value of the instance variables are also included in the output when IRB inspects your object. Think of instance variables as being attached to an object instance, which is why they are called instance variables.
 
 ---
 
@@ -197,7 +153,7 @@ puts product.name
 puts product.price
 ```
 
-Accessor methods expose the Objects instance variables refer to outside of the class
+Reader methods, which have the same name as the instance variable, allow you to get value of an object's instance variables to outside of the class:
 
     .terminal
     $ ruby my_program.rb
@@ -210,38 +166,27 @@ Accessor methods expose the Objects instance variables refer to outside of the c
 
 ```ruby
 class Product
-  # Constructor omitted...
-  def name
-    @name
-  end
-
   def name=(name)
     @name = name
-  end
-
-  def price
-    @price
-  end
-
-  def price=(price)
-    @price = price
   end
 end
 
 product = Product.new
 product.name = "iPhone"
-product.price = 499
-
 puts product.inspect
-puts product.name
-puts product.price
 ```
+
+A writer method allows you to set the value of an object's instance variable from outside of the class.
+
+    .terminal
+    $ ruby my_program.rb
+    #<Product:0x007f98320f8170 @name="iPhone">
 
 ---
 
 # attr_accessor
 
-Have Ruby generate readers and writers for you with `attr_accessor`
+Ruby can generate readers and writers for you with `attr_accessor`
 
 ```ruby
 class Product
@@ -263,11 +208,16 @@ puts product.name
 puts product.price
 ```
 
+    .terminal
+    #<Product:0x007fd96c88fcc8 @name="iPhone", @price=499>
+    iPhone
+    499
+
 ---
 
 # State
 
-Objects hold state
+Objects hold the state of some data and provide methods to do things with that data. Add this to the same program where the `Product` class is defined:
 
 ```ruby
 class Catalog
@@ -281,30 +231,50 @@ class Catalog
 end
 ```
 
-`||=` is the short for
+The `||=` operator will assign a value to the variable on the left side if it does not have one. It is the same thing as:
 
 ```ruby
-if @products
-  @products
-else
-  @products = []
-end
+@products || @products = []
 ```
 
-Add products to the catalog
+Now in [your program][my_program], add some products to the catalog and take a look at what you have:
 
 ```ruby
 catalog = Catalog.new
 catalog.add Product.new("iPhone", 499)
 catalog.add Product.new("T-Shirt", 19)
+
+puts catalog.inspect
 ```
+
+[my_program]: https://gist.github.com/pjb3/4e9aa40751226d482c1d
 
 ---
 
 # Inheritance
 
-You can subclass a class to override or extend behavior
+You can subclass a class to override or extend behavior. When creating a class, if after the name you use the `<` operator and then the name of another class, that means the class you are creating will be a subclass of that class. In this case, `CatalogDatabase` is a subclass of `Catalog`:
 
+```ruby
+class CatalogDatabase < Catalog
+end
+```
+
+Now change catalog to be a `CatalogDatabase` instead of a `Catalog`, so the full program looks like [this][my_program].
+
+Notice that the method `add` that we previous defined in the super class `Catalog` is available to be called on our `catalog` instance, even though the `CatalogDatabase` class itself does not directly define an `add` method. It is inherited from the super class `Catalog`.
+
+[my_program]: https://gist.github.com/pjb3/7cd75cb1726081abecf9
+
+---
+
+# Overriding methods
+
+In a subclass, if you create a method with the same name as a method in the super class, that **overrides**, or replaces, the method in the super class with the one in the subclass.
+
+If you want to call the method from the super class, you use `super`. With no parentheses and no arguments, `super` calls the super class version of the method with the same arguments passed to the method in which `super` is being called from.
+
+.small[
 ```ruby
 class CatalogDatabase < Catalog
   def add(product)
@@ -313,124 +283,100 @@ class CatalogDatabase < Catalog
   end
 
   def add_to_database(product)
+    # A real program would be complicated than this
     puts "Adding #{product.inspect} to the database"
-    # TODO: Add code to add to database
   end
 end
 ```
+]
+
+In this example, the in the `add` method, the parent version of the method is called first, then `add_to_database` is called.
+
+The output of [the program][my_program] will look like this, except all on one line:
+
+
+.small[
 
     .terminal
-    $ irb -r ./my_program
-    >> catalog = CatalogDatabase.new
-    => #<CatalogDatabase:0x007f98acabd370>
-    >> catalog.add Product.new("iPhone", 499)
-    Adding #<Product:0x007f98acaa6328 @name="iPhone", @price=499> to the database
-    >> catalog.add Product.new("T-Shirt", 19)
-    Adding #<Product:0x007f98aca8d530 @name="T-Shirt", @price=19> to the database
-    >> catalog
-    => #<CatalogDatabase:0x007f98acabd370 @products=[#<Product:0x007f98acaa6328 ...
-    >> catalog.class.ancestors
-    => [CatalogDatabase, Catalog, Object, Kernel, BasicObject]
+    Adding #<Product:0x007fc62b0e64f8 @name="iPhone", @price=499> to the database
+    Adding #<Product:0x007fc62b0e6318 @name="T-Shirt", @price=19> to the database
+    #<CatalogDatabase:0x007fc62b0e6548 @products=[
+      #<Product:0x007fc62b0e64f8 @name="iPhone", @price=499>,
+      #<Product:0x007fc62b0e6318 @name="T-Shirt", @price=19>
+    ]>
+
+]
+
+[my_program]: https://gist.github.com/pjb3/d755e039c4e26ae77d1e
 
 ---
 
 # Modules
 
-Modules are used to share behavior
+Modules are used to share methods between classes. Modules are like classes in that they contain methods, but module can't be directly instantiated. To use a module, you must **include** it into a class and then the methods defined in the module exist on the class as if they were defined in the class.
 
 ```ruby
 module DatabasePersistence
-  def add_to_database
-    puts "Adding #{inspect} to the database"
+  def add(product)
+    super
+    add_to_database(product)
   end
-end
 
-class Product
-  include DatabasePersistence
+  def add_to_database(product)
+    # A real program would be complicated than this
+    puts "Adding #{product.inspect} to the database"
+  end
 end
 
 class CatalogDatabase < Catalog
-  def add(product)
-    super
-    product.add_to_database
-  end
+  include DatabasePersistence
 end
 ```
 
-    .terminal
-    $ irb -r ./my_program
-    >> catalog = CatalogDatabase.new
-    => #<CatalogDatabase:0x007fcf59b51758>
-    >> catalog.add Product.new("T-Shirt", 19)
-    Adding #<Product:0x007fcf59b3a490 @name="T-Shirt", @price=19> to the database
-    >> Product.ancestors
-    => [Product, DatabasePersistence, Object, Kernel, BasicObject]
+[This version of the program][my_program] works the same as the previous version and produces the same output, but does so using a module. This module could be reused by being included into other classes.
+
+[my_program]: https://gist.github.com/pjb3/b312baefbf9f175e9a2d
 
 ---
 
-# Blocks
+# Ancestors
 
-Used for iteration, but also much more
-
-```ruby
-catalog.products.each do |product|
-  puts "#{product.name} #{product.price}"
-end
-```
-
-Same as
-
-```ruby
-for product in catalog.products
-  puts "#{product.name} #{product.price}"
-end
-```
-
-To get an Array of all prices, you could do this
-
-```
-prices = []
-for product in products
-  prices << product.price
-end
-prices
-```
-
-This is shorter and much more common
+Modules work similar to classes in that they are inserted into the class hierarchy for the class just like other classes. You can use the `ancestors` method to see the class hierarchy for a class:
 
     .terminal
-    >> catalog.products.map{|p| p.price }
-    => [499, 19]
+    $ irb -r ./my_program.rb
+    >> CatalogDatabase.ancestors
+    => [CatalogDatabase, DatabasePersistence, Catalog, Object, Kernel, BasicObject]
 
----
+This should be read as `CatalogDatabase` is a subclass of `DatabasePersistence`, which is a subclass of `Catalog`, which is a subclass of `Object`, etc...
 
-# Enumerable
-
-Return only elements that the block evaluates to truthy for
-
-    .terminal
-    >> [1,2,3,4,5].select{|e| e.even? }
-    => [2, 4]
-
-Return the first element that the block evaluates to truthy for
+Ruby does keep track of which of these classes are actually classes so when you call `superclass` you do actual get the class that the class is a subclass of. Modules in the class hierarchy are skipped over until an actual class, not a module, is reached.
 
     .terminal
-    >> [1,2,3,4,5].detect{|e| e.even? }
-    => 2
+    >> CatalogDatabase.superclass
+    => Catalog
 
-Sort the elements based on what is returned by the block
-
-    .terminal
-    >> people = [{ name: 'Peter' }, { name: 'Paul' }, { name: 'Mary' }]
-    => [{:name=>"Peter"}, {:name=>"Paul"}, {:name=>"Mary"}]
-    >> people.sort_by{|p| p[:name] }
-    => [{:name=>"Mary"}, {:name=>"Paul"}, {:name=>"Peter"}]
-
-See more at [http://ruby-doc.org/core-2.0.0/Enumerable.html](http://ruby-doc.org/core-2.0.0/Enumerable.html)
+Modules give Ruby the benefits of multiple inheritance without [the problems that come with true multiple inheritance](http://stackoverflow.com/questions/406081/why-should-i-avoid-multiple-inheritance-in-c)
 
 ---
 
 # self
+
+The current instance of a class can be referenced from within methods of a class as the special variable called `self`. Notice in the `discount` method in this code example, the call to `self.price`:
+
+```ruby
+class Product
+  DISCOUNT_RATE = 0.2
+
+  attr_accessor :name, :price
+
+  def discount
+    self.price * DISCOUNT_RATE
+  end
+end
+```
+
+You don't have to explicitly use `self`. If you leave it out, Ruby will assume you want to call the method on `self`:
 
 ```ruby
 class Product
@@ -444,13 +390,11 @@ class Product
 end
 ```
 
-In this example, because there is no local variable price, it calls the `price` method of the instance
-
 ---
 
 # Gotchas
 
-Local variables take precedence of methods. This doesn't work:
+When you leave out `self`, there is no difference in the syntax between local variables and method calls with no arguments. This can cause problems though, like when trying to call a writer method, like this:
 
 ```ruby
 class Product
@@ -460,7 +404,7 @@ class Product
 end
 ```
 
-Because it creates a local variable price that is then unused. This is how to do that:
+This doesn't do what you want because it creates a local variable `price` that is then unused. For this reason, when calling a writer, you must explicitly use `self`, like this:
 
 ```ruby
 class Product
@@ -474,10 +418,12 @@ end
 
 # Shadowing methods with local variables
 
-Be careful of shadowing a method with a local variable
+Be careful of shadowing a method with a local variable. In the following code example, in the first line in the discount method, we establish a local variable named `price`. Then on the following line, the local variable is used instead of the reader method by the same name:
 
 ```ruby
 class Product
+  attr_accessor :price
+
   def discount
     price = 99
     price * DISCOUNT_RATE
@@ -485,7 +431,7 @@ class Product
 end
 ```
 
-You can always call the method instead of the local variable if you use self
+You can always call the method instead of the local variable if you use `self` explicitly
 
 ```ruby
 class Product
@@ -496,6 +442,7 @@ class Product
 end
 ```
 
+The common style in Ruby is to not call `self` explicitly unless you need to.
 
 ---
 
@@ -528,13 +475,13 @@ A writer is just syntactic sugar for calling a method than ends in `=`
     >> product.name=('iPhone')
     => "iPhone"
 
-If it's just a method, then we can call it with send
+If it's just a method, then we can call it with `send`:
 
     .terminal
     >> product.send('name=', 'iPhone')
     => "iPhone"
 
-If we can call it with send, we can dynamically create the name of the writer
+If we can call it with `send`, we can dynamically create the name of the writer
 
     .terminal
     >> attr = 'name'
@@ -560,41 +507,20 @@ class Product
 end
 ```
 
+Therefore we can now instantiate our Product using a Hash:
+
     .terminal
     $ irb -r ./my_program
     >> Product.new(name: 'iPhone', price: 499)
     => #<Product:0x007f89652b4878 @name="iPhone", @price=499>
 
----
-
-# Class Methods
-
-If you prefix the method name with `self.`, it makes it a method of the Class, instead of an instance methods
-
-```ruby
-class Product
-  def self.find(name)
-    # TODO: Make this work
-    puts "I'm supposed to find the product named '#{name}'"
-  end
-end
-```
-
-    .terminal
-    $ irb -r ./my_program
-    >> Product.find('iPhone')
-    I'm supposed to find the product named 'iPhone'
-    => nil
-    >> Product.new.find
-    NoMethodError: undefined method `find' for #<Product:0x007f8223ae59a0>
-      from (irb):7
-      from /Users/pbarry/.rbenv/versions/2.0.0-p247/bin/irb:12:in `<main>'
+This style of initializer is commonly used in Rails code as you will see later.
 
 ---
 
-# Classes can have instance variables
+# Classes are objects too
 
-Because Classes are Objects, instances of the Class Class, they have instance variables
+In Ruby, classes are objects too. They are instances of the class `Class`. Defining a class in the normal way, like this:
 
 ```ruby
 class Product
@@ -602,7 +528,7 @@ class Product
 end
 ```
 
-is equivalent to
+is actually just using a syntactic construct that is the same as this code:
 
 ```ruby
 Product = Class.new do
@@ -610,102 +536,199 @@ Product = Class.new do
 end
 ```
 
-A Class is just an instance of Class that is assigned to a Constant
+A class is just an instance of `Class` that is assigned to a constant.
 
 ---
 
-# Pulling It Together
+# Classes can have methods
 
+Since classes are objects, you can define methods on `Class` and then you will be able to call that method directly on a class. Class methods are useful for creating objects in a more specialized way than just instantiating it. For example, let's say we want a method where we pass it the id (a.k.a primary key) for a record in the database and we want the method to look up the record in the database that matches that id, instantiate an object and set all of the attributes on the object with the values from the columns we get from the database.
+
+We won't actually implement that method now because it's fairly complex, so we'll create a method that would do all that but for now just prints a string in place of making an actual database query:
+
+.small[
+```ruby
+class Class
+  def find(id)
+    puts "TODO: Get the #{name.downcase} record with id=#{id}"
+    new
+  end
+end
+
+class Product
+end
+
+Product.find(1)
+```
+]
+
+The output of this program is:
+
+.small[
+
+    .terminal
+    TODO: Get the product record with id=1
+
+]
+
+There are couple of interesting things happening here, let's go over each one
+
+---
+
+# Open Classes
+
+.small[
+```ruby
+class Class
+  def find(id)
+    puts "TODO: Get the #{name.downcase} record with id=#{id}"
+    new
+  end
+end
+```
+]
+
+First, `Class` is a class that is built-in to Ruby. Shouldn't we have gotten an error when we tried to define a class with the same name?
+
+No, we don't and the reason is that Ruby has a concept which is referred to as **open classes**. What this means is that when you create a class definition for a class that already exists, the code is applied to the original class as if it were in the original class definition. So this code:
+
+.small[
+```ruby
+class Foo
+  def foo; "foo"; end
+end
+
+class Foo
+  def bar; "bar"; end
+end
+```
+]
+
+is equivalent to
+
+.small[
+```ruby
+class Foo
+  def foo; "foo"; end
+  def bar; "bar"; end
+end
+```
+]
+
+.small[
+_In Ruby, you can put multiple statements on one line and separate them with `;` semi-colon characters. This is generally a frowned upon style and I only did so here to fit everything on one slide._
+]
+
+---
+
+# Predefined class methods
+
+.small[
+```ruby
+class Class
+  def find(id)
+    puts "TODO: Get the #{name.downcase} record with id=#{id}"
+    new
+  end
+end
+```
+]
+
+Another interesting thing here is this `name` method. This method can be called on any class to get its name:
+
+    .terminal
+    >> String.name
+    => "String"
+
+In this example, `name` is being called on the class without explicitly referring to `self` because as we said earlier, Ruby allows you to omit `self` if there is no conflicting local variable name.
+
+---
+
+# Defining methods on object instances
+
+The problem with our find method is that we have defined the method for all classes. This is not what we want, we just want a method defined on our class. But how can we do that?
+
+The answer is that Ruby allows you to define a method directly on an object. You do that by putting the object instance before the method name in `def`. For example, we can create a String that has a `shout` method.
+
+.small[
+```ruby
+msg = "hello"
+
+def msg.shout
+  "#{upcase}!"
+end
+
+puts msg.shout
+
+puts "Something Else".shout
+```
+]
+
+In this example, we create the `msg` string and then we define a method on that instance with `def msg.shout`. Now when we call the `shout` method on that string, it works, but if we try to call that method on another string we get an error:
+
+.small[
+
+    .terminal
+    HELLO!
+    my_program.rb:9:in `<main>': undefined method `shout' for "Something Else":String (NoMethodError)
+
+]
+
+---
+
+# Singleton Class
+
+So how does this work? How does Ruby allow you have methods just on an object?
+
+The answer each object actually has a special class called the `singleton_class`:
+
+    .terminal
+    >> "".singleton_class
+    => #<Class:#<String:0x007fb6189ba250>>
+
+When you call a method on an object, Ruby first checks the object's singleton class to see if it has the method. If it does not, then it checks each class in the object's ancestors, and uses the method from the first class it finds that has a method with that name.
+
+---
+
+# Class Methods
+
+So now armed with knowledge, we know that we could move our `find` method from `Class` to `Product`, like this:
+
+.small[
+```ruby
+def Product.find(id)
+  puts "TODO: Get the #{name.downcase} record with id=#{id}"
+  new
+end
+```
+]
+
+This works, but there is a better way. In the context of a class definition, `self` refers to the class that is being defined, therefore if you prefix the method name with `self.`, you accomplish the same result:
+
+.small[
 ```ruby
 class Product
-  attr_accessor :name, :price
-
-  def initialize(attrs={})
-    attrs.each do |attr, value|
-      send("#{attr}=", value)
-    end
-  end
-
-  def self.products
-    @products ||= []
-  end
-
-  def self.add(attrs)
-    products << new(attrs)
-  end
-
-  def self.find(name)
-    products.detect{|p| p.name == name }
+  def self.find(id)
+    puts "TODO: Get the #{name.downcase} record with id=#{id}"
+    new
   end
 end
 ```
+]
+
+This is typically the way you will see class methods defined in Ruby code.
+
+To learn more about this topic and help deepen your understanding of Ruby in general, check out the [The Ruby Object Model and Metaprogramming](http://pragprog.com/screencasts/v-dtrubyom/the-ruby-object-model-and-metaprogramming) videos by Dave Thomas. They are not free, but are well worth. If you watch these videos and understand them, you are well on your way to becoming an expert Ruby programmer.
 
 ---
 
-# Pulling It Together
+# Review
 
-    .terminal
-    $ irb -r ./my_program
-    >> Product.add(name: 'T-Shirt')
-    => [#<Product:0x007f8223b46e30 @name="T-Shirt">]
-    >> Product.add(name: 'iPhone', price: 499)
-    => [#<Product:0x007f8223b46e30 @name="T-Shirt">, ...]
-    >> Product.find('iPhone')
-    => #<Product:0x007f8223b25870 @name="iPhone", @price=499>
+That completes our whirlwind tour of Object-Oriented Programming in Ruby. Here's what we covered:
 
----
+* Classes are factories for making objects
+* How to use modules for sharing behavior / multiple inheritance
 
-# Automated tests
-
-```ruby
-require 'minitest/autorun'
-
-class HelloTest < MiniTest::Unit::TestCase
-  def test_hello
-    assert_equal "hello", "hello"
-  end
-end
-```
-
-    .terminal
-    $ ruby my_test.rb
-    Run options: --seed 10484
-
-    # Running:
-
-    .
-
-    Finished in 0.001633s, 612.3699 runs/s, 612.3699 assertions/s.
-
-    1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
-
----
-
-# Homework
-
-Make an object-oriented version of the program we created in the last class. Once your program is working, this test should pass.
-
-```ruby
-require 'minitest/autorun'
-
-# Write your code here
-
-class OrderTest < MiniTest::Unit::TestCase
-  def test_total_price
-    Product.add(name: "Muffin", price: 2.99)
-    Product.add(name: "Coffee", price: 3.75)
-    Product.add(name: "Smoothie", price: 3.99)
-
-    order = Order.new(tax_rate: 0.05)
-
-    order.add 2, "Muffin"
-    order.add 1, "Coffee"
-    order.add 1, "Smoothie"
-
-    assert_equal 14.41, order.total_price
-  end
-end
-```
   </textarea><div id="slideshow"></div>
   </body>
 </html>
