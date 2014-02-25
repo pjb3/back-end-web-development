@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Functional Programming with Ruby</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+class: center
+
+# Functional Programming with Ruby
+
+![Ruby](img/lambda.png)
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Ruby is a Functional Language
+
+Functional programming is a style of programming that makes extensive use of functions. In this context, when we talk about functions, we mean something like functions in the mathematical sense. A function takes some input and produces an output.
+
+For example, if _f(x) = x + 1_, then _f(1)_ would be 2.
+
+In this function, the input is a single integer 1 and the output is 2.
+
+As you'll see in this lesson, Ruby encourages programming in a functional style.
+
+---
+
+# First-Class Functions
+
+In order to do functional programming in a language, that language must have **first-class functions**. To have support for first-class functions in a programming language, you must be able to:
+
+* Create new functions at runtime
+* Assign a function to a variable
+* Pass a function as an argument to a function
+* Return a function as the result of a function
+
+Ruby supports all of these and even has special syntax to support doing these types of things as easily as possible.
+
+# Higher-Order Functions
+
+When you have a function that accepts another function as it argument, that is commonly referred to a **higher-order function**. Ruby has special built-in support for higher-order functions called blocks that you will learn more about in a few minutes.
+
+---
+
+# Purely Functional Programming
+
+One other aspect of pure mathematical functions is that they have no side effects. A side effect means that something happens or changes as a result of calling the function. Examples of side effects that functions typically have in programming languages are:
+
+* Changing the value of a global variable
+* Deleting a file
+* Sending email
+
+A function that has no side effects is called a **pure function**. Pure functions are much easier to test and debug, because you don't have to worry about anything other than the inputs to a function and the code within it to reason about what happens when the function is called.
+
+On the other hand, if you know that a function may interact with files on the computer, make network calls or refer global variables that can change, you can't be sure what will happen when the function is called unless you know what the exact state of all of those things is at the exact moment that the function is called.
+
+---
+
+# Ruby is not a Purely Functional Language
+
+Some languages, such as Haskell, have features to encourage working with pure functions, therefore Haskell is known as a **purely functional language**. Since Ruby allows for side effects anywhere in functions, it is not considered a purely functional language. Most mainstream programming languages, including C, Java, C#, JavaScript, PHP, Python, Perl are also not purely functional languages.
+
+If you are interested in learning more about pure functional programming, I highly suggest you read the book [Learn You A Haskell][lyah]. It's my personal favorite programming book. Although it's unlikely you will find yourself programming in Haskell, you will learn much more about functional programming and will therefore be a better Ruby programmer if you learn Haskell.
+
+For this lesson, we are going to stick to how Ruby encourages the use of higher-order functions.
+
+[lyah]: http://learnyouahaskell.com
+
+---
+
+# Proc
+
+In Ruby, you define a function like this:
+
+    .terminal
+    >> f = -> (x) { x + 1 }
+    => #<Proc:0x007faacb88bf58@(irb):2 (lambda)>
+
+As we said in [the first lesson on Ruby][first-lesson], every value in Ruby is an Object and functions are no different. **Proc** is the class in Ruby for functions. In this example, the variable `f` is assigned a Proc as its value.
+
+The `->` operator indicates the start of the Proc. If the Proc has arguments, they are included in a comma-separated list in between parentheses, similar to how arguments to methods are defined.
+
+After the argument is the body of the Proc between curly braces. You call a Proc using the `call` method or with square brackets:
+
+    .terminal
+    >> f.call(1)
+    => 2
+    >> f[1]
+    => 2
+
+
+[first-lesson]: http://pjb3.github.io/back-end-web-development/01_command_line_git_ruby/ruby_basics#4
+
+---
+
+# Blocks
+
+Procs are rarely used directly in Ruby code. Ruby has a special syntactic construct for passing a Proc to a method, which looks like this:
+
+    .terminal
+    >> 3.times { puts "hello" }
+    hello
+    hello
+    hello
+
+In this case, this isn't referred to as a Proc, it is called a **Block**. The curly braces mark the start and end of the block. You can also use the `do` and `end` to create blocks, like this:
+
+```ruby
+3.times do
+  puts "hello"
+end
+```
+
+It's easy for methods to accept a block, so you see it used extensively in Ruby code.
+
+---
+
+# Block Arguments
+
+Just like methods and Procs, blocks take arguments. Arguments go between `|` characters inside the `{` `}` or `do` and `end` keywords:
+
+    .terminal
+    >> 3.times {|n| puts n }
+    0
+    1
+    2
+
+```ruby
+3.times do |n|
+  puts n
+end
+```
+
+---
+
+# Method Arguments
+
+Methods can accept arguments in addition to the block, as in the case of the built-in `upto` method:
+
+    .terminal
+    >> 2.upto(5) {|n| puts n }
+    2
+    3
+    4
+    5
+
+---
+
+# Each
+
+One area in Ruby that you see blocks used extensively is with the `each` method of Array. The `each` method allows you to iterate over an Array and do something with each element, similar to a for loop, but using a block:
+
+    .terminal
+    >> [1,2,3].each{|n| puts n }
+    1
+    2
+    3
+
+You can also use each with a Hash, the difference being that the block you pass to `each` with a Hash takes 2 arguments, one for the key and one the value:
+
+    .terminal
+    >> { x: 1, y: 2, z: 3}.each{|k,v| puts "#{k}=#{v}" }
+    x=1
+    y=2
+    z=3
+
+---
+
+# Enumerable
+
+The `each` method provides the basis for a whole series of methods that can be used to transform anything that can be iterated over by a method named `each`. These methods are most commonly used with Arrays, but they can be used in other situations as well.
+
+Each of these methods usually has two names, one shorter name which typically comes from the terminology used in functional programming and a longer name that ends in "ect" that comes from Smalltalk terminology.
+
+The methods are defined in a module called [Enumerable][enumerable] and you can get the full list of methods from that documentation.
+
+[enumerable]: http://ruby-doc.org/core-2.1.1/Enumerable.html
+
+---
+
+# Map / Collect
+
+You will often want to transform an Array of Objects into an Array of other Objects. For example, say you want to convert an Array of Floats into an Array of Strings representing a formatted price. You can do that using [map][map]:
+
+    .terminal
+    >> [1.1, 2.2, 3.3].map{|p| "$%.2f" % p }
+    => ["$1.10", "$2.20", "$3.30"]
+
+Map takes each element of the Array, calls the block passing the element as an argument and then collects the result of each call of the block into a new Array.
+
+The other name this method is aliased to is `collect`.
+
+The following code is equivalent, but is considered poor Ruby style:
+
+```ruby
+a = []
+for p in [1.1, 2.2, 3.3]
+  a << "$%.2f" % p
+end
+a
+```
+
+[map]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-map
+
+---
+
+# Filter / Select
+
+If you want to get the objects out of an Array that meet some condition, you can filter the Array using the [find_all][find_all] method:
+
+    .terminal
+    >> [1,2,3,4].find_all{|e| e.even? }
+    => [2, 4]
+
+This method will call the block for each element and return an Array with just the values for which the block returns a truthy value. Remember that in Ruby, all values besides `nil` and `false` are considered to be truthy. In most functional languages this method is called `filter`. The other name this method goes by in Ruby is `select`.
+
+There is a negative version of this method called `reject` that gives you all elements for which the block returns a falsy value, which means `nil` or `false`:
+
+    .terminal
+    >> [1,2,3,4].reject{|e| e.even? }
+    => [1, 3]
+
+[find_all]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-find_all
+
+---
+
+# Reduce / Inject
+
+If you want to do something like get the sum or the product of all values in an Array, you can use [reduce]:
+
+    .terminal
+    >> [1,2,3,4].reduce(0){|sum, e| sum + e }
+    => 10
+
+Reduce takes a initial value as an argument, then it calls the block once for each element in the Array, passing 2 arguments to the block. The first argument is the result of the previous evaluation of the block, or in the case of the first element, it is the initial value. The second argument is the current element of the Array.
+
+The other name this method goes by is `inject`. Another way you see this method used is to produce a Hash from an Array, like this:
+
+    .terminal
+    >> [1,2,3,4].inject({}){|h, e| h[e] = e * e; h }
+    => {1=>1, 2=>4, 3=>9, 4=>16}
+
+Here we pass an empty Hash as the initial value. Then in the block, we assign the value of the element times itself to the key of just the element. Then on the next line, you have to return the Hash, so that the modified Hash will be used as the first argument to the block in the next iteration.
+
+Here's what that code would look like if you put each part on a separate line:
+
+```ruby
+[1,2,3,4].inject({}) do |h, e|
+  h[e] = e * e
+  h
+end
+```
+
+[reduce]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-reduce
+
+---
+
+# Find / Detect
+
+If you are looking for the first value in an Array that meets a condition, you can use [find][find]:
+
+    .terminal
+    >> [1,2,3,4].find{|e| e.even? }
+    => 2
+
+The other name for this method is `detect`.
+
+[find]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-find
+
+---
+
+# Sorting
+
+If you want to sort an Array, you can simply call [sort]:
+
+    .terminal
+    >> [2,3,1].sort
+    => [1, 2, 3]
+
+But say you have an Array of Hashes and you want to sort them by their name values. You can do so using [sort_by]:
+
+.small[
+
+    .terminal
+    >> [{ name: 'joe', age: 44}, { name: 'bob', age: 38 }, { name: 'jim', age: 22 }].sort_by{|p| p[:name] }
+    => [{:name=>"bob", :age=>38}, {:name=>"jim", :age=>22}, {:name=>"joe", :age=>44}]
+
+]
+
+If you modify the block, you can sort them by age instead:
+
+.small[
+
+    .terminal
+    >> [{ name: 'joe', age: 44}, { name: 'bob', age: 38 }, { name: 'jim', age: 22 }].sort_by{|p| p[:age] }
+    => [{:name=>"jim", :age=>22}, {:name=>"bob", :age=>38}, {:name=>"joe", :age=>44}]
+
+]
+
+[sort]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-sort
+[sort_by]: http://ruby-doc.org/core-2.1.1/Enumerable.html#method-i-sort_by
+
+---
+
+# Methods That Accept Procs
+
+The following code takes a bit of time to execute:
+
+    .terminal
+    >> 10_000_000.times {|n| n * n }
+    => 10000000
+
+How much time does it take? We can measure it like this:
+
+    .terminal
+    >> t0 = Time.now; 10_000_000.times {|n| n * n }; Time.now - t0
+    => 0.946136
+
+Ok, just under a second. But wouldn't it be nice to have a general way do to this? We could write a method that accepts a Proc to call, calls it and returns how long it took:
+
+    .terminal
+    >> timer = -> (proc) { t0 = Time.now; proc.call; Time.now - t0 }
+    => #<Proc:0x007f9a1b3511e8@(irb):24 (lambda)>
+    >> timer.call(-> { 10_000_000.times {|n| n * n } })
+    => 0.93728
+
+This works, but it's a bit ugly. Blocks were added to Ruby for just this case, so let's convert this example to use a block.
+
+---
+
+# Methods That Accept Blocks
+
+```ruby
+def time
+  t0 = Time.now
+  yield
+  Time.now - t0
+end
+```
+
+In a Ruby method, you use `yield` to call the block that was passed to the method. We now have a time method we can call with a block:
+
+    .terminal
+    >> time { 10_000_000.times {|n| n * n } }
+    => 0.951184
+
+What happens if you call this method without a block?
+
+    .terminal
+    >> time
+    LocalJumpError: no block given (yield)
+
+Whoops! How can we fix this?
+
+---
+
+# Block Given
+
+We can fix this by using another construct built into Ruby which is called `block_given?`:
+
+```ruby
+def time
+  t0 = Time.now
+  yield if block_given?
+  Time.now - t0
+end
+```
+
+Now it works with or without a block:
+
+    .terminal
+    >> time
+    => 6.0e-06
+    >> time { 10_000_000.times {|n| n * n } }
+    => 0.962209
+
+The first result is just a very small number formatted in scientific notation.
+
+---
+
+# Assigning a block to a Proc
+
+If you would like, you can assign the block to a variable in a method definition. It is then available as a Proc object.
+
+```ruby
+def time(&block)
+  t0 = Time.now
+  block.call if block
+  Time.now - t0
+end
+```
+
+When you put an `&` character in front of the name of the last argument to a method, that means that argument is the block. Since a method can only have one block, you can only have one argument per method defined like this.
+
+You can similarly use the `&` character to pass a Proc object as the block to a method, like this:
+
+    .terminal
+    >> slow_loop = -> { 10_000_000.times {|n| n * n } }
+    => #<Proc:0x007ff50a090b80@(irb):1 (lambda)>
+    >> time &slow_loop
+    => 0.963149
+
+This works regardless of how the method is defined, with no argument and using yield to call the block, or with a named argument and treating the block as a Proc.
+
+---
+
+# Recap
+
+In this lesson you've learned:
+
+* Ruby is a functional language, but not a purely functional langauge
+* Ruby has first-class functions
+* Ruby has the special syntactic construct called Block to make the use of higher-order functions look cleaner
+* How to use some of the most popular Enumerable methods and where to find out about the rest
+* How to write your own methods that accept a block
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
