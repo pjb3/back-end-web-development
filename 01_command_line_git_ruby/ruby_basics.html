@@ -98,17 +98,7 @@ Ruby provides an interactive shell called **IRB**. In IRB, you can enter small p
     .terminal
     subl ~/.irbrc
 
-and copy and paste the following code into that file and save it:
-
-```ruby
-require 'irb/completion'
-
-# History
-IRB.conf[:PROMPT_MODE] = :SIMPLE
-IRB.conf[:SAVE_HISTORY] = 100
-IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb-save-history"
-IRB.conf[:AUTO_INDENT] = true
-```
+and copy and paste the code from [this gist](https://gist.github.com/pjb3/9166610) into that file and save it.
 
 Now you can launch IRB like this:
 
