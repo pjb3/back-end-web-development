@@ -1167,6 +1167,122 @@ The output will be:
 
 ---
 
+# Multiple Arguments
+
+Methods can have more than one argument, each one separated by a comma:
+
+```ruby
+def multiply(x, y)
+  x * y
+end
+```
+
+    .terminal
+    >> multiply(6, 7)
+    => 42
+
+When calling a method, you can omit the parentheses:
+
+    .terminal
+    >> multiply 6, 7
+    => 42
+
+The most common Ruby style is to omit the parentheses if there are no arguments to the method and include them when there are. There are exceptions to the rule, where calling the method without parentheses is considered the preferred style, we'll learn about some of those cases as we learn more about Ruby.
+
+---
+
+# Optional Arguments
+
+You can have optional arguments to your method. The optional arguments come after the required arguments and must have a default value specified:
+
+```ruby
+def multiply(x, y = 1)
+  x * y
+end
+```
+
+This method can be called with 1 or 2 arguments:
+
+    .terminal
+    >> multiply(6)
+    => 6
+    >> multiply(6, 7)
+    => 42
+
+---
+
+# Default Argument Evaluation
+
+The value of a default argument can be an expression, like calling another method. The expression is evaluated at the time you call the method, not at the time the method is defined:
+
+```ruby
+def current_time(time = Time.now)
+  puts "It is #{time}"
+end
+```
+
+Each time the method is called, the default value for time is recalculated:
+
+    .terminal
+    >> current_time
+    It is 2014-02-27 09:19:32 -0500
+    => nil
+    >> current_time
+    It is 2014-02-27 09:19:36 -0500
+
+---
+
+# Variable Arguments
+
+```ruby
+def multiply(*args)
+  args.reduce(:*)
+end
+```
+
+When you put a `*` in front of the name of an argument, that means that all the arguments are put into an Array. Don't worry about the body of the method for now, just know that it multiplies each of the values in the `args` Array together.
+
+    .terminal
+    >> multiply(2)
+    => 2
+    >> multiply(2, 3)
+    => 6
+    >> multiply(2, 3, 4)
+    => 24
+    >> multiply(2, 3, 4, 5)
+    => 120
+
+---
+
+# Keyword Arguments
+
+Ruby 2.0 introduced a feature called keyword arguments. This allows you to give each possible argument a name and a default value. When you call a method like this, you can specify the arguments in any order and leave ones out:
+
+```ruby
+def chapter(title, number: 1, body: nil)
+  puts "Chapter #{number}: #{title}"
+  puts body if body
+end
+```
+
+    .terminal
+    >> chapter "The beginning"
+    Chapter 1: The beginning
+    => nil
+    >> chapter "The next chapter", number: 2
+    Chapter 2: The next chapter
+    => nil
+    >> chapter "A long one", number: 3, body: "A long long time ago..."
+    Chapter 3: A long one
+    A long long time ago...
+    => nil
+
+For a more in-depth explanation of this topic, check out this blog post:
+
+[http://dev.af83.com/2013/02/18/ruby-2-0-keyword-arguments.html](http://dev.af83.com/2013/02/18/ruby-2-0-keyword-arguments.html)
+
+---
+
 # Local Variables
 
 An import concept to understand about variables is called **scoping**, which refers to the context which a variable is available. Put this code into your program:
@@ -1391,6 +1507,108 @@ Now all 4 names are printed. You can imagine in a more complex program we might 
 
 ---
 
+# Working with multiple files
+
+As your Ruby programs get bigger, you will want to organize them into separate files. You might have some code that is not specific to your project and could be used in other projects and you might want to have a way to package up that code and share it. Ruby has mechanisms for this.
+
+First, create a file called `my_lib.rb` with a method in it:
+
+```ruby
+def my_method
+  puts "This is my method!"
+end
+```
+
+Next, create a second file called `my_program.rb` in the same directory as `my_lib.rb` with the following code in it:
+
+```ruby
+require './my_lib'
+
+my_method
+```
+
+When you run `my_program.rb`, first it loads the file `./my_lib.rb` into your program. It's really the same thing as if you just copy and pasted the code from the file `my_lib.rb` into `my_program.rb`.
+
+`require` keeps track of the files that have been loaded and doesn't load them twice, so it's safe to require the same file in multiple places throughout your program.
+
+
+---
+
+# Requiring features from the standard library
+
+Ruby comes with a lot of code that you can use in your own programs. For example, if you want to format data as JSON, you can use the JSON module from the standard library by requiring it.
+
+```ruby
+require 'json'
+
+data = { name: 'Paul', city: 'Baltimore' }
+
+puts data.to_json
+```
+
+---
+
+# Where Ruby looks for files to load
+
+You might have noticed in the last example that we didn't specify the full or relative path to the file `json`, but Ruby knew how to load it. Ruby does this in a similar way to how bash finds programs. There is a variable called `$LOAD_PATH` that has an Array of directories that Ruby will search through to find files to load. My load path looks like this:
+
+.small[
+
+    .terminal
+    >> puts $LOAD_PATH
+    /Users/paul/.rbenv/plugins/rbenv-gem-rehash
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/gems/2.1.0/gems/hirb-0.7.1/lib
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby/2.1.0/x86_64-darwin13.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby/2.1.0/x86_64-darwin13.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/2.1.0/x86_64-darwin13.0
+
+]
+
+You can modify the load path by adding values to tell Ruby about new places where it should look for code. You can also use the `-I` switch when launching Ruby to specify additional directories that should be on the load path:
+
+    .terminal
+    $ irb -I foo
+    => nil
+    >> puts $LOAD_PATH.first
+    /Users/paul/dev/back-end-web-development/foo
+
+---
+
+# Rubygems
+
+Ruby comes with a program called `gem` that allows you to install other libraries outside of the standard library that you can load into your program. You can run the command `gem list` to see all of the gems that you currently have installed. If you already have rails installed, you will see a list of quite a few gems. If you don't have Rails installed yet, [follow the instructions here](https://github.com/pjb3/back-end-web-development#things-to-install) to do so. You can search for and learn about gems at [http://rubygems.org](http://rubygems.org).
+
+You don't have to do anything special to load up the ruby gems framework, it is integrated into ruby. When you try to load a gem, ruby adds that gem to the load path for you.
+
+For example, start up irb and then look at the load path. Then do `require 'rack'`. Once you have done so, you will see the directory where the rack gem is installed as been added to your load path:
+
+.small[
+
+    .terminal
+    >> require 'rack'
+    => true
+    >> puts $LOAD_PATH
+    /Users/paul/.rbenv/plugins/rbenv-gem-rehash
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/gems/2.1.0/gems/hirb-0.7.1/lib
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/gems/2.1.0/gems/rack-1.5.2/lib
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby/2.1.0/x86_64-darwin13.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/site_ruby
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby/2.1.0/x86_64-darwin13.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/vendor_ruby
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/2.1.0
+    /Users/paul/.rbenv/versions/2.1.0/lib/ruby/2.1.0/x86_64-darwin13.0
+
+]
+
+---
+
 # That's All For Now
 
 In this tutorial you've learned:
@@ -1398,9 +1616,11 @@ In this tutorial you've learned:
 * The basic ruby types
 * How to call methods
 * What some of the built-in methods are
-* How to define your own
+* How to define your own methods
 * What happens when when your program encounters an error
 * How to iterate over Arrays with a for loop
+* How to load code into your program
+* What Rubygems are and how to use them
 
 Tune in next time to learn about Object-Orientation and Blocks!
 
