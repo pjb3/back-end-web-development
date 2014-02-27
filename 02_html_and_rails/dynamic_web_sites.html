@@ -85,11 +85,7 @@ A static web page is an HTML file on a server
 
 # Rack
 
-A framework for building web application, used by Rails
-
-    .terminal
-    $ echo '<h1>Something</h1>' > something.html
-    $ subl config.ru
+Rack is the basis of all dynamic Ruby-based web applications and it is used by Rails. We can use Rack to setup a simple static web server though. To create a static web page server with Rack, put this code into a file named `config.ru`:
 
 ```ruby
 class MyServer
@@ -136,6 +132,8 @@ See the request being logged
 
 # Static File Server
 
+Right now, our server just returns the name of the file you requested. Let's make our Rack app serve static web pages. Update `config.ru` to look like this and restart rackup. _(press ctrl+c to stop the rackup process that is already running)_
+
 ```ruby
 class MyServer
   def initialize(document_root)
@@ -162,7 +160,29 @@ run MyServer.new(File.dirname(__FILE__))
 
 ---
 
-# Static File Server
+# Serve a static HTML file
+
+Create a file named `something.html` in the same directory as the `config.ru` file. Put a basic HTML page into that file. Now you can fetch it through the server:
+
+    .terminal
+    $ curl http://localhost:9292/something.html
+    <html>
+      <head>
+        <title>Something</title>
+      </head>
+      <body>
+        <h1>Something</h1>
+      </body>
+    </html>
+
+You can also load this page in your web browser:
+
+    .terminal
+    $ open http://localhost:9292/something.html
+
+---
+
+# File not found
 
 What happens if we ask for a file that doesn't exist?
 
@@ -201,6 +221,9 @@ Should be a 404
 
 # Static File Server With Not Found
 
+Update the `config.ru` again and restart rackup
+
+.small[
 ```ruby
 class MyServer
   def initialize(document_root)
@@ -227,6 +250,7 @@ end
 
 run MyServer.new(File.dirname(__FILE__))
 ```
+]
 
 ---
 
@@ -270,6 +294,9 @@ A dynamic web page does not exist in an HTML file on the server, instead the HTM
 
 # Dynamic Web Page
 
+Update the `config.ru` and restart rackup:
+
+.small[
 ```ruby
 class MyServer
   def call(env)
@@ -290,6 +317,7 @@ end
 
 run MyServer.new
 ```
+]
 
 This server will generate a page based on whatever the path is
 
