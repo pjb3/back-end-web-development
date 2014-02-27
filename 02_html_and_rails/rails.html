@@ -73,43 +73,6 @@ class: middle, center
 
 ---
 
-# Install Postgres 9.2
-
-Postgres 9.2 is the database we're going to use
-
-## Windows
-
-http://www.enterprisedb.com/products-services-training/pgdownload#windows
-
-## Mac
-
-    .terminal
-    $ brew install postgresql
-
-Follow post-install steps
-
-    .terminal
-    $ initdb /usr/local/var/postgres -E utf8
-    $ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
-
-## Verify you can log in
-
-    .terminal
-    $ psql -U postgres
-    psql (9.2.4)
-    Type "help" for help.
-
-    postgres=#
-
----
-
-# Install Rails
-
-    .terminal
-    $ gem install rails
-
----
-
 # Create A New Project
 
 Create a new Rails app using the Postgresql database
@@ -233,17 +196,19 @@ For our application, let's generate a "coming soon" page where we collect email 
 
 ## Config database
 
-In `config/database.yml`, change username from `betastore` to `postgres`
+Replace the contents of `config/database.yml` with this:
 
 ```yml
 development:
   adapter: postgresql
-  encoding: unicode
   database: betastore_development
-  pool: 5
-  username: postgres
-  password:
+
+test:
+  adapter: postgresql
+  database: betastore_test
 ```
+
+Because you are using Postgres.app, you can connect without a username or password
 
 ## Run migrations
 
@@ -273,9 +238,19 @@ You can create your own, we will cover that later
     [2013-09-23 19:56:40] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
     [2013-09-23 19:56:40] INFO  WEBrick::HTTPServer#start: pid=387 port=3000
 
+Your server will continue running in this bash shell. You can press ctrl+c to stop it, but leave it running.
+
+Go to http://localhost:3000 to see the app
+
 ---
 
 .center[![Welcome](img/welcome.png)]
+
+---
+
+# Our App
+
+We are just getting started with our Betastore app, so for now we want to show a form on the home page that will allow future customers to give us their email address so we can send them an email when our store goes live. We will store the email addresses we collect in our database.
 
 ---
 
@@ -286,11 +261,11 @@ You can create your own, we will cover that later
 ```ruby
 Betastore::Application.routes.draw do
   resources :subscriptions
-  root :to => 'subscriptions#index'
+  root :to => 'subscriptions#new'
 end
 ```
 
-Remove comments and add root route
+Remove comments and add root route to our sign up page
 
 ---
 
@@ -317,13 +292,9 @@ The format of `subscriptions#index` means the `index` method of the `Subscriptio
 
 ---
 
-# Subscriptions Index
-
-.center[![Scaffold Index](img/scaffold_index.png)]
-
----
-
 # Subscriptions New
+
+The subscription sign up form that was generated for us looks like this:
 
 .center[![Scaffold New](img/scaffold_new.png)]
 
@@ -331,23 +302,25 @@ The format of `subscriptions#index` means the `index` method of the `Subscriptio
 
 # What We Want
 
+Lets change it to look like this:
+
 .center[![Betamore Sign Up](img/betamore_sign_up.png)]
 
 ---
 
 # Subscriptions Controller
 
-`app/controllers/subscriptions_controller.rb` _(simplified)_
+Here is a simplified version of what you see in `app/controllers/subscriptions_controller.rb`:
 
 ```ruby
 class SubscriptionsController < ApplicationController
-  def index
-    @subscriptions = Subscription.all
+  def new
+    @subscriptions = Subscription.new
   end
 
   def create
     @subscription = Subscription.new(subscription_params)
-    
+
     if @subscription.save
       redirect_to @subscription, notice: 'Subscription was successfully created.'
     else
@@ -356,6 +329,12 @@ class SubscriptionsController < ApplicationController
   end
 end
 ```
+
+The new action sets up a variable for the form.
+
+The create action handles actually creating a record in the database based on the form data passed in.
+
+We will cover how this works in more detail in future lessons.
 
 ---
 
@@ -406,6 +385,8 @@ The code between the `<% %>` and `<%= %>` is Ruby
 
 # New view
 
+Replace the contents of this file
+
 `app/views/subscriptions/new.html.erb`
 
     .terminal
@@ -414,6 +395,8 @@ The code between the `<% %>` and `<%= %>` is Ruby
 ---
 
 # Form Partial
+
+Replace the contents of this file
 
 `app/views/subscriptions/_form.html.erb`
 
@@ -443,6 +426,10 @@ The code between the `<% %>` and `<%= %>` is Ruby
 
 # Layout
 
+Replace the contents of this file
+
+`app/views/layouts/application.html.erb`
+
     .terminal
     <!DOCTYPE html>
     <html>
@@ -464,42 +451,88 @@ The code between the `<% %>` and `<%= %>` is Ruby
 
 # Sign Up Form
 
+Go to http://localhost:3000 to see the sign up page
+
 .center[![Betamore Sign Up](img/betamore_sign_up.png)]
 
 ---
 
 # Success
 
+Go ahead and submit an email address and you should see the success page:
+
 .center[![Betamore Sign Up Success](img/betamore_sign_up_success.png)]
 
 ---
 
-# Valentina
+# Rails Console
 
-We can view our data in a database GUI
+Wouldn't it be nice if we could look into our database to see what records we have? You can boot up an IRB session with the Rails environment loaded up using the command `rails console`:
 
-.center[![Valentina](img/valentina.png)]
+    .terminal
+    $ rails console
+    Loading development environment (Rails 4.0.2)
+
+You can then get the last subscription created like this:
+
+    .terminal
+    >> Subscription.last
+    => #<Subscription id: 1, email: "test@example.com", ...>
 
 ---
 
 # psql
 
-or from the `psql` console
+We can also use Postgres' command line tool to query our database:
 
     .terminal
-    $ psql -U postgres -d betastore_development
-    psql (9.2.1)
+    $ psql -d betastore_development
+    psql (9.3.1)
     Type "help" for help.
 
-    betastore_development=# select * from subscriptions;
-     id |      email       |         created_at         |         updated_at
-    ----+------------------+----------------------------+----------------------------
-      1 | test@example.com | 2013-09-24 00:45:24.755576 | 2013-09-24 00:45:24.755576
+    betastore_development=# select email from subscriptions;
+           email
+    --------------------
+     mail@paulbarry.com
     (1 row)
+
+`psql` is like IRB for your database. The prompt ends in a `#` character. You type in a SQL query and press enter and it shows you the result. You can press `ctrl+d` to exit.
+
+This is just a simple query to get all the email addresses in the database. We will learn SQL in-depth in a future class.
+
+---
+
+# Navicat
+
+There is an app called **Navicat Essentials for PostgreSQL** available in the Mac App Store for $6.99, I recommend purchasing that. It is a graphical tool for working with your database. Once you have it installed and running, click on connection and you will see something like this:
+
+.center[![Navicat Connection](img/navicat_connection.png)]
+
+Enter `localhost` for **Connection Name**, `betastore_development` for **Default Database**, your Mac username for **User Name**, leave the **Password:** field blank and then check the box **Save password**. Press the button "Test Connection" and you should see something similar to the following slide.
+
+---
+
+# Navicat Connection
+
+.center[![Navicat Test Connection](img/navicat_test_connection.png)]
+
+---
+
+# Navicat
+
+Once connected, you navigate to your database in the left-side menu:
+
+![Navicat Database](img/navicat_database.png)
+
+Then you can double-click on the subscriptions table and see the rows that are in the table:
+
+![Navicat Table](img/navicat_table.png)
 
 ---
 
 # Review
+
+We're just getting started with our Rails app. At this point we want to make sure we understand the high-level components of a Rails app and how they relate to one another:
 
 ![MVC](img/request_diagram.png)
 
@@ -515,35 +548,7 @@ or from the `psql` console
 
 6.  Controller returns the HTML page to the browser to be rendered
 
----
-
-# Homework
-
-Create a ProductsController with an index action and an index template that shows the same product listing from the previous homework
-
-Deploy app to heroku
-
-[https://devcenter.heroku.com/articles/quickstart](https://devcenter.heroku.com/articles/quickstart)
-
----
-
-# Install Heroku Toolbelt
-
-.center[,![Heroku Toolbelt](img/heroku-toolbelt.png)]
-
-.center[[http://heroku.toolbelt.com](http://toolbelt.heroku.com)]
-
----
-
-# Deploying a Heroku App
-
-    .terminal
-    $ heroku login
-    $ heroku create
-    $ git push heroku master
-    $ heroku run rake db:migrate
-    $ heroku ps:scale web=1
-    $ heroku open
+We will be exploring each of these components in-depth in our upcoming classes.
 
   </textarea><div id="slideshow"></div>
   </body>
