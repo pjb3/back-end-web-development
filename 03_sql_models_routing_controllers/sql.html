@@ -79,7 +79,7 @@ Structured Query Language (SQL) is a language for querying Relational DataBase M
 
 # RDBMS
 
-A Relational DataBase Management System is a server that stores data in related tables
+A Relational DataBase Management System is a server that stores data in related tables. There are several open source and proprietary RDBMSes, we will use PostgreSQL (often shortened to just Postgres) because it is open source and therefore free, has great features like full-text searching and GIS-related features and is well-supported by Heroku. MySQL is a popular open-source alternative to Postgres and is used for many large web applications including Facebook. SQLite is only for testing and embedded applications. I've used all of these database and prefer Postgres.
 
 .center[![Popular RDMBSs](img/rdbms.png)]
 
@@ -90,26 +90,52 @@ A Relational DataBase Management System is a server that stores data in related 
 ## Command Line
 
     .terminal
-    $ psql -U postgres -d betastore_development
-    
+    $ psql -d betastore_development
+
 or launch it based on the database configuration in your Rails app
 
     .terminal
     $ rails dbconsole
 
-## Graphical
+## Graphical Clients
 
-[PGAdmin - http://www.pgadmin.org](http://www.pgadmin.org) - Clunky on a Mac, maybe good on Windows?
+[PGAdmin - http://www.pgadmin.org](http://www.pgadmin.org) - Free/Open Source, Clunky on a Mac, maybe good on Windows/Linux?
 
-[Valentina](http://www.valentina-db.com/valentina-studio-overview) - Available in the Mac App Store
+[Navicat Essentials for PostgreSQL](http://navicat.com/download/navicat-essentials#pgsql_essentials) - Lots of features, Free Trial, $10 license, also available in the Mac App Store
 
-![Valentina Mac App Store](img/valentina.png)
+[PG Commander](https://eggerapps.at/pgcommander/) - Free Trial, $39 license, also available in the Mac App Store
+
+[Induction](http://inductionapp.com/) - Free/Open Source
+
+In these slides, we will use `psql`, which is good to learn first and then you can choose to learn to use a graphical tool like Navicat later if you find it more convenient.
+
+---
+
+# psql
+
+`psql` is the command-line tool that comes with Postgres for interacting with your database. It is similar to a bash or irb prompt in that you type commands, it prints the result and waits for you to type the next command. The default prompt in `psql` looks like this:
+
+    .terminal
+    betastore_development=#
+
+That is the name of the database you are connected to followed by an `=` and a `#`. You can can out about what commands you can use within psql using the `help` command:
+
+    .terminal
+    betastore_development=# help
+    You are using psql, the command-line interface to PostgreSQL.
+    Type:  \copyright for distribution terms
+           \h for help with SQL commands
+           \? for help with psql commands
+           \g or terminate with semicolon to execute query
+           \q to quit
 
 ---
 
 # Tables
 
-A table is a like a spreadsheet with data organized in rows and columns
+A table is a like a spreadsheet with data organized in rows and columns. You can query for the data in a table using a `SELECT` statement, like this:
+
+.small[
 
     .terminal
     betastore_development=# SELECT * from subscriptions;
@@ -118,21 +144,118 @@ A table is a like a spreadsheet with data organized in rows and columns
       1 | test@example.com | 2013-09-24 00:45:24.755576 | 2013-09-24 00:45:24.755576
     (1 row)
 
-A database can have multiple tables and data is organized into tables that relate to each other
+]
+
+When using `psql`, you must always end each statement with a `;`. If forget the `;`, that is ok, `psql` will allow you to enter it on the next line:
+
+.small[
+
+    .terminal
+    betastore_development=# select * from subscriptions
+    betastore_development-# ;
+     id |      email       |         created_at         |         updated_at
+    ----+------------------+----------------------------+----------------------------
+      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
+    (1 row)
+
+]
+
+This is because `psql` allows you enter a query on multiple lines and the `;` character indicates when you are finished with the query. You can see that the character before the `#` in the prompt changes to a `-` when you have started a query but haven't completed it with a `;` yet.
+
+---
+
+# Using Sublime Text with psql
+
+You can edit your queries from within a `psql` session using Sublime Text. Type the command `\e` and press enter. This should bring up the last query you entered in Sublime Text. Change the query to look like this:
+
+```sql
+select email from subscriptions;
+```
+
+In Sublime Text, press `⌘+s` to save the file, then `⌘+w` close the file. This will take you back to the terminal and you will see that `psql` ran your query:
+
+    .terminal
+    betastore_development=# \e
+          email
+    ------------------
+     test@example.com
+    (1 row)
+
+You can enter the command `\e` to pull up the query again in Sublime Text and then you can continue the cycle of editing, saving and closing the file to run different queries throughout your `psql` session.
+
+---
+
+# Displaying Results Vertically
+
+As your tables get more complicated, they will have more columns and the output from psql will get hard to read, because it will be so wide that it will be forced to wrap. To make things easier to read, you can change the way the output is displayed to list one column per line. In some cases, this will be an easier way to read the data. The `\x` command toggles your `psql` session between these two modes:
+
+.small[
+
+    .terminal
+    betastore_development=# select * from subscriptions;
+     id |      email       |         created_at         |         updated_at
+    ----+------------------+----------------------------+----------------------------
+      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
+    (1 row)
+
+    betastore_development=# \x
+    Expanded display is on.
+    betastore_development=# select * from subscriptions;
+    -[ RECORD 1 ]--------------------------
+    id         | 1
+    email      | test@example.com
+    created_at | 2014-03-05 01:44:58.602869
+    updated_at | 2014-03-05 01:44:58.602869
+
+    betastore_development=# \x
+    Expanded display is off.
+    betastore_development=# select * from subscriptions;
+     id |      email       |         created_at         |         updated_at
+    ----+------------------+----------------------------+----------------------------
+      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
+    (1 row)
+
+]
+
+---
+
+# Records
+
+A database can have multiple tables and data is organized into tables that relate to each other.
+
+A row in a database is often also referred to as a **record**.
 
 ## Primary Keys
 
-A primary key is a value that is unique within the table
+A primary key is a column value that is unique within the table
 
 In Rails, this is always a auto-incrementing integer called `id`, as is the case in this example
 
 ---
 
+# Schema
+
+In an RDMBS, you must create the structure of each table before you can create records in the table. You define which columns a table is allowed to have and what the columns are named. We can look at which tables exist in the database using the `\dt` command in `psql`:
+
+    .terminal
+    betastore_development=# \dt
+                 List of relations
+     Schema |       Name        | Type  | Owner
+    --------+-------------------+-------+-------
+     public | schema_migrations | table | paul
+     public | subscriptions     | table | paul
+
+Using Rails generators and migrations, we have already created the subscriptions database table. The schema_migrations table was also created by Rails. It is used to keep track of which migrations have already been run. We will cover migrations in more detail in the lesson on Active Record.
+
+---
+
 # Database Normalization
 
-Organizing data into tables in a way that minimizes duplication
+We should organize our data into tables in a way that minimizes duplication. This process is referred to as **database normalization**.
 
 ## First version of our orders table
+
+Let's say we are going to create a table to allow us to keep track of orders to our store. We will need the information about who placed the order and what products they ordered. So a naive first attempt at creating at table for this might look like this:
 
     .terminal
     id | customer_name | customer_email     | placed_at  | products         |
@@ -143,15 +266,15 @@ Organizing data into tables in a way that minimizes duplication
 
 ## Problems
 
-There are multiple products in the products column, which will make it hard to query
+There are multiple products in the products column, which will make it hard to query. We have also repeated the name of the product in multiple places. Also, the customer name and email are repeated in multiple rows.
 
-The customer name and email are repeated in multiple rows
-
-Database normalization to the rescue!
+What are we going to do if a customer wants to change their email address? Or if we rename a product? When designing a database schema, you always want to minimize the duplication of data so that if you need to change a value, you only have to change it in one place.
 
 ---
 
 # Each column should contain only one value
+
+We can create another table called line items to store
 
     .terminal
     orders
@@ -162,7 +285,7 @@ Database normalization to the rescue!
     3  | John Doe      | test@example.com   | 2013-09-30
 
     line_items
-    id | order_id | product_name | product_price 
+    id | order_id | product_name | product_price
     ---+----------+--------------+--------------
     1  | 1        | Muffin       | 2.99
     2  | 1        | Smoothie     | 3.75
@@ -170,12 +293,16 @@ Database normalization to the rescue!
     4  | 3        | Muffin       | 2.99
     5  | 3        | Coffee       | 3.99
 
-The `order_id` is called a **foreign key**
+---
+
+# Foreign Keys
+
+In the `line_items` table, the `order_id` is called a **foreign key**
 
 Foreign keys are commonly used to create relationships between tables
 
     .terminal
-                        line_items   
+                        line_items
     orders              ----------
     --------------      id
     id             <--- order_id
@@ -186,6 +313,10 @@ Foreign keys are commonly used to create relationships between tables
 ---
 
 # Remove Product Duplication
+
+Our `line_items` table was a step in the right direction, but we still have duplication of the product information like name and price. Let's break out `products` into a separate table:
+
+.small[
 
     .terminal
     orders
@@ -208,26 +339,33 @@ Foreign keys are commonly used to create relationships between tables
     id | name      | price
     ---+-----------+-------
     1  |  Muffin   | 2.99
-    2  |  Smoothie | 3.75     
+    2  |  Smoothie | 3.75
     3  |  Coffee   | 3.99
+
+]
 
 ---
 
 # Relationship Diagram
 
+Now the structure of our tables looks like this:
+
     .terminal
-                        line_items   
-    orders              ----------    
+                        line_items
+    orders              ----------
     --------------      id              products
     id             <--- order_id        --------
     customer_name       product_id ---> id
     customer_email                      name
     placed_at                           price
 
+A table like the `line_items` table is often referred to as a **join table**, because it has foreign keys to both the `orders` table and the `products` table and serves as the link between those two tables.
 
 ---
 
 # Remove Customer Duplication
+
+We still have duplicate customer information, so let's break that out into a separate `customers` table in the same way we did with our `products` table:
 
     .terminal
     customers
@@ -248,7 +386,7 @@ Foreign keys are commonly used to create relationships between tables
     id | name      | price
     ---+-----------+-------
     1  |  Muffin   | 2.99
-    2  |  Smoothie | 3.75     
+    2  |  Smoothie | 3.75
     3  |  Coffee   | 3.99
 
 ---
@@ -256,51 +394,63 @@ Foreign keys are commonly used to create relationships between tables
 # Relationship Diagram
 
     .terminal
-                                       line_items   
-                   orders              ----------    
+                                       line_items
+                   orders              ----------
     customers      --------------      id              products
     ---------      id             <--- order_id        --------
     id        <--- customer_id         product_id ---> id
     name           placed_at                           name
     email                                              price
 
+The `orders` table now has a foreign key to the `customers` table:
+
 ---
 
 # Denormalization
 
     .terminal
-                                       line_items   
-                   orders              ----------    
+                                       line_items
+                   orders              ----------
     customers      --------------      id              products
     ---------      id             <--- order_id        --------
     id        <--- customer_id         product_id ---> id
     name           placed_at           quantity        name
     email          total_amount        price           price
 
-Some values will change over time, so you might want to denormalize to record the value that time, as is the case with the `price` column on `line_items`
+In an e-commerce system like the one we are building prices of products will undoubtedly change over time. We need to keep a record of the price of the a customer paid for a product when they placed the order. To support this, a technique called **denormalization** is useful.
 
-Sometimes even though values can be calculated, it's better to store them for performance reasons to avoid having to calculate them, as is the case with `total_amount` in `orders`
+Denormalization is the opposite of what we just did. It is the process of putting data in multiple places. In this case, we are going to store the price of a product with the line item, for historical purposes. The price in the line items table will not be changed if we change the price of a product. This makes it a good candidate for denormalization because there is still only one place we have to make a change if the price of a product changes.
+
+Another reason to denormalize is to improve performance. Let's say we want to sort all orders by their total amount. We could calculate the total amount for each order and then sort them, but that might be slow once we have a lot of orders. Since the total amount of an order doesn't change, we can calculate it once when the order is placed and then save it into a column on the order.
+
+**This type of performance-improvement-based denormalization should only be used once you are sure you need it**. It is a mistake to do this when you are first creating your application because you don't even know yet if you will need to sort orders by their total amount.
 
 ---
 
-class: center, middle
+# Entity-Relationship Diagram
 
-![ERD](img/erd.png)
+Here is the final structure of our database tables:
+
+.center[![ERD](img/erd.png)]
+
+This type of diagram is often referred to as an Entity-Relationship Diagram, or ERD for short
 
 ---
 
 # Creating Tables with Rails
 
+So we want to create our tables so they look like this:
+
     .terminal
-                                       line_items   
-                   orders              ----------    
+                                       line_items
+                   orders              ----------
     customers      --------------      id              products
     ---------      id             <--- order_id        --------
     id        <--- customer_id         product_id ---> id
     name           placed_at           quantity        name
     email          total_amount        price           price
 
-Use Rails Generators
+We can use Rails generators to do that for us. Run these commands in a bash shell in the directory of your Rails app:
 
 .small[
 
@@ -313,12 +463,15 @@ Use Rails Generators
 
 ]
 
+We will cover what these commands mean and the code they generate in more detail in the lesson on ActiveRecord.
+
 ---
 
 # Creating Data with Rails
 
-Put this into `db/seeds.rb`
+Replace the contents of the `db/seeds.rb` file in your Rails app with the following code:
 
+.small[
 ```ruby
 me = Customer.create(name: 'Paul Barry', email: 'mail@paulbarry.com')
 test = Customer.create(name: 'John Doe', email: 'test@example.com')
@@ -339,27 +492,30 @@ order = Order.create(customer: test, placed_at: Time.current)
 LineItem.create(order: order, quantity: 1, product: muffin)
 LineItem.create(order: order, quantity: 1, product: coffee)
 ```
+]
+
+This code is using the code generated by the commands we ran in the previous slide to create data in our database. Use this command to run it:
 
     .terminal
     $ rake db:seed
+
+If you need to reload the data for any reason, use this command:
+
+    .terminal
+    $ rake db:setup
 
 ---
 
 # Let's Write Some SQL!
 
-Use `rails dbconsole` to bring up the command line client, or use a GUI client
+Use `rails dbconsole` to bring up `psql` connected to database:
 
     .terminal
     $ rails dbconsole
-    psql (9.2.1)
+    psql (9.3.1)
     Type "help" for help.
-    betastore_development=# help
-    You are using psql, the command-line interface to PostgreSQL.
-    Type:  \copyright for distribution terms
-           \h for help with SQL commands
-           \? for help with psql commands
-           \g or terminate with semicolon to execute query
-           \q to quit
+
+    betastore_development=#
 
 ---
 
@@ -371,7 +527,7 @@ Use the `\?` command to get a list of psql commands:
     betastore_development=# \?
     ...
            \d[S+]                 list tables, views, and sequences
-           \d[S+]  NAME           describe table, view, sequence, or index           
+           \d[S+]  NAME           describe table, view, sequence, or index
     ...
 
 These are psql-specific commands, other clients and databases have different ones.
@@ -427,20 +583,24 @@ Use a `SELECT` query to get all of the orders
 SELECT id, customer_id, placed_at FROM orders
 ```
 
-Execute the query in `psql`:
+Use `\e` to enter the query using Sublime Text. Once you save the file _(⌘+s)_ and close the tab _(`⌘+w`)_, you will see the result of the query in `psql`:
 
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at FROM orders;
+    betastore_development=# \e
      id | customer_id |         placed_at
     ----+-------------+----------------------------
       1 |           1 | 2013-09-27 00:00:00
-      2 |           1 | 2013-09-30 18:17:46.112671
-      3 |           2 | 2013-09-30 18:17:46.117622
+      2 |           1 | 2014-03-06 09:47:20.374823
+      3 |           2 | 2014-03-06 09:47:20.380245
     (3 rows)
-    betastore_development=# SELECT * FROM orders;
+    betastore_development=# \e
     ...
 
-You can use `*` in place of column names to get them all
+You can use `*` in place of column names to get all columns:
+
+```sql
+SELECT * FROM orders;
+```
 
 ---
 
@@ -448,15 +608,18 @@ You can use `*` in place of column names to get them all
 
 Use the `WHERE` clause to filter the rows that are returned
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders WHERE placed_at > '2013-09-30';
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders WHERE placed_at > '2013-09-30';
      id | customer_id |         placed_at
     ----+-------------+----------------------------
-      2 |           1 | 2013-09-30 18:17:46.112671
-      3 |           2 | 2013-09-30 18:17:46.117622
+      2 |           1 | 2014-03-06 09:47:20.374823
+      3 |           2 | 2014-03-06 09:47:20.380245
     (2 rows)
-    
+
 A query can be separated on multiple lines and must end with a `;`
 
 ---
@@ -465,23 +628,28 @@ A query can be separated on multiple lines and must end with a `;`
 
 Use `LIMIT` to control how many rows are returned:
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders LIMIT 1;
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders LIMIT 1;
-     id | customer_id |      placed_at
+    id | customer_id |      placed_at
     ----+-------------+---------------------
       1 |           1 | 2013-09-27 00:00:00
     (1 row)
 
 `LIMIT` can be combined with `WHERE`:
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders WHERE placed_at > '2013-09-30'
+LIMIT 1;
+```
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders WHERE placed_at > '2013-09-30'
-    betastore_development-# LIMIT 1;
      id | customer_id |         placed_at
     ----+-------------+----------------------------
-      2 |           1 | 2013-09-30 18:17:46.112671
+      2 |           1 | 2014-03-06 09:47:20.374823
     (1 row)
 
 ---
@@ -490,26 +658,32 @@ Use `LIMIT` to control how many rows are returned:
 
 Use `order` to control the order the rows are returned in
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders ORDER BY placed_at desc;
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders ORDER BY placed_at desc;
      id | customer_id |         placed_at
     ----+-------------+----------------------------
-      3 |           2 | 2013-09-30 18:17:46.117622
-      2 |           1 | 2013-09-30 18:17:46.112671
+      3 |           2 | 2014-03-06 09:47:20.380245
+      2 |           1 | 2014-03-06 09:47:20.374823
       1 |           1 | 2013-09-27 00:00:00
     (3 rows)
 
 The opposite of `desc` is `asc`, but it is the default and can be omitted:
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders ORDER BY placed_at;
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders ORDER BY placed_at;
      id | customer_id |         placed_at
     ----+-------------+----------------------------
       1 |           1 | 2013-09-27 00:00:00
-      2 |           1 | 2013-09-30 18:17:46.112671
-      3 |           2 | 2013-09-30 18:17:46.117622
+      2 |           1 | 2014-03-06 09:47:20.374823
+      3 |           2 | 2014-03-06 09:47:20.380245
     (3 rows)
 
 ---
@@ -518,25 +692,32 @@ The opposite of `desc` is `asc`, but it is the default and can be omitted:
 
 Can also be combined with WHERE and LIMIT:
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders WHERE placed_at > '2013-09-30'
+ORDER BY placed_at LIMIT 1;
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders WHERE placed_at > '2013-09-30'
-    betastore_development-# ORDER BY placed_at LIMIT 1;
+    betastore_development=# \e
      id | customer_id |         placed_at
     ----+-------------+----------------------------
-      2 |           1 | 2013-09-30 18:17:46.112671
+      2 |           1 | 2014-03-06 09:47:20.374823
     (1 row)
 
 You can order by multiple columns:
 
+```sql
+SELECT id, customer_id, placed_at
+FROM orders ORDER BY customer_id desc, placed_at;
+```
+
     .terminal
-    betastore_development=# SELECT id, customer_id, placed_at
-    betastore_development-# FROM orders ORDER BY customer_id desc, placed_at;
      id | customer_id |         placed_at
     ----+-------------+----------------------------
-      3 |           2 | 2013-09-30 18:17:46.117622
+      3 |           2 | 2014-03-06 09:47:20.380245
       1 |           1 | 2013-09-27 00:00:00
-      2 |           1 | 2013-09-30 18:17:46.112671
+      2 |           1 | 2014-03-06 09:47:20.374823
     (3 rows)
 
 ---
@@ -556,25 +737,25 @@ Each order is related to a customer via the the `customer_id` foreign key:
 We want to get data from both of these tables in one query:
 
     .terminal
-    customers                            
-     id |    name      
-    ----+------------  
-      1 | Paul Barry   
-      2 | John Doe     
-      3 | Nowhere Man  
+    customers
+     id |    name
+    ----+------------
+      1 | Paul Barry
+      2 | John Doe
+      3 | Nowhere Man
 
     orders
-     id | customer_id | placed_at 
+     id | customer_id | placed_at
     ----+-------------+--------------------
       1 |           1 | 2013-09-27 00:00:00
-      2 |           1 | 2013-09-30 18:17:46.112671
-      3 |           2 | 2013-09-30 18:17:46.117622
+      2 |           1 | 2014-03-06 09:47:20.374823
+      3 |           2 | 2014-03-06 09:47:20.380245
 
 ---
 
 # Inner Join
 
-Use `LEFT INNER JOIN` to combine data from multiple tables:
+Use `JOIN` to combine data from multiple tables:
 
 ```sql
 SELECT c.id as customer_id,
@@ -582,18 +763,16 @@ SELECT c.id as customer_id,
        c.name as customer_name,
        o.placed_at as ordered_at
 FROM customers c
-LEFT INNER JOIN orders o on c.id = o.customer_id;
+JOIN orders o on c.id = o.customer_id;
 ```
 
     .terminal
      customer_id | order_id | customer_name |         ordered_at
     -------------+----------+---------------+----------------------------
                1 |        1 | Paul Barry    | 2013-09-27 00:00:00
-               1 |        2 | Paul Barry    | 2013-09-30 18:17:46.112671
-               2 |        3 | John Doe      | 2013-09-30 18:17:46.117622
+               1 |        2 | Paul Barry    | 2014-03-06 09:47:20.374823
+               2 |        3 | John Doe      | 2014-03-06 09:47:20.380245
     (3 rows)
-
-You can leave `left inner` out because it is the most common and the default
 
 Notice Customer 3, Nowhere Man, is not in the result set
 
@@ -616,8 +795,8 @@ LEFT OUTER JOIN orders o on c.id = o.customer_id;
      customer_id | order_id | customer_name |         ordered_at
     -------------+----------+---------------+----------------------------
                1 |        1 | Paul Barry    | 2013-09-27 00:00:00
-               1 |        2 | Paul Barry    | 2013-09-30 18:17:46.112671
-               2 |        3 | John Doe      | 2013-09-30 18:17:46.117622
+               1 |        2 | Paul Barry    | 2014-03-06 09:47:20.374823
+               2 |        3 | John Doe      | 2014-03-06 09:47:20.380245
                3 |          | Nowhere Man   |
     (4 rows)
 
@@ -649,7 +828,7 @@ In this case, the effect is that we get customers who have not placed an order:
      customer_id | customer_name
     -------------+---------------
                3 | Nowhere Man
-           
+
 ---
 
 # Distinct
@@ -691,35 +870,62 @@ JOIN orders o on c.id = o.customer_id;
 
 Use `count(*)` to count how many records match the criteria:
 
+```sql
+SELECT count(*) FROM orders;
+```
+
     .terminal
-    betastore_development=# SELECT count(*) FROM orders;
      count
     -------
          3
     (1 row)
 
-    betastore_development=# SELECT count(*) FROM orders
-    betastore_development-# WHERE placed_at > '2013-09-30';
+```sql
+SELECT count(*) FROM orders
+WHERE placed_at > '2013-09-30';
+```
      count
     -------
          2
     (1 row)
 
-There are other aggregate functions available like `sum`, `avg`, `min` and `max`:
+---
+
+# Other Aggregate Functions
+
+There are other aggregate functions available like `sum`, `avg`, `min` and `max`. Before we take a look at these, toggle into extended display mode:
 
     .terminal
-    betastore_development=# SELECT count(*), sum(price),
-    betastore_development-# avg(price), min(price), max(price) FROM products;
-     count |  sum  |        avg         | min  | max
-    -------+-------+--------------------+------+------
-         3 | 10.73 | 3.5766666666666667 | 2.99 | 3.99
-    (1 row)
+    betastore_development=# \x
+    Expanded display is on.
+
+Now run this query:
+
+```sql
+SELECT count(*), sum(price), avg(price), min(price), max(price) FROM products;
+```
+
+You will see the following result:
+
+    .terminal
+    -[ RECORD 1 ]-------------
+    count | 3
+    sum   | 10.73
+    avg   | 3.5766666666666667
+    min   | 2.99
+    max   | 3.99
+
+You can switch back into non-extended display:
+
+    .terminal
+    betastore_development=# \x
+    Expanded display is off.
 
 ---
 
 # Grouping
 
-Use `GROUP BY` to group rows that have the same value together, useful for aggregate queries, such as this one that will give you the number of orders each customer has placed. 
+Use `GROUP BY` to group rows that have the same value together, useful for aggregate queries, such as this one that will give you the number of orders each customer has placed.
 
 ```sql
 SELECT count(*) as order_count, customer_id
@@ -762,12 +968,12 @@ HAVING count(*) > 1
 ORDER BY order_count desc;
 ```
 
-You can use a combination of `WHERE` and `HAVING` to get, for example, all customers with multiple orders since 2013-09-30:
+You can use a combination of `WHERE` and `HAVING` to get, for example, all customers with multiple orders since 2014-03-01:
 
 ```sql
 SELECT count(*) as order_count, customer_id
 FROM orders
-WHERE placed_at > '2013-09-30'
+WHERE placed_at > '2014-03-01'
 GROUP BY customer_id
 HAVING count(*) > 1
 ORDER BY order_count desc;
@@ -790,8 +996,9 @@ This example returns all products named `'Smoothie'` or `'Coffee'`:
     .terminal
      id |  name  | price |         created_at         |         updated_at
     ----+--------+-------+----------------------------+----------------------------
-      1 | Muffin |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
-      3 | Coffee |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+      1 | Muffin |  2.99 | 2014-03-06 09:47:20.317279 | 2014-03-06 09:47:20.317279
+      3 | Coffee |  3.99 | 2014-03-06 09:47:20.323369 | 2014-03-06 09:47:20.323369
+    (2 rows)
 
 ---
 
@@ -807,11 +1014,12 @@ WHERE name LIKE '%o%';
 
 This example returns all products with an `o` in their name:
 
-    .terminal 
+    .terminal
      id |   name   | price |         created_at         |         updated_at
     ----+----------+-------+----------------------------+----------------------------
-      2 | Smoothie |  3.75 | 2013-09-30 18:17:46.03724  | 2013-09-30 18:17:46.03724
-      3 | Coffee   |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+      2 | Smoothie |  3.75 | 2014-03-06 09:47:20.32101  | 2014-03-06 09:47:20.32101
+      3 | Coffee   |  3.99 | 2014-03-06 09:47:20.323369 | 2014-03-06 09:47:20.323369
+    (2 rows)
 
 ---
 
@@ -823,7 +1031,7 @@ You can combine multiple conditions together to for a WHERE clause with `AND`:
 SELECT *
 FROM products
 WHERE name LIKE '%o%'
-AND price > 3.75
+AND price > 3.75;
 ```
 
 This example returns all products whose name contains an `o` and have a price greater than 3.75:
@@ -831,7 +1039,8 @@ This example returns all products whose name contains an `o` and have a price gr
     .terminal
      id |  name  | price |         created_at         |         updated_at
     ----+--------+-------+----------------------------+----------------------------
-      3 | Coffee |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+      3 | Coffee |  3.99 | 2014-03-06 09:47:20.323369 | 2014-03-06 09:47:20.323369
+    (1 row)
 
 ---
 
@@ -843,7 +1052,7 @@ Similar to `AND`, but only one of the conditions has to be met for the row to be
 SELECT *
 FROM products
 WHERE name LIKE '%o%'
-OR price < 3
+OR price < 3;
 ```
 
 This example returns all products whose name contains an `o` or have a price less than 3:
@@ -851,9 +1060,10 @@ This example returns all products whose name contains an `o` or have a price les
     .terminal
      id |   name   | price |         created_at         |         updated_at
     ----+----------+-------+----------------------------+----------------------------
-      1 | Muffin   |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
-      2 | Smoothie |  3.75 | 2013-09-30 18:17:46.03724  | 2013-09-30 18:17:46.03724
-      3 | Coffee   |  3.99 | 2013-09-30 18:17:46.039351 | 2013-09-30 18:17:46.039351
+      1 | Muffin   |  2.99 | 2014-03-06 09:47:20.317279 | 2014-03-06 09:47:20.317279
+      2 | Smoothie |  3.75 | 2014-03-06 09:47:20.32101  | 2014-03-06 09:47:20.32101
+      3 | Coffee   |  3.99 | 2014-03-06 09:47:20.323369 | 2014-03-06 09:47:20.323369
+    (3 rows)
 
 ---
 
@@ -865,7 +1075,7 @@ You can combine `AND` and `OR` to build more complex queries. Use parentheses to
 SELECT *
 FROM products
 WHERE price < 3
-AND (name = 'Muffin' OR name = 'Coffee')
+AND (name = 'Muffin' OR name = 'Coffee');
 ```
 
 This example returns all products that have a price less than 3 and are named either `Muffin` or `Coffee`:
@@ -873,7 +1083,8 @@ This example returns all products that have a price less than 3 and are named ei
     .terminal
      id |  name  | price |         created_at         |         updated_at
     ----+--------+-------+----------------------------+----------------------------
-      1 | Muffin |  2.99 | 2013-09-30 18:17:46.033147 | 2013-09-30 18:17:46.033147
+      1 | Muffin |  2.99 | 2014-03-06 09:47:20.317279 | 2014-03-06 09:47:20.317279
+    (1 row)
 
 ---
 
@@ -884,7 +1095,7 @@ You can use the results of one query to filter the results of another using a su
 ```sql
 SELECT *
 FROM customers
-WHERE id in (SELECT customer_id FROM orders)
+WHERE id in (SELECT customer_id FROM orders);
 ```
 
 This example will return all customers who have placed an order:
@@ -892,10 +1103,11 @@ This example will return all customers who have placed an order:
 .small[
 
     .terminal
-     id |    name    |       email        |         created_at         |         updated_at
-    ----+------------+--------------------+----------------------------+----------------------------
-      1 | Paul Barry | mail@paulbarry.com | 2013-09-30 18:17:45.974852 | 2013-09-30 18:17:45.974852
-      2 | John Doe   | test@example.com   | 2013-09-30 18:17:45.983197 | 2013-09-30 18:17:45.983197
+     id |    name    |       email        |        created_at         |        updated_at
+    ----+------------+--------------------+---------------------------+---------------------------
+      1 | Paul Barry | mail@paulbarry.com | 2014-03-06 09:47:20.29229 | 2014-03-06 09:47:20.29229
+      2 | John Doe   | test@example.com   | 2014-03-06 09:47:20.30248 | 2014-03-06 09:47:20.30248
+    (2 rows)
 
 ]
 
@@ -908,17 +1120,20 @@ Subqueries can often be expressed as a join instead, I recommend that whenever p
 You can create new record using insert:
 
 ```sql
-INSERT INTO customers (name, email, created_at) 
+INSERT INTO customers (name, email, created_at)
 VALUES ('New Guy', 'new@example.com', now());
 ```
 
 You can see the record was created and the id was auto-generated even though we didn't provide a value for it:
 
+```sql
+SELECT * FROM customers ORDER BY id desc LIMIT 1;
+```
+
     .terminal
-    betastore_development=# select * from customers order by id desc limit 1;
      id |  name   |      email      |         created_at         | updated_at
     ----+---------+-----------------+----------------------------+------------
-      4 | New Guy | new@example.com | 2013-09-30 17:44:51.074779 |
+      4 | New Guy | new@example.com | 2014-03-06 05:22:03.000289 |
     (1 row)
 
 ---
@@ -936,13 +1151,16 @@ WHERE id = 4;
 
 After we run that statement, you can see the record has been updated if you select it again:
 
+```sql
+SELECT * FROM customers ORDER BY id desc LIMIT 1;
+```
+
 .small[
 
     .terminal
-    betastore_development=# select * from customers order by id desc limit 1;
      id |    name    |      email      |         created_at         |         updated_at
     ----+------------+-----------------+----------------------------+----------------------------
-      4 | New Person | new@example.com | 2013-09-30 17:44:51.074779 | 2013-09-30 17:50:55.170811
+      4 | New Person | new@example.com | 2014-03-06 05:22:03.000289 | 2014-03-06 05:23:16.854682
     (1 row)
 
 ]
@@ -959,16 +1177,52 @@ DELETE FROM customers WHERE id = 4;
 
 Now we can see that the most recent user is back to Nowhere Man:
 
+```sql
+SELECT * FROM customers ORDER BY id desc LIMIT 1;
+```
+
 .small[
 
     .terminal
-    betastore_development=# select * from customers order by id desc limit 1;
      id |    name     |      email      |        created_at         |        updated_at
     ----+-------------+-----------------+---------------------------+---------------------------
-      3 | Nowhere Man | man@nowhere.com | 2013-09-30 19:37:17.41708 | 2013-09-30 19:37:17.41708
+      3 | Nowhere Man | man@nowhere.com | 2014-03-06 09:47:20.30497 | 2014-03-06 09:47:20.30497
     (1 row)
 
 ]
+
+---
+
+# Exporting to CSV
+
+One thing that you might find yourself needing to do is to export the data to CSV, so you can open it in a spreadsheet, share it with other people who don't have direct access to the database, etc.
+
+Postgres allows you to use `COPY` to do this. For example, run this command from `psql` to copy the data from the orders table to a CSV file:
+
+    .terminal
+    betastore_development=# COPY orders TO '/tmp/orders.csv' CSV;
+    COPY 3
+    betastore_development=# \q
+
+The file looks like this:
+
+.small[
+
+    .terminal
+    $ cat /tmp/orders.csv
+    1,1,2013-09-27 00:00:00,,2014-03-06 09:47:20.351343,2014-03-06 09:47:20.351343
+    2,1,2014-03-06 09:47:20.374823,,2014-03-06 09:47:20.375697,2014-03-06 09:47:20.375697
+    3,2,2014-03-06 09:47:20.380245,,2014-03-06 09:47:20.381082,2014-03-06 09:47:20.381082
+
+]
+
+You can now open this file in a spreadsheet program like Excel, Numbers, Libre Office, Google Docs, etc.
+
+You can also use `COPY` to load data into a table from a CSV file. For more information on how to do that, read [the documentation for the COPY command][copy].
+
+One thing to note is that the `COPY` command is not part of the SQL standard and will not work in other databases like MySQL, SQLite, Oracle, SQL Server, etc. Each of those databases have their own tools for exporting data.
+
+[copy]: http://www.postgresql.org/docs/9.3/static/sql-copy.html
 
 ---
 
@@ -987,6 +1241,8 @@ Now we can see that the most recent user is back to Nowhere Man:
 * Use **UPDATE** to modify existing rows
 
 * Use **DELETE** to remove existing rows
+
+* Use **COPY** to export data to CSV
 
 
   </textarea><div id="slideshow"></div>
