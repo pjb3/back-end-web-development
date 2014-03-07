@@ -164,7 +164,7 @@ There is one `ActiveRecord::Base` subclass per table. In our app now, the models
     app/models/subscription.rb
 
 And the tables are:
-    
+
     .terminal
      Schema |       Name        | Type  |  Owner
     --------+-------------------+-------+----------
@@ -200,9 +200,9 @@ All we have to do is subclass `ActiveRecord::Base` and we've got a model that ca
     $ rails console
 
     >> subscription = Subscription.first
-      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions" 
+      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions"
       ORDER BY "subscriptions"."id" ASC LIMIT 1
-    => #<Subscription id: 1, email: "test@example.com", 
+    => #<Subscription id: 1, email: "test@example.com",
            created_at: "2013-10-01 00:27:54", updated_at: "2013-10-01 00:27:54">
 ]
 
@@ -236,7 +236,7 @@ The output looks like a table, which is easier to read
     $ rails c
     Loading development environment (Rails 4.0.0)
     >> Subscription.first
-      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions" 
+      Subscription Load (0.9ms)  SELECT "subscriptions".* FROM "subscriptions"
       ORDER BY "subscriptions"."id" ASC LIMIT 1
     +----+------------------+-------------------------+-------------------------+
     | id | email            | created_at              | updated_at              |
@@ -263,13 +263,13 @@ You can modify the database record by changing the state of the object
     >> subscription.email = "something.else@example.com"
     => "something.else@example.com"
 
-And calling `save` to persist the changes to the database    
+And calling `save` to persist the changes to the database
 
     .terminal
     >> subscription.save
        (0.5ms)  BEGIN
-      SQL (9.3ms)  UPDATE "subscriptions" SET "email" = $1, "updated_at" = $2 
-      WHERE "subscriptions"."id" = 1  [["email", "something.else@example.com"], 
+      SQL (9.3ms)  UPDATE "subscriptions" SET "email" = $1, "updated_at" = $2
+      WHERE "subscriptions"."id" = 1  [["email", "something.else@example.com"],
       ["updated_at", Tue, 01 Oct 2013 00:51:23 UTC +00:00]]
        (4.6ms)  COMMIT
     => true
@@ -373,7 +373,7 @@ class MyActiveRecord
         instance_variable_get("@#{name}")
       end
       send(name)
-    elsif args.length == 1 && 
+    elsif args.length == 1 &&
           self.class.column_names.include?(name.to_s.sub(/=$/,'').to_sym)
       self.class.send(:define_method, name) do |arg|
         instance_variable_set("@#{name.to_s.sub(/=$/,'')}", arg)
@@ -432,7 +432,7 @@ If you pass an id to the `find` class method, you get an instance of  `Product` 
 
     .terminal
     >> product = Product.find(1)
-      Product Load (3.7ms)  SELECT "products".* FROM "products" 
+      Product Load (3.7ms)  SELECT "products".* FROM "products"
       WHERE "products"."id" = $1 LIMIT 1  [["id", 1]]
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -446,7 +446,7 @@ If you pass an Array of ids to the `find` class method, you get an Array of `Pro
 
     .terminal
     >> Product.find([1,2])
-      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      Product Load (0.9ms)  SELECT "products".* FROM "products"
       WHERE "products"."id" IN (1, 2)
     +----+----------+-------+-------------------------+-------------------------+
     | id | name     | price | created_at              | updated_at              |
@@ -465,7 +465,7 @@ The `find_by` class method accepts a Hash of columns and value to match:
 
     .terminal
     >> product = Product.find_by(name: 'Muffin')
-      Product Load (4.6ms)  SELECT "products".* FROM "products" 
+      Product Load (4.6ms)  SELECT "products".* FROM "products"
       WHERE "products"."name" = 'Muffin' LIMIT 1
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -481,7 +481,7 @@ You can pass multiple column/value pairs:
 
     .terminal
     >> product = Product.find_by(name: 'Muffin', price: 2.99)
-      Product Load (2.9ms)  SELECT "products".* FROM "products" 
+      Product Load (2.9ms)  SELECT "products".* FROM "products"
       WHERE "products"."name" = 'Muffin' AND "products"."price" = 2.99 LIMIT 1
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -497,7 +497,7 @@ Get the first object created
 
     .terminal
     >> Product.first
-      Product Load (0.5ms)  SELECT "products".* FROM "products" 
+      Product Load (0.5ms)  SELECT "products".* FROM "products"
       ORDER BY "products"."id" ASC LIMIT 1
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -511,7 +511,7 @@ Get the most recently created object
 
     .terminal
     >> Product.last
-      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      Product Load (0.9ms)  SELECT "products".* FROM "products"
       ORDER BY "products"."id" DESC LIMIT 1
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -555,7 +555,7 @@ Use multiple arguments for conditions besides equals
 
     .terminal
     >> Product.where("name like ? AND price > ?", '%o%', 3)
-      Product Load (4.4ms)  SELECT "products".* FROM "products" 
+      Product Load (4.4ms)  SELECT "products".* FROM "products"
       WHERE (name like '%o%' AND price > 3)
     +----+----------+-------+-------------------------+-------------------------+
     | id | name     | price | created_at              | updated_at              |
@@ -607,7 +607,7 @@ Creates a second query to load related objects
     .terminal
     >> Order.includes(:customer)
       Order Load (0.9ms)  SELECT "orders".* FROM "orders"
-      Customer Load (1.5ms)  SELECT "customers".* FROM "customers" 
+      Customer Load (1.5ms)  SELECT "customers".* FROM "customers"
       WHERE "customers"."id" IN (1, 2)
     +----+-------------+-------------------------+--------------+
     | id | customer_id | placed_at               | total_amount |
@@ -625,7 +625,7 @@ Adds an inner join to the query
 
     .terminal
     >> Order.joins(:customer)
-      Order Load (0.7ms)  SELECT "orders".* FROM "orders" 
+      Order Load (0.7ms)  SELECT "orders".* FROM "orders"
       INNER JOIN "customers" ON "customers"."id" = "orders"."customer_id"
     +----+-------------+-------------------------+--------------+
     | id | customer_id | placed_at               | total_amount |
@@ -655,7 +655,7 @@ When you try to "use" the relation as an Array, the query is then executed
 
     .terminal
     >> relation
-      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      Product Load (0.9ms)  SELECT "products".* FROM "products"
       WHERE "products"."name" = 'Muffin'
     +----+--------+-------+-------------------------+-------------------------+
     | id | name   | price | created_at              | updated_at              |
@@ -671,7 +671,7 @@ This allows you to combine methods into a single query
 
     .terminal
     >> Product.where('price > 3').order('name desc').limit(1)
-      Product Load (5.1ms)  SELECT "products".* FROM "products" 
+      Product Load (5.1ms)  SELECT "products".* FROM "products"
       WHERE (price > 3) ORDER BY name desc LIMIT 1
     +----+----------+-------+-------------------------+-------------------------+
     | id | name     | price | created_at              | updated_at              |
@@ -683,7 +683,7 @@ Only works on methods that return a relation:
 
     .terminal
     >> Product.first.order('name')
-      Product Load (9.9ms)  SELECT "products".* FROM "products" 
+      Product Load (9.9ms)  SELECT "products".* FROM "products"
       ORDER BY "products"."id" ASC LIMIT 1
     NoMethodError: undefined method `order' for #<Product:0x007f9cdc3110c0>
 
@@ -741,9 +741,9 @@ Can be combined with other methods
     >> me = Customer.first
     #<Customer id: 1, name: "Paul Barry", ...
     >> Order.recent.by(me).order('placed_at').limit(1)
-      Order Load (4.9ms)  SELECT "orders".* FROM "orders" 
-      WHERE "orders"."customer_id" = 1 
-      AND (placed_at > '2013-09-24 02:54:29.590871') 
+      Order Load (4.9ms)  SELECT "orders".* FROM "orders"
+      WHERE "orders"."customer_id" = 1
+      AND (placed_at > '2013-09-24 02:54:29.590871')
       ORDER BY placed_at LIMIT 1
     +----+-------------+-------------------------+
     | id | customer_id | placed_at               |
@@ -773,13 +773,13 @@ The `line_items` table has an order_id foreign key and a product_id foreign_key
 
     .terminal
     betastore_development=# \d line_items;
-       Column   |            Type             
+       Column   |            Type
     ------------+-----------------------------
-     id         | integer                     
-     order_id   | integer                     
-     product_id | integer                     
-     quantity   | integer                     
-     price      | numeric                     
+     id         | integer
+     order_id   | integer
+     product_id | integer
+     quantity   | integer
+     price      | numeric
 
 We use the `belongs_to` method in the class to define the associations that represents those relationships
 
@@ -800,8 +800,8 @@ The `belongs_to` association gives the model a method to access the associated o
     >> line_item = LineItem.first
 
     >> line_item.order
-      Order Load (5.8ms)  SELECT "orders".* FROM "orders" 
-      WHERE "orders"."id" = $1 
+      Order Load (5.8ms)  SELECT "orders".* FROM "orders"
+      WHERE "orders"."id" = $1
       ORDER BY "orders"."id" ASC LIMIT 1  [["id", 1]]
     +----+-------------+-------------------------+
     | id | customer_id | placed_at               |
@@ -810,8 +810,8 @@ The `belongs_to` association gives the model a method to access the associated o
     +----+-------------+-------------------------+
 
     >> line_item.product
-      Product Load (2.7ms)  SELECT "products".* FROM "products" 
-      WHERE "products"."id" = $1 
+      Product Load (2.7ms)  SELECT "products".* FROM "products"
+      WHERE "products"."id" = $1
       ORDER BY "products"."id" ASC LIMIT 1  [["id", 1]]
     +----+--------+-------+
     | id | name   | price |
@@ -828,8 +828,8 @@ There may be multiple records in the `line_items` table that have the same value
 Since a line item also belongs to an order, we can get the orders for a products through the line item association
 
     .terminal
-                        line_items   
-    orders              ----------    
+                        line_items
+    orders              ----------
     --------------      id              products
     id             <--- order_id        --------
     customer_id         product_id ---> id
@@ -853,8 +853,8 @@ end
     >> product = Product.first
 
     >> product.orders
-      Order Load (6.0ms)  SELECT "orders".* FROM "orders" 
-      INNER JOIN "line_items" ON "orders"."id" = "line_items"."order_id" 
+      Order Load (6.0ms)  SELECT "orders".* FROM "orders"
+      INNER JOIN "line_items" ON "orders"."id" = "line_items"."order_id"
       WHERE "line_items"."product_id" = $1  [["product_id", 1]]
     +----+-------------+-------------------------+
     | id | customer_id | placed_at               |
@@ -909,12 +909,12 @@ Full documentation at [http://guides.rubyonrails.org/association_basics.html](ht
 
     >> product.save
        (0.4ms)  BEGIN
-      SQL (2.2ms)  INSERT INTO "products" 
-      ("created_at", "name", "price", "updated_at") 
-      VALUES ($1, $2, $3, $4) RETURNING "id"  
-      [["created_at", Tue, 01 Oct 2013 03:48:44 UTC +00:00], 
-      ["name", "Cookie"], 
-      ["price", #<BigDecimal:7f8b0e35ebc0,'0.179E1',18(45)>], 
+      SQL (2.2ms)  INSERT INTO "products"
+      ("created_at", "name", "price", "updated_at")
+      VALUES ($1, $2, $3, $4) RETURNING "id"
+      [["created_at", Tue, 01 Oct 2013 03:48:44 UTC +00:00],
+      ["name", "Cookie"],
+      ["price", #<BigDecimal:7f8b0e35ebc0,'0.179E1',18(45)>],
       ["updated_at", Tue, 01 Oct 2013 03:48:44 UTC +00:00]]
        (1.8ms)  COMMIT
     => true
@@ -930,11 +930,11 @@ You can change the attributes of the object and then save it
     => 1.99
     >> product.save
        (0.4ms)  BEGIN
-      SQL (1.1ms)  UPDATE "products" 
-      SET "price" = $1, 
-      "updated_at" = $2 
-      WHERE "products"."id" = 4  
-      [["price", #<BigDecimal:7f8b0c29b0c8,'0.199E1',18(45)>], 
+      SQL (1.1ms)  UPDATE "products"
+      SET "price" = $1,
+      "updated_at" = $2
+      WHERE "products"."id" = 4
+      [["price", #<BigDecimal:7f8b0c29b0c8,'0.199E1',18(45)>],
       ["updated_at", Tue, 01 Oct 2013 03:49:09 UTC +00:00]]
        (2.1ms)  COMMIT
     => true
@@ -948,10 +948,10 @@ You can change the object and save it in one method with `update_attributes`
     .terminal
     >> product.update_attributes(price: 1.89)
        (0.4ms)  BEGIN
-      SQL (0.8ms)  UPDATE "products" 
-      SET "price" = $1, "updated_at" = $2 
-      WHERE "products"."id" = 4  
-      [["price", #<BigDecimal:7f8b0c33b258,'0.189E1',18(45)>], 
+      SQL (0.8ms)  UPDATE "products"
+      SET "price" = $1, "updated_at" = $2
+      WHERE "products"."id" = 4
+      [["price", #<BigDecimal:7f8b0c33b258,'0.189E1',18(45)>],
       ["updated_at", Tue, 01 Oct 2013 03:51:46 UTC +00:00]]
        (2.1ms)  COMMIT
     => true
@@ -965,14 +965,14 @@ What happens if we try to save a Product with no name or price?
     .terminal
     >> Product.new.save
        (0.3ms)  BEGIN
-      SQL (3.3ms)  INSERT INTO "products" ("created_at", "updated_at") 
-      VALUES ($1, $2) RETURNING "id"  
-      [["created_at", Tue, 01 Oct 2013 03:58:21 UTC +00:00], 
+      SQL (3.3ms)  INSERT INTO "products" ("created_at", "updated_at")
+      VALUES ($1, $2) RETURNING "id"
+      [["created_at", Tue, 01 Oct 2013 03:58:21 UTC +00:00],
       ["updated_at", Tue, 01 Oct 2013 03:58:21 UTC +00:00]]
        (0.6ms)  COMMIT
     => true
     >> Product.last
-      Product Load (0.9ms)  SELECT "products".* FROM "products" 
+      Product Load (0.9ms)  SELECT "products".* FROM "products"
       ORDER BY "products"."id" DESC LIMIT 1
     +----+------+-------+-------------------------+-------------------------+
     | id | name | price | created_at              | updated_at              |
@@ -992,7 +992,7 @@ Validations allow use to specify the conditions that must be met in order to sav
 class Product < ActiveRecord::Base
   has_many :line_items
   has_many :orders, :through => :line_items
-  
+
   validates :name, presence: true
   validates :price, numericality: { greater_than_or_equal_to: 0 }
 end
@@ -1048,7 +1048,7 @@ Taken from [http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html](http
 ```ruby
 class LineItem < ActiveRecord::Base
   before_validation :set_price
-  
+
   def set_price
     self.price = product.price
   end
@@ -1056,12 +1056,6 @@ end
 ```
 
 Full documentation at [http://guides.rubyonrails.org/active_record_callbacks.html](http://guides.rubyonrails.org/active_record_callbacks.html)
-
----
-
-# Homework
-
-Update the Betastore product list to use the models and the data from the database
 
   </textarea><div id="slideshow"></div>
   </body>
