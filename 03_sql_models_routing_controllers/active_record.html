@@ -294,7 +294,7 @@ Where do the methods like `email` come from?
 The table name is determined by pluralizing the model's class name
 
     .terminal
-    >> Subscription.name.pluralize.downcase
+    >> Subscription.table_name
     => "subscriptions"
 
 That is used to generate the SQL to get the data:
@@ -335,9 +335,9 @@ You can define a method on an object while your program is running:
 
     .terminal
     >> Thing.send(:define_method, :whoops){ @whoops }
-    => #<Proc:0x007f92ecd09ef0@(irb):19 (lambda)>
+    => :whoops
     >> Thing.send(:define_method, :whoops=){|w| @whoops = w }
-    => #<Proc:0x007f92ecd1b650@(irb):20 (lambda)>
+    => :whoops=
 
 We must use `send` because `define_method` is private
 
@@ -348,6 +348,8 @@ Now we can call whoops without hitting `method_missing`
     => "hello"
     >> thing.whoops
     => "hello"
+
+This is called **metaprogramming**, because we are modifying the program while it is running.
 
 ---
 
@@ -519,6 +521,96 @@ Get the most recently created object
     | 3  | Coffee | 3.99  | 2013-09-30 18:17:46 UTC | 2013-09-30 18:17:46 UTC |
     +----+--------+-------+-------------------------+-------------------------+
 
+---
+
+# Retrieving an instance
+
+I've used the term "retrieving an instance" from the database a few times because that is how people typically refer to it and think about it, but that phrase is technically incorrect. You might think that "retrieving an instance" from the database means that there are some how Ruby objects stored in the database, but that is not actually the case.
+
+When we saying "retrieving an instance", what we mean is we execute a query to get the record or records we want, then instantiating an object and assigning that data to the object.
+
+The way this works is that Rails had lower level methods that deal directly with SQL. These methods work directly on the database connection provided by the database driver. One of them is called `select_one` and it looks like this:
+
+.small[
+
+    .terminal
+    >> attributes = Product.connection.select_one("SELECT * FROM products")
+    => {"id"=>"1", "name"=>"Muffin", "price"=>"2.99", ... }
+
+]
+
+In this method, I passed the full SQL statement to the `select_one` method and got a Hash back. I could then use that data to instantiate a Product instance:
+
+.small[
+
+    .terminal
+    >> product = Product.new(attributes)
+    +----+--------+-------+-------------------------+-------------------------+
+    | id | name   | price | created_at              | updated_at              |
+    +----+--------+-------+-------------------------+-------------------------+
+    | 1  | Muffin | 2.99  | 2014-03-07 01:35:38 UTC | 2014-03-07 01:35:38 UTC |
+    +----+--------+-------+-------------------------+-------------------------+
+    1 row in set
+
+]
+
+This is a simplified version of how the `Product.first` method works
+
+---
+
+# Using SQL directly
+
+In addition to `select_one`, there are several methods that work directly with SQL. `select_all` returns an Array of Hashes, one for each record:
+
+.small[
+
+    .terminal
+    >> result = Product.connection.select_all("SELECT * FROM products")
+    => #<ActiveRecord::Result:0x007ff89c125240 ...>
+    >> result.to_a.first
+    => {"id"=>"1", "name"=>"Muffin", "price"=>"2.99", ...}
+    >> result.to_a.size
+    => 3
+
+]
+
+The object returned is actually an `ActiveRecord::Result` object, which gives you some additional information about the query, but you can easily convert it to an array.
+
+---
+
+# Selecting a single column from multiple rows
+
+You can use `select_values` when your statement only has one column and you want an Array with the value from each row:
+
+    .terminal
+    >> Product.connection.select_values("SELECT name FROM products")
+    => ["Muffin", "Smoothie", "Coffee"]
+
+The built-in method for doing this specifically is called `pluck`:
+
+    .terminal
+    >> Product.pluck(:name)
+    => ["Muffin", "Smoothie", "Coffee"]
+
+---
+
+# Selecting a single value
+
+Finally, if you have have a query that just returns one row and one column, you can use `select_value` to get the result. A good example of this is the `count` function, which returns the number of rows that match the query:
+
+    .terminal
+    >> Product.connection.select_value("SELECT count(*) FROM products")
+    => "3"
+
+Notice that even though this should be a number, it is a string. All of the methods that work directly with SQL, `select_one`, `select_all`, `select_values` and `select_value`, return the column values as strings.
+
+The built-in way to do this same query is to use the `count` class method:
+
+    .terminal
+    >> Product.count
+    => 3
+
+This method returns the result as a number.
 ---
 
 # Querying
@@ -708,6 +800,13 @@ Works if you call `find`, `find_by`, `first` or `last` on a relation:
 * `find_by`
 * `first`
 * `last`
+
+## Finder methods on the connection take SQL and return array, hashes or strings
+
+* `select_one`
+* `select_all`
+* `select_values`
+* `select_value`
 
 ## Finder methods that return a relation
 
@@ -943,10 +1042,10 @@ You can change the attributes of the object and then save it
 
 # Updating Objects
 
-You can change the object and save it in one method with `update_attributes`
+You can change the object and save it in one method with `update`
 
     .terminal
-    >> product.update_attributes(price: 1.89)
+    >> product.update(price: 1.89)
        (0.4ms)  BEGIN
       SQL (0.8ms)  UPDATE "products"
       SET "price" = $1, "updated_at" = $2
@@ -1024,22 +1123,47 @@ This means it did not save and there are errors:
 
 # Callbacks
 
-Callbacks allow you trigger a method at various points in the process of saving an object
+Callbacks allow you trigger a method at various points in the process of saving an object. When an object is being saved for the first time, the create callbacks are called. The series of methods called look like this:
+
+.small[
 
     .terminal
-    (-) save
-    (-) valid
-    (1) before_validation
-    (-) validate
-    (2) after_validation
-    (3) before_save
-    (4) before_create
-    (-) create
-    (5) after_create
-    (6) after_save
-    (7) after_commit
+    save
+      valid?
+        (1) before_validation
+        validate
+        (2) after_validation
+      (3) before_save
+      create
+        (4) before_create
+        (5) after_create
+      (6) after_save
+      (7) after_commit
 
-Taken from [http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html](http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html)
+]
+
+When updating an object has already been saved, the methods called are:
+
+.small[
+
+    .terminal
+    save
+      valid?
+        (1) before_validation
+        validate
+        (2) after_validation
+      (3) before_save
+      update
+        (4) before_update
+        (5) after_update
+      (6) after_save
+      (7) after_commit
+
+]
+
+
+See [http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html](http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html) for more details
+
 
 ---
 
@@ -1056,6 +1180,29 @@ end
 ```
 
 Full documentation at [http://guides.rubyonrails.org/active_record_callbacks.html](http://guides.rubyonrails.org/active_record_callbacks.html)
+
+---
+
+# Summary
+
+* **Migrations** are used to create / update the structure of tables
+
+* **ActiveRecord** models are used in Rails to load and retrieve data from the database
+
+* ActiveRecord uses **metaprogramming** to create methods that match up with each column of the database
+
+* `find`, `find_by`, `first` and `last` are used to retrieve instances from the database
+
+* `select_one`, `select_all`, `select_values` and `select_value` are take custom SQL and return arrays, hashes or strings
+
+* `where`, `order`, `limit`, `includes`, and `joins` are used to build queries
+
+* `belongs_to`, `has_many` and `has_one` define the associations between models
+
+* Validations are used to define the conditions that must be met in order to save a record
+
+* Callbacks are used to make things happen before and after records are saved
+
 
   </textarea><div id="slideshow"></div>
   </body>
