@@ -27,7 +27,7 @@
     <style type="text/css">
       body {
         font-family: 'Droid Serif';
-        font-size: medium;
+        font-size: 24px;
       }
       h1, h2, h3 {
         font-family: 'Yanone Kaffeesatz';
@@ -95,7 +95,7 @@ Modify db/seeds.db to create categories and then put each product in one or more
 
 class: middle
 
-Use the rails model generator a model to hold information about a credit card. It should be associated to a customer, have a number and expiry_date
+Use the rails model generator to generate a model to hold information about a credit card. It should be associated to a customer, have a number and expiry_date
 
 ---
 
@@ -113,7 +113,7 @@ Add the gem "faker" to your Gemfile. Run bundle to install the gem.
 
 class: middle
 
-Create a script that you can run with rails runner to generate 100 fake customers and a credit card for each customer. Make each customer place Place between 1 and 5 orders, with between 1 and 5 line items per order, with a quantity between 1 and 5 for each line item.
+Create a script that you can run with rails runner to generate 100 fake customers and a credit card for each customer. Make each customer place between 1 and 5 orders, with between 1 and 5 line items per order, with a quantity between 1 and 5 for each line item.
 
 Hint: use `rand(4) + 1` to get a random between between 1 and 5.
 Hint: use the `sample` method on an Array to get a random element of an Array
@@ -139,11 +139,15 @@ class: middle
 
 Create data in the fixtures so that there are at least 3 orders. Write a test in `test/models/order_test.rb` so that you verify that `total_revenue` works correctly.
 
+For more information on Fixtures, read the [Rails Guide on Testing][testing].
+
+[testing]: http://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures
+
 ---
 
 class: middle
 
-Use ActiveRecord print out the name of the customer for each of the 5 most recent orders for the hat product.
+Use ActiveRecord to print out the name of the customer for each of the 5 most recent orders for the hat product.
 
 ---
 
@@ -151,13 +155,19 @@ class: middle
 
 Use validations to make sure the following conditions are met before each of these objects can be saved:
 
-Category - name exists
-Customer - name exists, email exists and is unique
-Product - name exists, price exists and is a number greater than 0
-Order - customer_id exists, credit_card_id exists and the credit card belongs to the customer placing the order
-Line Item -
+* **Category** - name exists
 
-To prove each of these, create a test that shows if the values exist that the record can be saved and that if the values are missing, there is an error
+* **Customer** - name exists, email exists and is unique
+
+* **Product** - name exists, price exists and is a number greater than 0
+
+* **Credit Card** - number exists, is at least 15 characters and has only numbers, the expiration_date is in the format of MM/YYYY and is a date in the future
+
+* **Line Item** - order_id exists, product_id exists
+
+* **Order** - customer_id exists, credit_card_id exists and the credit card belongs to the customer placing the order
+
+To prove each of these, modify the test for the model that shows if the model is valid that the record can be saved and that if the model is not valid, then there is an error
 
 ---
 
