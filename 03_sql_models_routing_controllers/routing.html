@@ -354,12 +354,14 @@ To create a view for a namespaced controller, you just have to put the template 
     <th>ID</th>
     <th>Name</th>
     <th>Price</th>
+    <th>Created At</th>
   </tr>
   <% for product in @products %>
     <tr>
       <td><%= product.id %></td>
       <td><%= product.name %></td>
       <td><%= product.price %></td>
+      <td><%= produce.created_at %></td>
     </tr>
   <% end %>
 </table>
@@ -369,45 +371,220 @@ Now if you go to [http://localhost:3000/admin/products](http://localhost:3000/ad
 
 ---
 
-# Variables in paths
+# Variables in routes paths
 
-You can define a route which has a placeholder for any value, which looks like this:
+You can define a route which has a placeholder for any value. Put this into the admin namespace in `config/routes.rb`:
 
 ```ruby
-get '/orders/:id' => 'orders#show'
+get '/products/:id' => 'products#show'
 ```
 
-The means that if the request has a URL that starts with `/orders/` followed by anything, it will match.
+The means that if the request has a URL that starts with `/products/` followed by anything, it will match.
 
-For example, `/orders/1` matches, so does `/orders/hello`. The value that matches the id part of the route, which are `"1"` and `"hello"` in this case, are stored in a parameter that the controller will be able to access.
+For example, `/products/1` matches, so does `/products/hello`. The value that matches the id part of the route, which are `"1"` and `"hello"` in this case, are stored in a parameter that the controller will be able to access.
 
-FYI, `/orders` does not match this route,
+FYI, `/products` does not match this route,
 
 ---
 
-# Optional variables in paths
+# Parameters
 
-If you surround the variable part of a route with parentheses, that means that part is optional:
+In the controller, you can access an parameters that are passed in via the `params` Hash, like this:
 
 ```ruby
-get '/orders/(:id)' => 'orders#show`
+def show
+  params[:id]
+end
 ```
 
-This means a request will match this route even if the path doesn't have an id, it will match
+Params can come from the routes, as discussed, in the previous slide, or from query string params or as we will see later, form fields.
 
-So `/orders` does match this route
+---
+
+# Exercise
+
+Make a view for the admin products show action. In the view, print all the param names and their values.
+
+Add some query string params and reload the page and see how the values show up in the output.
 
 ---
 
 # Named Routes
 
-You can give routes a name:
+In the routes, you can give a name to the route. This will allow you generate the route using a method from your controllers and views. Change your admin products show route to look like this:
 
 ```ruby
-get '/orders' => 'orders#index', as: 'orders'
+get '/products/:id' => 'products#show', as: 'product'
 ```
 
-This means that in our code, controller, view, etc., we can construct a URL that will match this route by calling the method `orders_path`
+The value of the `as` parameter is the name of the route. To generate that route, modify the view for the admin products index by replacing where we are printing the id of the product, which looks like this:
+
+```rhtml
+<%= product.id %>
+```
+
+With a call to the route, which looks like this:
+
+```rhtml
+<%= admin_product_path(product) %>
+```
+
+The name of the method is whatever you named the route with `_path` added to the end. Because the route is in the admin namespace, `admin_` is added to the front. The route path has one variable in it, so we pass in the product to be used as the value for the path. Rails knows to called `id` on the active record object to get the actual value that should be included in the path. The actual path will look like this for the first product:
+
+```
+/admin/products/1
+```
+
+---
+
+# View Helpers
+
+Rails makes methods available for you to use in the views. These are typically called view helpers. Rails has many that are built in and as we will see later, you can add your own. One of the most commonly used view helpers is called `link_to` and it is used to generate links. Make a change to the same table cell as we did in the last slide so that it looks like this:
+
+```rhtml
+<%= link_to admin_product_path(product), product.id %>
+```
+
+The way the `link_to` method works is the first argument in the URL or path that the link should go to and the second argument is what text should appear. If you inspect the HTML of the page, you will see something like this:
+
+```html
+<a href="/admin/products/1">1</a>
+```
+
+If you click on on the link, you should then see your admin product show action rendered, which at this point just prints out params.
+
+---
+
+# Exercise
+
+1. Modify the admin products show action to get the product that matches the id param from the database and store it in an instance variable named `@product`
+
+2. Modify the admin products show view to display the ID, name, price, image_url and created_at for the product.
+
+---
+
+# Number Formatting Helpers
+
+Rails has several built in helpers for formatting different types of numbers for display. For example, if a number represents a currency, like our price does, you are going to want to display it with a dollar sign, with commas and 2 decimal places. Change the both places where were are printing out the price, in the admin products index view and the admin products show view, to display the price like this:
+
+```rhtml
+<%= number_to_currency product.price %>
+```
+
+You can read about some other types of number formatting, such as percentages, file sizes, etc. here:
+
+[http://api.rubyonrails.org/classes/ActionView/Helpers/NumberHelper.html](http://api.rubyonrails.org/classes/ActionView/Helpers/NumberHelper.html)
+
+---
+
+# Images
+
+Right now the admin product show is just displaying the product image URL. If we would like to display the actual image, we can use the `image_tag` helper, like this:
+
+```rhtml
+<%= image_tag product.image_url %>
+```
+
+Modify the admin product show view to use this helper.
+
+---
+
+# Formatting Date/Times
+
+If you want to print a time in a better format, one option Rails gives you is a helper called `time_ago_in_words`. Change where created_at is displayed in the admin product show view to use this helper:
+
+```rhtml
+<%= time_ago_in_words product.created_at %> ago
+```
+
+You can see that this displays a human readable time like "about 30 minutes". For more precise formatting of a time, you can use the Ruby `strftime` method, like this:
+
+```rhtml
+<%= product.created_at.strftime('%m/%d/%Y') %>
+```
+
+Read the documentation for `Time#strftime` here:
+
+[http://ruby-doc.org/core-2.1.1/Time.html#method-i-strftime](http://ruby-doc.org/core-2.1.1/Time.html#method-i-strftime)
+
+Modify the code in the view to display the time in the format "Tuesday, March 25, 2014 8:00 PM"
+
+---
+
+# Forms
+
+Now that we've gotten the hang of routes, controllers, actions and views, let's move on to creating forms to allow us to create records in the database. The first thing we'll need is an action to display the form to create a new product.
+
+1. Add a route to the admin namespace so that the path `/products/new` goes to the new action of the admin products controller. Name the route `new_product`.
+
+2. Create a view template for the admin products new action. Put some basic HTML in it like an **h1** that says New Product.
+
+Did you get it to work? Did you notice that you didn't have to create a new action in the controller? That is because in Rails if the action doesn't do anything, you don't actually need to create the blank action, you can just create a view and it will get rendered.
+
+That's a neat trick and it's good to know that is how it works, but it turns out that we actually do need our new action to do something, so create one that looks like this:
+
+```ruby
+def new
+  @product = Product.new
+end
+```
+
+---
+
+# Form Builders
+
+Now we have an empty Product object that our view can make use of. Add this code to the admin products new view:
+
+```rhtml
+<%= form_for [:admin, @product] do |f| %>
+  <%= f.label :name %>
+  <%= f.text_field :name %>
+  <%= f.submit %>
+<% end %>
+```
+
+This view will correctly, but try to fill something in and submit it. What error do you get?
+
+---
+
+# Route for create
+
+When we submit a form, there needs to be an action to handle it. Make a route like this:
+
+```ruby
+post '/products' => 'products#create'
+```
+
+The default method for forms is post, so this is the first time we have defined a route using post. Notice that it is the same path as the index, but a post instead of a get.
+
+---
+
+# create action
+
+Let's create an action to save the data we received from the form into a new record in the products table.
+
+```ruby
+def create
+  @product = Product.new(params.require(:product).permit!)
+  if @product.save
+    redirect_to admin_products_path, notice: "Product #{@product.id} was created"
+  else
+    render 'new'
+  end
+end
+```
+
+In this code, if we are able to save the product, the we'll redirect to the products listing with a little message letting the user know that it worked. If the product could not be saved, most likely due to a validation error, then we will re-render the form and display the errors
+
+---
+
+# Exercises
+
+1. Modify the admin products index view to display the `flash[:notice]` message if it exists
+
+2. Modify the admin products new view to display the errors on the product if there are any. Make sure to add at least one validation rule to product so that there is a way to make it fail to save.
+
+3. Add more fields to the form so you can enter the price and image_url for the product.
 
 ---
 
@@ -436,13 +613,13 @@ In Rails applications, the two main types of resources are **collections** and *
 The 7 routes for a RESTful controller typically are:
 
 ```ruby
-   get '/orders'          => 'orders#index', as: 'orders'
-  post '/orders'          => 'orders#create'
-   get '/orders/new'      => 'orders#new',   as: 'new_order'
-   get '/orders/:id/edit' => 'orders#edit',  as: 'edit_order'
-   get '/orders/:id'      => 'orders#show',  as: 'order'
- patch '/orders/:id'      => 'orders#update'
-delete '/orders/:id'      => 'orders#destroy
+   get '/products'          => 'products#index', as: 'products'
+  post '/products'          => 'products#create'
+   get '/products/new'      => 'products#new',   as: 'new_product'
+   get '/products/:id/edit' => 'products#edit',  as: 'edit_product'
+   get '/products/:id'      => 'products#show',  as: 'order'
+ patch '/products/:id'      => 'products#update'
+delete '/products/:id'      => 'products#destroy
 ```
 
 Previous to Rails 4, `put` was commonly used for update
@@ -468,236 +645,36 @@ Adhering to this pattern as much as possible is a very useful design tool
 
 ---
 
-# Non-RESTful Example
-
-Say you have your RESTful controller for orders:
-
-```ruby
-   get '/orders'          => 'orders#index', as: 'orders'
-  post '/orders'          => 'orders#create'
-   get '/orders/new'      => 'orders#new',   as: 'new_order'
-   get '/orders/edit/:id' => 'orders#edit',  as: 'edit_order'
-   get '/orders/:id'      => 'orders#show',  as: 'order'
- patch '/orders/:id'      => 'orders#update'
-delete '/orders/:id'      => 'orders#destroy
-```
-
-This is very nice and RESTful. In your application, say that customers are allowed to cancel an order up until it is shipped, but once it has shipped, they must get a refund. You might implement this by just starting to tack some actions onto your orders controller:
-
-```ruby
-   get '/orders/refund'      => 'orders#refund_status', as: 'refund_status'
-  post '/orders/refund'      => 'orders#create_refund'
-```
-
-This design leads down the path of controllers with many actions and it harder to understand and test
-
----
-
-# RESTful Example
-
-Instead of thinking of a refund as a modification to an order, think of refunds as a resource itself:
-
-```ruby
-   get '/refunds'          => 'refunds#index',  as: 'refunds'
-  post '/refunds'          => 'refunds#create'
-   get '/refunds/new'      => 'refunds#new',    as: 'new_refund'
-   get '/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
-   get '/refunds/:id'      => 'refunds#show',   as: 'refund'
- patch '/refunds/:id'      => 'refunds#update'
-delete '/refunds/:id'      => 'refunds#destroy'
-```
-
-This is a nice design that allows us to add extra information to refund is necessary and keeps it separate from the order
-
----
-
-# Nested Resources
-
-We haven't created the model for the Refund yet, but you can imagine at a minimum that it would belong to an Order. A Refund without an Order doesn't make any sense.
-
-For this type of situation, Rails allows us to use nested routes to include which order the refund is for in the route. That looks like this:
-
-```ruby
-   get '/orders/:order_id/refunds'          => 'refunds#index',  as: 'refunds'
-  post '/orders/:order_id/refunds'          => 'refunds#create'
-   get '/orders/:order_id/refunds/new'      => 'refunds#new',    as: 'new_refund'
-   get '/orders/:order_id/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
-   get '/orders/:order_id/refunds/:id'      => 'refunds#show',   as: 'refund'
- patch '/orders/:order_id/refunds/:id'      => 'refunds#update'
-delete '/orders/:order_id/refunds/:id'      => 'refunds#destroy'
-```
-
----
-
-# Singular Resources
-
-This design allows for multiple refunds per order, but that doesn't make sense, an order can only have one refund. To support this, we can switch our design to a singular resource, that looks like this:
-
-```ruby
-  post '/orders/:order_id/refund'      => 'refunds#create'
-   get '/orders/:order_id/refund/new'  => 'refunds#new',    as: 'new_refund'
-   get '/orders/:order_id/refund/edit' => 'refunds#edit',   as: 'edit_refund'
-   get '/orders/:order_id/refund'      => 'refunds#show',   as: 'refund'
- patch '/orders/:order_id/refund'      => 'refunds#update'
-delete '/orders/:order_id/refund'      => 'refunds#destroy'
-```
-
-Notice that the refund ids are no longer needed, but once we know which order we are dealing with, we know which refund we are dealing with
-
----
-
 # resources
 
 Have you noticed we've been doing a lot of typing for these routes? Well it turns out that since this pattern is baked into rails, there is support for automatically generating all of these routes.
 
-First, for our orders resource, the full routes look like this:
+First, for our products resource, the full routes look like this:
 
 ```ruby
-   get '/orders'          => 'orders#index', as: 'orders'
-  post '/orders'          => 'orders#create'
-   get '/orders/new'      => 'orders#new',   as: 'new_order'
-   get '/orders/:id/edit' => 'orders#edit',  as: 'edit_order'
-   get '/orders/:id'      => 'orders#show',  as: 'order'
- patch '/orders/:id'      => 'orders#update'
-delete '/orders/:id'      => 'orders#destroy
+   get '/products'          => 'products#index', as: 'products'
+  post '/products'          => 'products#create'
+   get '/products/new'      => 'products#new',   as: 'new_product'
+   get '/products/:id/edit' => 'products#edit',  as: 'edit_product'
+   get '/products/:id'      => 'products#show',  as: 'order'
+ patch '/products/:id'      => 'products#update'
+delete '/products/:id'      => 'products#destroy
 ```
 
 But we can abbreviate that to just:
 
 ```ruby
-resources :orders
+resources :products
 ```
 
-That's a lot shorter and a lot more typo-proof as well
+That's a lot shorter and a lot more typo-proof as well. After you make this change, run `rake routes` to see what the routes look like.
 
 ---
 
-# Partial Resources
+# Exercise
 
-You application isn't going to allow users to do everything to every resource. For example, for an e-commerce store, it would not make sense for customers to be able to create, update or delete products.
+Implement the full set of RESTful actions for the admin products controller, so we can create, update and delete products.
 
-You can limit which routes are defined when using `resources` by using the `only` option:
-
-```ruby
-resources :products, only: [:index, :show]
-```
-
-This will make it so only the index and show routes are generated for the products resource, instead of the typical full set of 7 routes
-
----
-
-# Nested Resources
-
-To handle our refund, first if we were doing the original version of refund where we could have multiple refunds per order, if you recall those routes looked like this:
-
-```ruby
-   get '/orders/:order_id/refunds'          => 'refunds#index',  as: 'refunds'
-  post '/orders/:order_id/refunds'          => 'refunds#create'
-   get '/orders/:order_id/refunds/new'      => 'refunds#new',    as: 'new_refund'
-   get '/orders/:order_id/refunds/:id/edit' => 'refunds#edit',   as: 'edit_refund'
-   get '/orders/:order_id/refunds/:id'      => 'refunds#show',   as: 'refund'
- patch '/orders/:order_id/refunds/:id'      => 'refunds#update'
-delete '/orders/:order_id/refunds/:id'      => 'refunds#destroy'
-```
-
-We can shorten that to:
-
-```ruby
-resources :orders do
-  resources :refunds
-end
-```
-
----
-
-# Nested Singular Resource
-
-Now to switch our refund resource to be a singular resource that only allows for one refund per order, where we had routes like this:
-
-```ruby
-  post '/orders/:order_id/refund'      => 'refunds#create'
-   get '/orders/:order_id/refund/new'  => 'refunds#new',    as: 'new_refund'
-   get '/orders/:order_id/refund/edit' => 'refunds#edit',   as: 'edit_refund'
-   get '/orders/:order_id/refund'      => 'refunds#show',   as: 'refund'
- patch '/orders/:order_id/refund'      => 'refunds#update'
-delete '/orders/:order_id/refund'      => 'refunds#destroy'
-```
-
-We simply change the route to use `resource` (singular) instead of `resources` (plural)
-
-```ruby
-resources :orders do
-  resource :refund
-end
-```
-
-Note that the controller name is still the plural form `RefundsController`, which is the convention in Rails. The controller name is always plural even if the route is singular.
-
----
-
-# Summary
-
-Make your design as RESTful as possible
-
-## More Info
-
-[http://guides.rubyonrails.org/routing.html](http://guides.rubyonrails.org/routing.html)
-
-## Good Cheat Sheet - Print this out!
-
-[http://envylabs.com/uploads/Rails_3_Cheat_Sheets.pdf](http://envylabs.com/uploads/Rails_3_Cheat_Sheets.pdf)
-
----
-
-# Homework
-
-Add the Refund model, which belongs to Order and Order has one refund
-
-Define the routes to allow the application to:
-
-* list products
-* view product details
-* place an order
-* edit an order
-* list your orders
-* view order details
-* cancel an order
-* create a refund for an order
-* view the status of a refund
-
----
-
-# Routes
-
-Check the output of `rake routes` to verify the routes looks like this:
-
-.small[
-
-    .terminal
-               Prefix Verb   URI Pattern                             Controller#Action
-             products GET    /products(.:format)                     products#index
-              product GET    /products/:id(.:format)                 products#show
-        subscriptions POST   /subscriptions(.:format)                subscriptions#create
-     new_subscription GET    /subscriptions/new(.:format)            subscriptions#new
-         subscription GET    /subscriptions/:id(.:format)            subscriptions#show
-         order_refund POST   /orders/:order_id/refund(.:format)      refunds#create
-     new_order_refund GET    /orders/:order_id/refund/new(.:format)  refunds#new
-    edit_order_refund GET    /orders/:order_id/refund/edit(.:format) refunds#edit
-                      GET    /orders/:order_id/refund(.:format)      refunds#show
-                      PATCH  /orders/:order_id/refund(.:format)      refunds#update
-                      PUT    /orders/:order_id/refund(.:format)      refunds#update
-                      DELETE /orders/:order_id/refund(.:format)      refunds#destroy
-               orders GET    /orders(.:format)                       orders#index
-                      POST   /orders(.:format)                       orders#create
-            new_order GET    /orders/new(.:format)                   orders#new
-           edit_order GET    /orders/:id/edit(.:format)              orders#edit
-                order GET    /orders/:id(.:format)                   orders#show
-                      PATCH  /orders/:id(.:format)                   orders#update
-                      PUT    /orders/:id(.:format)                   orders#update
-                      DELETE /orders/:id(.:format)                   orders#destroy
-                 root GET    /                                       subscriptions#new
-
-]
   </textarea><div id="slideshow"></div>
   </body>
 </html>
