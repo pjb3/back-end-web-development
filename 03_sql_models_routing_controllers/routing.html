@@ -361,7 +361,7 @@ To create a view for a namespaced controller, you just have to put the template 
       <td><%= product.id %></td>
       <td><%= product.name %></td>
       <td><%= product.price %></td>
-      <td><%= produce.created_at %></td>
+      <td><%= product.created_at %></td>
     </tr>
   <% end %>
 </table>
@@ -442,7 +442,7 @@ The name of the method is whatever you named the route with `_path` added to the
 Rails makes methods available for you to use in the views. These are typically called view helpers. Rails has many that are built in and as we will see later, you can add your own. One of the most commonly used view helpers is called `link_to` and it is used to generate links. Make a change to the same table cell as we did in the last slide so that it looks like this:
 
 ```rhtml
-<%= link_to admin_product_path(product), product.id %>
+<%= link_to product.id, admin_product_path(product) %>
 ```
 
 The way the `link_to` method works is the first argument in the URL or path that the link should go to and the second argument is what text should appear. If you inspect the HTML of the page, you will see something like this:
