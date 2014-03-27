@@ -465,7 +465,7 @@ If you click on on the link, you should then see your admin product show action 
 
 # Number Formatting Helpers
 
-Rails has several built in helpers for formatting different types of numbers for display. For example, if a number represents a currency, like our price does, you are going to want to display it with a dollar sign, with commas and 2 decimal places. Change the both places where were are printing out the price, in the admin products index view and the admin products show view, to display the price like this:
+Rails has several built in helpers for formatting different types of numbers for display. For example, if a number represents a currency, like our price does, you are going to want to display it with a dollar sign, with commas and 2 decimal places.
 
 ```rhtml
 <%= number_to_currency product.price %>
@@ -475,6 +475,10 @@ You can read about some other types of number formatting, such as percentages, f
 
 [http://api.rubyonrails.org/classes/ActionView/Helpers/NumberHelper.html](http://api.rubyonrails.org/classes/ActionView/Helpers/NumberHelper.html)
 
+## Exercise
+
+Change the both places where were are printing out the price, in the admin products index view and the admin products show view, to display the price like this:
+
 ---
 
 # Images
@@ -482,8 +486,10 @@ You can read about some other types of number formatting, such as percentages, f
 Right now the admin product show is just displaying the product image URL. If we would like to display the actual image, we can use the `image_tag` helper, like this:
 
 ```rhtml
-<%= image_tag product.image_url %>
+<%= image_tag product.image_url, alt: @product.image_url %>
 ```
+
+## Exercise
 
 Modify the admin product show view to use this helper.
 
@@ -507,7 +513,9 @@ Read the documentation for `Time#strftime` here:
 
 [http://ruby-doc.org/core-2.1.1/Time.html#method-i-strftime](http://ruby-doc.org/core-2.1.1/Time.html#method-i-strftime)
 
-Modify the code in the view to display the time in the format "Tuesday, March 25, 2014 8:00 PM"
+## Exercise
+
+Modify the code in the view to display both how long ago the product was created and the time it was created in the format "Tuesday, March 25, 2014 8:00 PM UTC"
 
 ---
 
@@ -574,7 +582,17 @@ def create
 end
 ```
 
-In this code, if we are able to save the product, the we'll redirect to the products listing with a little message letting the user know that it worked. If the product could not be saved, most likely due to a validation error, then we will re-render the form and display the errors
+In this code, if we are able to save the product, then we'll redirect to the products listing with a flash message letting the user know that it worked. If the product could not be saved, most likely due to a validation error, then we will re-render the form and display the errors
+
+A flash message is a message that temporarily exists that is typically used to let the user know that something happened. You can print it out in a view like this:
+
+```rhtml
+<% if flash[:notice].present? %>
+  <div class="notice"><%= flash[:notice] %></div>
+<% end %>
+```
+
+The flash will be printed on the page after the flash is set, not the current page.
 
 ---
 
