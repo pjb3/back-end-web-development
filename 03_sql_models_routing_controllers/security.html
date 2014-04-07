@@ -63,6 +63,8 @@ class: middle, center
 
 # [Oh, Security!](https://www.youtube.com/watch?v=w9Sx34swEG0&feature=youtu.be&t=1m11s)
 
+![It's A Secret To Everybody](img/secret.png)
+
 .footnote[
   created with [remark](http://github.com/gnab/remark)
 ]
@@ -71,7 +73,7 @@ class: middle, center
 
 # Authentication
 
-Unless we make some changes to our app, once we post it to the Internet, anyone will be able to go to `/admin/products` and modify the product catalog. This is, of course, not good.
+Unless we make some changes to our app, anyone can go to `/admin/products` and modify the product catalog. This is, of course, not good.
 
 We can fix this by requiring the user to log in as an administrator before they make any changes to the products. We'll go through a series of improvements to the application to increase the security.
 
@@ -104,6 +106,388 @@ When you go to [http://localhost:3000/admin/products](http://localhost:3000/admi
 ---
 
 # Log In Form
+
+To setup a log in form, first let's create these routes in the admin namespace:
+
+```ruby
+get  '/login' => 'logins#new', as: 'logins'
+post '/login' => 'logins#create'
+```
+
+Next create an empty controller at `app/controllers/admin/logins_controller.rb`:
+
+```ruby
+class Admin::LoginsController < ApplicationController
+  layout 'admin'
+end
+```
+
+For this form, we don't need to do anything to setup our new action, so next we will create the log in form in the view for `new`.
+
+---
+
+# Log In Form
+
+Put this into `app/views/admin/logins/new.html.erb`. The next slide will cover the details of this form.
+
+```rhtml
+<div class="jumbotron">
+  <%= form_tag admin_logins_path, class: 'form-horizontal', role: 'form' do %>
+
+    <div class="form-group">
+      <%= label_tag :email, nil, class: 'col-sm-2 control-label' %>
+      <div class="col-sm-4">
+        <%= email_field_tag :email, params[:email], class: 'form-control' %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <%= label_tag :password, nil, class: 'col-sm-2 control-label' %>
+      <div class="col-sm-4">
+        <%= password_field_tag :password, nil, class: 'form-control' %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-4">
+        <%= submit_tag "Log In", class: 'btn btn-success' %>
+      </div>
+    </div>
+  <% end %>
+</div>
+```
+
+---
+
+# Log In Form
+
+So first off in our log in form, we wrap it in a `jumbotron` div just to give it some spacing. As far as the bootstrap structure of this form goes, it is the same as the form we created for products in the admin, so nothing new there.
+
+What is different is that in this form, we aren't going to be creating a model. There is no `Login` model that we are going to save or update. We just need to get the two fields, `email` and `password` and verify that they are correct. So in this case, we are going to use `form_tag` instead of `form_for`.
+
+We used `form_for` for the product form because it we wanted to have our form bound to a model, which means that when we edit the form, all the fields would be pre-populated with the current state of the model. In the case of our log in form, that isn't needed so we can use the simpler `form_tag`.
+
+Each of the `_tag` helper methods that we use in the form follow the pattern of input name, input value and input attributes as the arguments.
+
+---
+
+# Log In Action
+
+When we submit our form, it will go to the `create` action of the admin logins controller. Let's implement that action like this for now:
+
+```ruby
+def create
+  if params[:password] == 'secret'
+    session[:logged_in_email] = params[:email]
+    redirect_to admin_products_path
+  else
+    flash\.now[:danger] = 'Log In Failed'
+    render 'new'
+  end
+end
+```
+
+So this isn't a very secure first attempt at a log in, but it's a start. What we do is check that the password equals "secret". If it does not, then we use `flash.now` to display the error message. Flash messages are typically displayed in the next request after they are set because the current request will redirect to the next page. In this case, we want to show the form with the same email address the user entered, so we are going to render the form instead of redirecting. To make the flash message show up on the page rendered by this request, we can use `flash.now`.
+
+If the password does equal "secret", then we log the user in. We do that by storing a value in the session. So what is `session`?
+
+---
+
+# Session
+
+Each user who accesses your application has a session that is unique to that user. The session is very much like a Hash in that you can put values into the session and get them out use the brackets `[]`.
+
+You can access the session from any controller in your application in a similar way to how you can access the params. The major different between `session` and `params` is that values that are stored in params are only available for one request, whereas values stored in the session are available for every request after that one, until the values are cleared out.
+
+Although the session can be stored in a few different places, the default is to store the session into a browser cookie and that is an appropriate storage location for many applications in production. The only real drawback of storing sessions in the browser is that most browsers limit you to 4KB of data in a cookie, but you typically don't store a lot of data in the session, so that is fine.
+
+If you need a refresher on what cookies are, take a look back at [slide 9 of The Internet](http://pjb3.github.io/back-end-web-development/02_html_and_rails/internet#9)
+
+You can read more about sessions at [http://guides.rubyonrails.org/security.html#sessions](http://guides.rubyonrails.org/security.html#sessions)
+
+---
+
+# Trying to Log In
+
+If you try it now though, upon entering the correct password, you will still get redirected back to the log in page.
+
+How do you think we fix that?
+
+---
+
+# Checking the session for login
+
+In the admin products controller, we still have a hard-coded value of `false` in our `logged_in?` method, so with that in place, no matter what happens in the logins controller, there is no way to get the list of products. Let's fix the `logged_in?` method to look like this:
+
+```ruby
+def logged_in?
+  session[:logged_in_email].present?
+end
+```
+
+We check to see if there is a value in the session in the key `:logged_in_email`. This is the same key that we used in the admin logins create action, so that is what will make this work.
+
+If you want to test that the admin products index action still redirects the user to the log in form, close your browser and open it back up. If you try to access the admin products index action, you should be redirected to the log in form. The session is stored in a cookie that only lives for the length of the browser session. If you want to store something for a longer period of time, you will have to use a separate cookie with an explicit `expires_at` set to some time in the future.
+
+---
+
+# Protecting All Actions
+
+With a new browser session, if you attempt to access `/admin/products`, you will get redirected to the log in form, but if you go directly to `/admin/products/new`, you will be able to access the form to create a new product without logging in.
+
+We could fix this by adding code to the new action in a similar way to how we did it in the index action, but we really need to do this for all admin actions. A better way to accomplish this is to create a `before_action`. Add this in the class definition of the admin products action:
+
+```ruby
+before_action :require_login
+```
+
+Before actions work very similar to the callbacks like `before_save` in active record. The `before_action` method takes a symbol representing the name of the method to call before any of the actions in the controller are called. If the method does a redirect, then the action won't be called, instead the redirect will be returned.
+
+Next we will take a look at how to write the `require_login` method.
+
+---
+
+# Before Action
+
+Implement the `require_login` method as a protected method in the admin products controller that looks like this:
+
+```ruby
+def require_login
+  unless logged_in?
+    redirect_to admin_login_path, danger: 'Please log in to continue'
+  end
+end
+```
+
+You should now remove the code that checks for `logged_in?` from the index action because it is now duplicative.
+
+Now test out some links in a clean browser session. You should get redirected to the log in form no matter which action you try to access, such as `/admin/products` or `/admin/products/new`.
+
+---
+
+# Creating A Different Password Per User
+
+So now we have each action locked down with the `require_login` before action, but one of the major security flaws is that we will have to tell everyone to use the same password, which is currently 'secret'. If we need to change it, we will have to tell everyone the new password. This is not a good way to handle passwords.
+
+Instead, we should have a user account that we store in the database and each one should have a different password. To do that, let's create a model, like this:
+
+    .terminal
+    $ rails g model user email password
+    $ rake db:migrate
+
+Next modify your `db/seeds.rb` to create an account for yourself with whatever password you like. It might look something like this:
+
+```ruby
+User.create!(email: 'mail@paulbarry.com', password: 'secret')
+```
+
+Re-generate your database with the seeds using this command:
+
+    .terminal
+    $ rake db:setup
+
+---
+
+# Using the model to authenticate
+
+Now that we have users in the database, we can update the admin logins controller to use it, like this:
+
+```ruby
+def create
+  user = User.find_by(email: params[:email])
+  if user.try(:password) == params[:password]
+    session[:user_id] = user.id
+    redirect_to admin_products_path
+  else
+    flash.now[:danger] = 'Log In Failed'
+    render 'new'
+  end
+end
+```
+
+The parts that have changed is that first we use the email param to find the user record in the database. Then on the next line, we see if the password provided in the params matches the password stored in the database. We use `try` because if we didn't find the user by email, then `user` will be nil. This makes it so that if the email is wrong or the password is wrong, the user will just see a "Log In Failed" message.
+
+---
+
+# Storing the user ID in the session
+
+The second thing is that we are doing differently now is we are storing the user id in the session under the key `:user_id`. This will make it easier to just look up the user by ID later if we need to load the user object. That means to make this work, we also need to change the `logged_in?` method in the admin products controller to check for the presence of this value now as well:
+
+```ruby
+def logged_in?
+  session[:user_id].present?
+end
+```
+
+This this out and make sure that you can log in with the email and password you created the user with in the seeds file and that other combinations fail.
+
+---
+
+# Storing Passwords Securely
+
+The next security problem we have to fix is that we are storing the passwords in the database in plain text. This means that if someone gained access to our database, that would have a nice list of email accounts to try to break into. Unfortunately, many people use the same password on multiple websites, so if a hacker would gain access to our database, then they would likely get into the email accounts of many of our users.
+
+So how can we check our user's password if we don't store them in the database? The answer is that you use a [hashing function](http://en.wikipedia.org/wiki/Cryptographic_hash_function) of some sort. A hashing function takes a string and gives you back another string that doesn't resemble the other string. If you apply the hashing function to the same string twice, you get the same string both times.
+
+This allow you to store the result of the hashing function in the database, and because you can't figure out the original string used to produce the result, even if you know the algorithm being used, even if a hacker gains access to your database, they won't have a list of our users passwords.
+
+Next we're going to do a little exercise to illustrate this concept further.
+
+---
+
+# Hashing Passwords
+
+One well known hashing function is called MD5. It is built into the Ruby standard library and already loaded by Rails, so start up `rails c` and run this code:
+
+    .terminal
+    >> hashed_password = Digest::MD5.hexdigest('secret')
+    => "5ebe2294ecd0e0f08eab7690d2a6ee69"
+    ```
+
+So now we can see what the value is for hashing the string `"secret"` and we have stored it in a variable. If we hash the same string `"secret"` again, we get the same value:
+
+    .terminal
+    >> Digest::MD5.hexdigest('secret')
+    => "5ebe2294ecd0e0f08eab7690d2a6ee69"
+
+Next, let's say a user tries to log in and use the password "fail". This will produce a different hash, like this:
+
+    .terminal
+    >> Digest::MD5.hexdigest('fail')
+    => "e11185b6e35c1b767174dc988aa0f179"
+
+So that means that the we check if a password is correct is that we compare the hash of the value the user has attempted to log in with against the value we have saved:
+
+    .terminal
+    >> Digest::MD5.hexdigest('fail') == hashed_password
+    => false
+    >> Digest::MD5.hexdigest('secret') == hashed_password
+    => true
+
+---
+
+# BCrypt
+
+So as it turns out, even hashing passwords like this isn't secure enough. The reasons why and a suggestion on how to securely store passwords are described in [this blog post][hale]. The summary of that article is that you should use a function called `bcrypt` instead of `MD5`.
+
+Luckily, Rails has this pattern, storing password hashes using `bcrypt`, built in with a method called [has_secure_password](http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password). To use it, as the documentation says, add this line to the class definition in User model:
+
+```ruby
+has_secure_password validations: false
+```
+
+Add this line to your `Gemfile`:
+
+```ruby
+gem 'bcrypt-ruby', '~> 3.1.5'
+```
+
+Modify the migration that "create users" migration to rename the `password` column to `password_digest`:
+
+```ruby
+t.string :password_digest
+```
+
+And finally, install bcrypt and re-build your database with the following chain of commands:
+
+    .terminal
+    $ bundle && rake db:migrate:reset && rake db:setup
+
+[hale]: http://codahale.com/how-to-safely-store-a-password/
+
+---
+
+# Using has_secure_password
+
+The only change we have left to use `has_secure_password` in our application is to modify the admin logins controller to use the `authenticate` method to check the password:
+
+```ruby
+def create
+  user = User.find_by(email: params[:email])
+  if user.try(:authenticate, params[:password])
+    session[:user_id] = user.id
+    redirect_to admin_products_path
+  else
+    flash\.now[:danger] = 'Log In Failed'
+    render 'new'
+  end
+end
+```
+
+The only different here is that when using `has_secure_password`, we have to use the `authenticate` method of the user object, passing in the password the user entered as the argument, instead of just directly comparing the saved password to the password the user entered.
+
+---
+
+# Brakeman
+
+There is a gem called [Brakeman](http://brakemanscanner.org/docs/) that you can install in your Rails application and it will look for known security vulnerabilities and let you know about any that it finds and how to fix them. To install it, add this to your `Gemfile` in the development group:
+
+```ruby
+gem 'brakeman', require: false
+```
+
+The run bundle to install it:
+
+    .terminal
+    $ bundle
+
+To run brakeman, you run it and save the output to an HTML file and then open the HTML file in your browser:
+
+    .terminal
+    $ brakeman -o tmp/brakeman.html
+    $ open tmp/brakeman.html
+
+---
+
+# Reading the Brakeman Report
+
+In the brakeman report, all the way at the bottom are the security warnings. At this point you should have at least one, for the `Admin::ProductsController` in the `product_params` method with type "Mass Assignment". If you click on "Mass Assignment", you will end up on the the brakeman page that gives more infomtion abou this particular type of security vulnerability. That gives a pretty good explanation of what a Mass Assignment vulnerability is and links to an article that helps explain the problem in more detail, but unfortunately their explanation of how to fix this problem is a bit outdated.
+
+Let's go over a brief discussion of the problem and how we fix it in Rails 4.
+
+---
+
+# Mass-Assignment Vulnerability
+
+The term **mass-assignment** itself refers to using a Hash to assign more than one attribute at once. We typically do this in Rails applications with `form_for`. We generate a Hash in the params that contains all of the attributes that we want to assign to the product.
+
+Now let's say you have a user model that is used for anyone that can log into your system. Say there are 3 attributes, `email`, `password_digest` and `admin`. We've discussed what `email` and `password_digest` are used for, but say that in this example, `admin` is a boolean attribute that if true, means that the user can access the admin part of the site and if false means they can only log into their own account to see their orders and edit their email and password.
+
+For the non-admin form, we would have inputs named `user[email]` and `user[password]` so the params that would be submitted would be `user: { email: 'test@example.com', password: 'secret'}`. Then in the controller, we would then pass that Hash directly to the update method with something like `user.update(params[:user])`. Since `email` and `password` are the only two keys in the Hash, those would be the only two attributes that would be updated.
+
+The problem is that it is trivial for a user to pass any other params they want. Now a user could pass in a param named `user[admin]` with a value of `1` and if they did, `admin` would be included in the Hash of user attributes along with `email` and `password`. Now when update is called with that Hash, the user just made themselves into an admin.
+
+---
+
+# Strong Parameters
+
+The technique used in Rails to avoid this problem is called **Strong Parameters**. This simply means that in our controller, we explicitly list out each attribute that we expect the form to submit. To do this in our application, modify the `product_params` method of the admin products controller to look like this:
+
+```ruby
+def product_params
+  params.require(:product).permit(:name, :price)
+end
+```
+
+Previously, we had just used `permit!`, but since that allows any parameters to be passed in, it is considered a security risk.
+
+---
+
+# Exercise
+
+Fix any other security warnings generated by brakeman. Most of them will provide a link to some information on how to fix the issue but be careful because some of the information on the brakeman site is outdated. It may be better to google for Rails 4 and the brakeman security warning type.
+
+---
+
+# More On Security
+
+At this point we have covered a few of the key aspects to understand about security with a Rails application. There is a lot more to know about security in web applications. There is a good Rails guide on the topic that I suggest you read:
+
+[http://guides.rubyonrails.org/security.html](http://guides.rubyonrails.org/security.html)
+
+Once you have, the following [comic from XKCD](http://xkcd.com/327/) will make sense:
+
+![Little Bobby Tables](img/little_bobby_tables.png)
 
   </textarea><div id="slideshow"></div>
   </body>
