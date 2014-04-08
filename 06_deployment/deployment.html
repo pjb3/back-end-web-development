@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deploying Web Applications</title>
+    <meta charset="utf-8" />
+
+    <script src="js/remark-0.4.4.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+      remark.config({
+        highlightStyle: "solarized_dark"
+      });
+
+      var hljs = remark.highlighter.engine();
+
+      // extract the embedded styling from ansi spans
+      remark.on('ready', function() {
+        $('code.terminal > span.ansi').replaceWith(function(i, x) {
+          return(x.replace(/&lt;(\/?(\w+).*?)&gt;/g, '<$1>'))
+        });
+      });
+    </script>
+    <script src="js/terminal.language.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/droid_serif.css" />
+    <link rel="stylesheet" type="text/css" href="css/yanone_kaffeesatz.css" />
+    <style type="text/css">
+      body {
+        font-family: 'Droid Serif';
+        font-size: medium;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .small * {
+        font-size: small !important;
+      }
+      code {
+        border-radius: 5px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .footnote {
+        position: absolute;
+        font-size: small;
+        bottom: 3em;
+        right: 3em;
+      }
+    </style>
+  </head>
+  <body><textarea id="source" readonly>
+
+# Deploying Web Applications
+
+.center[![Deploy](img/deploy.jpg)]
+
+.footnote[
+  created with [remark](http://github.com/gnab/remark)
+]
+
+---
+
+# Options For Deploying Your Rails Application
+
+There are generally 6 ways you can host any web application, including Rails applications:
+
+1. Home
+
+2. Co-location / Data Center
+
+3. Managed Hosting
+
+4. Shared Hosting
+
+5. Virtual Private Server
+
+6. Platform as a service
+
+---
+
+# Home, Sweet, Home
+
+.center[![Host a website in your basement](img/home.jpg)]
+
+---
+
+# Running a Server From Home
+
+If you have an extra computer lying around that you can install Ubuntu (or any other Linux distro) on, this is actually a good option for learning about how to run servers.
+
+One issue that you will have to work around with is that typical residential Internet service, from a cable company like Comcast or a fiber company like Verizon Fios, will not give you a static IP address. If you remember back to when we talked about DNS, you have to register an IP address for your domain name. If you set that up right now at home, your IP address might be 1.2.3.4, so you would set up your DNS record for yourwebsite.com to point to 1.2.3.4 and http://yourwebsite.com would be up and running off of your home computer.
+
+24 hours later, your Internet provider might change your IP address to 5.6.7.8. So now, people you go to http://yourwebsite.com would still go to 1.2.3.4 and get nothing or even possibly some other website.
+
+The way to get around this is with a concept called [DynamicDNS](https://www.namecheap.com/support/knowledgebase/article.aspx/33/11/what-is-dynamic-dns). All this is is a program that you run all the time on your computer to check what your current IP address is and then update the DNS record for yourwebsite.com to be what your IP address is at the moment.
+
+It is also possible to get a Static IP from your Internet provider, but those are usually more expensive "business" packages.
+
+This isn't a good option for a legitimate website (especially considering the other low cost options available today, as you will learn more about in the upcoming slides), but it's a great way to learn about how servers work.
+
+---
+
+# Co-Location / Datacenter
+
+.center[![Datacenter](img/datacenter.jpg)]
+
+---
+
+# Co-Location / Datacenter
+
+The next step up from hosting your application in your basement is to get computers that are specifically designed to run as servers. You them put them in racks in an room with very specifically controlled network, temperature, power and security settings. This is typically referred to as a datacenter.
+
+Building a datacenter is, as you can imagine, very expensive and only make sense for the very top traffic websites on the Internet, such as Amazon, Apple, Google, Facebook, Yahoo, Microsoft, etc. For smaller websites, there are **co-location** facilities that are a datacenter, but they allow many different clients to come and bring their own servers to run in the datacenter. You might put one or two servers in a co-location facility, or one or two racks of servers for a site with more traffic.
+
+The facility you host your servers at will provide you Internet connectivity and you can manage your servers remotely once you have them set up.
+
+---
+
+# Managed Hosting
+
+The next setup up from basic co-location is called managed hosting. What this refers to is a service where a company puts physical servers into racks in their datacenter for you and then provides you remote access to those servers to install and run your application.
+
+After you servers are up and running, there isn't much difference between co-location and managed hosting. The biggest advantages are that if there is a physical problem with a server (a hard drive fails, power supply goes out, etc.), someone on staff at your managed hosting provider can go to the datacenter and fix the problem for you. Also, if you need a new server, the managed hosting provider will take care of ordering it and getting it up and running for you.
+
+A couple of leadning providers of managed hosting are [Rackspace](https://www.rackspace.com/managed-hosting/) and [Softlayer](http://www.softlayer.com/managed-hosting).
+
+---
+
+# Shared Hosting
+
+All of the previous options are relatively expensive because they require purchasing or leasing physical servers and finding a place to run them. In the early days of hosting web applications, an option that became popular as a cheap alternative was known is **shared hosting**.
+
+In a shared hosting setup, a provider gets some servers up and running and provides multiple different people access to the same server remotely to run their application on. Unix users and permissions make this a viable option by preventing one user from seeing or modifying the files or processes of other users running on the same server. Because the cost of running the server was spread across many clients, this hosting option is orders of magnitude cheaper than co-location or managed hosting.
+
+In particular, PHP is well-suited to be run this way, most because the PHP interpreter works pretty well embedded into the web server. You can just upload your PHP files to the server and your site is up can running. This is the primary reason PHP continues to be one of the most popular languages for web applications today.
+
+Most other languages/frameworks, such as Java, C#/.net, Python and Rails, are not particularly well-suited to be hosted this way, mainly because it is difficult to prevent one application running on the server from consuming more CPU and/or memory which causes other applications running on the same server to slow down or completely stop working.
+
+Aside from PHP, shared hosting is no longer very popular, given the rise in other low-cost options.
+
+---
+
+# Virtual Private Server (VPS)
+
+A newer technology that became a viable hosting option due to the increase in processing power of physical servers around 2004 is called virtualization. A server typical is made up of hardware, CPU, RAM, Hard Drive, Network Interface, etc., and then boots up an operating system. With virtualization, you can run multiple independent operating systems on the same physical computer simutanesouly. When you remotely access any of the operating systems instances running on that physical server, they are completely isolated from other operating system instances running on that server. These are called "virtual servers", because when you connect to it, it seems as if you have your own server dedicated to just you, but it is actually running off of shared hardware.
+
+Using virtualization management software, hosting providers are able to manage how much CPU, RAM and Hard Drive space is allocated to each virtual server and therefore distribute it evenly. Hosting providers typically sell what they call a **Virtual Private Server (VPS)** and provide you access to that. As a user of a VPS, you are free to install any kid of software on that server you like. You have control over the operating system, Windows or Linux, and even which specific Linux distro, and then once that operating system is running, you can install whatever you want.
+
+Amazon popularized the idea of low-cost VPS servers with their EC2 service. Around 2005, a more developer friendly start up called Slicehost started providing fixed-price ($20/month) VPSs with great tutorials on getting things running. Slicehost was eventually bought by Rackspace and now Rackspace provides a mix of managed hosting and virtual private servers.
+
+One of the most popular VPS providers now is called [Digital Ocean](https://www.digitalocean.com/). They are similar to how Slicehost was, offering VPSes starting at just $5/month and providing tutorials on how to get things running.
+
+---
+
+# Software Infrastructure
+
+When using any of the previous options, whether it is running a server in your basement, racking servers in a colo or getting a $5/month VPS from Digital Ocean, setting up all the supporting software is still all on you. This is sometimes referred to as software infrastructure. The list of things you need to do includes, but is not limited to:
+
+1. Selecting and installing a Linux Distro
+2. Setting Up SSH access
+3. Securing the server firewall with iptables
+4. Selecting and installing a web server such as Nginx or Apache
+5. Selecting and installing a database server such as Postgres or MySQL
+6. Selecting and installing an application server such as Unicorn, Puma or Passenger
+7. Setting up a process for deploying new code and restarting the application using something like Capistrano
+8. Setting up the server to periodically rotate log files
+9. Setting up a caching server with Memcached
+10  Setting up a load balancer with HAProxy
+11. Setting up a reverse proxy cache with Varnish
+12. etc, etc, etc
+
+I do recommend that you learn how to do these things and what role they play in the stack of hosting a web application. If you plan on building a web application that needs to scale and handle an increasing amount of traffic, you will need to understand these things and how the way you develop your application effects these things.
+
+However, if you are looking to just get a Rails application on the Internet that you don't expect to have handle more than a few hundred concurrent users, there is an simpler alternative.
+
+---
+
+# Platform As A Service
+
+The final next level up from VPS is referred to as Platform as a service, or PAAS for short. The most popular provider of this service is Heroku. Heroku handles everything mentioned in the previous slide for you. You develop your application, push it to Heroku and it works.
+
+With Heroku, you pay for each resource that you need to run your application. You can run a fairly simple Rails app that has a small amount of data in the database and can be used concurrently by 100 or so users on Heroku, indefinitely, for free. As you need to store more data or handle more capacity, you start paying a monthly fee.
+
+For example, if you want to store more than 10,000 rows of data in your database, you start paying $9/month for the next tier up of database server. If you need to run a second server to handle more capacity or handle offline jobs, you start paying $34/month per server.
+
+---
+
+# Engine Yard
+
+Another PAAS option is [Engine Yard](https://www.engineyard.com). They are a little bit different than Heroku in that their offering is a little more hands on. They provide the setup of the same software infrastructure including web servers, load balancers, application servers, database servers, deployment scripts, etc. They also can provide a setup more tailored to your needs that can be deployed on virtual servers or physical servers or a mix of the two as well as provide some consulting on the best way to scale things and what applications to use.
+
+They way I compare the Heroku and Engine Yard offerings is that Heroku makes it easy to use whatever you want to use without having to install and manage infrastructure software like Linux, Nginx, Postgres, Memcached, Redis, etc, but you are on your own in terms of figuring out the right mix of those components to use, monitoring that your application is running and troubleshooting performance problems. Engine Yard can provide more support in terms of real people being able to give you advice on those topics.
+
+In either of these cases, the big thing you are saving money on is having to hire full-time system administrators. Whether or not that is right for you depends on your skills and how you want to build your team.
+
+---
+
+# Cost Comparison For Basic to Small Application
+
+If you are looking to setup and run a Rails application on your own, I recommend going with a VPS from Digital Ocean or Heroku. Here's how the cost comparison works between them.
+
+If you application is a pretty trivial application that will have less than 100 concurrent users, less than 10,000 rows of data in the database, you don't need to run background jobs and you don't foresee it needing to scale up in usage too drastically in the short term, Heroku is a great fit.
+
+Heroku can start to get a little bit expensive once you start doing more than just the basics. If your site is going to still be relatively small, but you need to have more than 10,000 rows of data but less than 1 million, and/or you need to do some offline/background processing, if you can afford a budget of somewhere between $50 - $100/month, Heroku is still a great option.
+
+If you need more than just the basics Heroku offers but you aren't looking to spend $50 a month, if you are willing to invest some time learning things, you can host the same application on digital ocean for probably $5 - $10 per month, either on 1 larger host or two smaller ones. Don't underestimate the amount of time that you will have to spend learning about Linux and systems administration if you go this route.
+
+---
+
+# Don't Worry About Scalability
+
+If you are building a consumer facing application that you are hoping scales up to thousands or even millions of users, first of all, and I can't stress this enough, **don't worry about scalability**.
+
+It is a far bigger challenge to build and market an application that attracts that many users than it easy to figure out how to scale it. The vast majority of applications fail to attract any significant amount of usage. **Don't waste your time worrying about scalability until you are lucky enough that it becomes a real problem**.
+
+Don't fall victim to the thinking "if you build it, they will come". Once your application is on the Internet and ready for users to start using, **that is when the hard part starts**. Writing the code is the easy part. Developers tend to get into the weeds of coding and developing applications and lose site of this fact.
+
+This is another reason that I suggest using Heroku, making it work with the free options at first and being willing to pay $50 - $100 a month to host your application as you scale up to a few hundred concurrent users. Spending time setting up all the different components on a VPS is time you could spend working on your application.
+
+The exception to this rule is to go the VPS route if you are interested in learning about how to do that. If you are lucky enough to have an application that you need to start scaling, having some real world experience setting up these components will be very value experience. But understand that if you decide to do this, you are dedicating some time to learning the ins and outs of system administration at the cost of spending time developing your application. This will length the amount of time it will take to get your application in the hands of real users.
+
+Also, if you are really trying to keep it to a tight budget, you could go the VPS route, but you have to ask yourself how much your time is worth. Is taking on the responsibility of all the software infrastructure management worth saving $40 a month? It might be, but make sure you ask yourself that question.
+
+---
+
+# Cost Comparison for Medium to Large Applications
+
+Once your application goes past a few hundred concurrent users, you are going to need a bit more complex set up to handle the traffic, especially if you expect the traffic to continue to increase. This is where the cost saving of a VPS is going to appear to be significant.
+
+If you host is on Heroku, you are probably going to have a setup that uses 2 - 4 web dynos, 1 - 2 background/scheduled job workers, a database tier capable of handling 100-200 connections, a memcached provider, a redis provider, a logging provider, a monitoring provider, a mail delivery provider, a continuous integration (CI) provider, a github team account, etc. Your monthly hosting bill for this kind of infrastructure is going to be $1000 a month or more. Engine Yard is also a good option at this level and will be a similar monthly cost.
+
+If you set up a few VPS servers at digital ocean, you can probably get equivalent computing power for $50 - $75 per month. You still might want some of the same additional service like monitoring, CI, Github, etc., but you are still probably going to spend no more $200 per month total.
+
+You might think VPS is the way to go as you can see that Heroku/Engine Yard are 5 times more expensive. The hidden cost that you should be aware of is personnel. Running the a VPS set up like this is not a trivial amount of work. You will probably be getting close to needing to hire someone full time to make sure all of that stuff is working. If you do, that person is going to command a salary that is much more expensive than the $800 a month that you are saving.
+
+On the other hand, if you can run the VPS setup yourself, you will save yourself quite a bit of money. Some people will say running a VPS isn't that hard and it's worth it to have control over how things are setup and saving a lot of money each month. Other people will say that time is money and if you can spend $800 a month to save a fews days a month worth of work, then that is worth it. The choice is yours to make once you understand the tradeoffs.
+
+  </textarea><div id="slideshow"></div>
+  </body>
+</html>
