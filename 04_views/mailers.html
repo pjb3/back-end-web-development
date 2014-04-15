@@ -85,17 +85,17 @@ For more info:
 
 # Generating A Mailer
 
-We are going to use mailers to implement a forgot password feature for our site.
+We are going to use mailers to implement a basic welcome email feature for our site.
 
     .terminal
-    $ rails g mailer CustomerMailer password_reset
+    $ rails g mailer UserMailer welcome
 
 You can execute this mailer in the rails console like this:
 
     .terminal
     $ rails c
-    Loading development environment (Rails 4.0.0)
-    >> CustomerMailer.password_reset.deliver
+    Loading development environment (Rails 4.1.0)
+    >> UserMailer.welcome.deliver
 
 You will see the email message printed out in the console, but this isn't a very good way to preview email. Let's install mailcatcher to make this better.
 
@@ -103,9 +103,9 @@ You will see the email message printed out in the console, but this isn't a very
 
 # Mail Catcher
 
-Mail Catcher is a server that runs on your machine that receives email and then allows you to preview those messages. This is useful fore development and testing because it doesn't matter who these emails are from or to, they all end up in mail catcher.
+Mail Catcher is a server that runs on your machine that receives email and then allows you to preview those messages. This is useful for development and testing because it doesn't matter who these emails are from or to, they all end up in mail catcher.
 
-Mail Catcher is packages as a gem, so to install it, you simply install the gem:
+Mail Catcher is packaged as a gem, so to install it, you simply install the gem:
 
     .terminal
     $ gem install mailcatcher
@@ -139,13 +139,13 @@ config.action_mailer.delivery_method = :smtp
 config.action_mailer.smtp_settings = { :address => "localhost", :port => 1025 }
 ```
 
-Now start a new rails console and send the `password_reset` message again:
+Now start a new rails console and send the `welcome` message again:
 
     .terminal
     $ rails c
-    Loading development environment (Rails 4.0.0)
-    >> CustomerMailer.password_reset.deliver
-      Rendered customer_mailer/password_reset.text.erb (1.8ms)
+    Loading development environment (Rails 4.1.0)
+    >> UserMailer.welcome.deliver
+      Rendered user_mailer/welcome.text.erb (1.8ms)
 
 Open http://localhost:1080 in another tab
 
@@ -159,85 +159,123 @@ You should see something like this:
 
 ---
 
-# Password Reset
+# Rails 4.1 Mailer Previews
 
-To implement password reset, we want to generate a token, then send the user that token in an email, and then if they come back to the site with a valid token, then we mark it as used and allow them to change their password.
+Rails 4.1 has a new feature that allows you to preview emails without having to use Mailcatcher. Go to this URL:
 
-So let's generate a model:
+[http://localhost:3000/rails/mailers](http://localhost:3000/rails/mailers)
 
-    .terminal
-    $ rails g model PasswordReset customer:belongs_to token used_at:timestamp
-      invoke  active_record
-      create    db/migrate/20131010204333_create_password_resets.rb
-      create    app/models/password_reset.rb
-      invoke    test_unit
-      create      test/models/password_reset_test.rb
-      create      test/fixtures/password_resets.yml
+You will be able to click though the links to see your welcome email.
 
 ---
 
-# Token Generation
+# Adding Links To Emails
 
-Next we can add a method and a before_validation callback to generate a token when a PasswordReset is created:
+When you generate links in emails, they need to be a full URL including the domain name of your site, not just a relative link. In order to do that, Rails needs to know what domain name to use. In `config/environments/development.rb`, use this setting:
 
 ```ruby
-class PasswordReset < ActiveRecord::Base
-  belongs_to :customer
+config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+```
 
-  before_validation :generate_token
-  
-  def generate_token
-    self.token ||= SecureRandom.hex(16)
-  end
+In `config/environments/production.rb`, it will look something like this:
+
+```ruby
+config.action_mailer.default_url_options = {
+  host: "serene-thicket-5859.herokuapp.com"
+}
+```
+
+Now in the email ERB templates, use the same code, but be sure to use the `_url` version of the route methods instead of `_path`, like this:
+
+```rhtml
+<%= link_to "Log In", admin_login_url %>
+```
+
+---
+
+# Using Parameters In Email
+
+Right now our mailer has a hard-coded to address, an incorrect from address and no dynamic content, so let's fix all that. First, modify the mailer to use a from address that matches you app, like this:
+
+```ruby
+default from: "support@serene-thicket-5859.herokuapp.com"
+```
+
+In a real app, you should switch this to your real domain name. Next, change the `welcome` mailer method to look like this:
+
+```ruby
+def welcome(user)
+  @name = user.email.split('@').first
+
+  mail to: user.email
 end
 ```
 
-Also add the `has_many` association to the `Customer` model:
+The method now takes an argument, which will be an active record user object. We use that object to first set an instance variable that we will later use in the view. Then we change the `to` to be the email address of the user. Change the view to use that instance variable:
 
-```ruby
-has_many :password_resets
+```rhtml
+<h1>Welcome, <%= @name %></h1>
 ```
 
-Run `rake db:migrate` to create the `password_resets` database table:
-
-    .terminal
-    $ rake db:migrate
-    ==  CreatePasswordResets: migrating ===========================================
-    -- create_table(:password_resets)
-       -> 0.0634s
-    ==  CreatePasswordResets: migrated (0.0635s) ==================================
+If you try to preview this mailer now, you will get an error, because we need to modify the preview, so let's do that next.
 
 ---
 
-# Password Reset
+# Mailer Previews
 
-Now let's try out creating a password reset in the console:
+When we generated the mailer, a file `test/mailers/previews/user_mailer_preview.rb` was generated to allow us to preview the mailer. When the mailer accepts no arguments, it works fine, but if you need to pass arguments to the mailer, as we do with the user record, then modify the preview code to do that. Modify the `welcome` method to look like this:
 
-    .terminal
-    $ rails c
-    >> password_reset = Customer.first.password_resets.create
-    ...
-    >> password_reset.token
-    => "05ff0e6a6bfdb0563ad8bf37d5496930"
+```ruby
+def welcome
+  UserMailer.welcome(User.last)
+end
+```
 
-Looks good!
+Now if you preview that mailer, it should work.
 
 ---
 
-# In-Class / Homework
+# Deployment
 
-Create a `PasswordResetsController` with the following routes/actions:
+In production, we will need a provider to handle mail delivery. A good one to use is Mailgun. Add it to your app like this:
 
-* GET /forgot_password => new, displays a form with a field to enter your email address to have a password reset created
+    .terminal
+    $ heroku addons:add mailgun
+    Adding mailgun on serene-thicket-5859... done, v12 (free)
 
-* POST /forgot_password => create, generates a password reset for the customer is one is found for the given email address, if found, redirects to the form again with a notice saying you should receive an email with instructions on how to reset your password, it not found, renders the form with an alert saying the email was not found
+Then update `config/environments/production.rb` with the following configuration:
 
-* Update the content of the mailer to have a link to reset the password
+```ruby
+config.action_mailer.smtp_settings = {
+  port:           ENV['MAILGUN_SMTP_PORT'],
+  address:        ENV['MAILGUN_SMTP_SERVER'],
+  user_name:      ENV['MAILGUN_SMTP_LOGIN'],
+  password:       ENV['MAILGUN_SMTP_PASSWORD'],
+  domain:         'serene-thicket-5859.herokuapp.com',
+  authentication: :plain,
+}
+config.action_mailer.delivery_method = :smtp
+```
 
-* GET /reset_password/:id/:token => edit, displays a form with a password field allowing the user to choose a new one
+Commit the changes and push them to Heroku as normal with `git push heroku master`. Once you have, to test that it working, run `heroku run rails c` to get a rails console at Heroku, then run this code to send an email to yourself:
 
-* POST /reset_password/:id/:token => update, changes the user's password, set the used_at on the password reset to the current time
+```ruby
+UserMailer.welcome(User.first).deliver
+```
 
+This assumes that the first user in your database at Heroku has an email address that matches yours. If it does not, either change it or create a user that does have your email address and use that.
+
+---
+
+# In-Class Assignments
+
+1. Create User Mailer, get it working locally first and then deploy it to Heroku
+
+2. Create a sign up form that allows anyone who visits your site to create a customer.
+
+3. When someone signs up and creates a customer, make it so there is a timestamp column called `verified_at` that is initially null. When a customer is created, send them a welcome email with a link in it to verify that they own that email address. When they click the link, have it set the value for `verified_at` to the current time, unless it is already set.
+
+Hint: Use the [new Rails 4.1 Application Message Verifier](http://api.rubyonrails.org/classes/Rails/Application.html#method-i-message_verifier) to secure the link by using `generate` to put the customer id in the URL that they click on and then using `verify` to get the value back out in the action that the URL goes to
 
   </textarea><div id="slideshow"></div>
   </body>
