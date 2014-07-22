@@ -401,6 +401,14 @@ Params can come from the routes, as discussed, in the previous slide, or from qu
 
 ---
 
+# Exercise
+
+1. Modify the admin products show action to get the product that matches the id param from the database and store it in an instance variable named `@product`
+
+2. Modify the admin products show view to display the ID, name, price, image_url and created_at for the product.
+
+---
+
 # Named Routes
 
 In the routes, you can give a name to the route. This will allow you generate the route using a method from your controllers and views. Change your admin products show route to look like this:
@@ -431,7 +439,7 @@ The name of the method is whatever you named the route with `_path` added to the
 
 # View Helpers
 
-Rails makes methods available for you to use in the views. These are typically called view helpers. Rails has many that are built in and as we will see later, you can add your own. One of the most commonly used view helpers is called `link_to` and it is used to generate links. Make a change to the same table cell as we did in the last slide so that it looks like this:
+Rails makes methods available for you to use in the views. These are typically called view helpers. Rails has many that are built in and as we will see later, you can add your own. One of the most commonly used view helpers is called `link_to` and it is used to generate links.
 
 ```rhtml
 <%= link_to product.id, admin_product_path(product) %>
@@ -449,9 +457,7 @@ If you click on on the link, you should then see your admin product show action 
 
 # Exercise
 
-1. Modify the admin products show action to get the product that matches the id param from the database and store it in an instance variable named `@product`
-
-2. Modify the admin products show view to display the ID, name, price, image_url and created_at for the product.
+Make the product names displayed on the admin products index be links to the admin product show using the link_to helper and the named route.
 
 ---
 
