@@ -137,7 +137,7 @@ Do you get an error message? What is the error message? Why do you get this erro
 
 # Exercise
 
-Add a route to `config/routes.db` so that when you make a GET request to `/products`, the `index` action of the products controller is called.
+Add a route to `config/routes.rb` so that when you make a GET request to `/products`, the `index` action of the products controller is called.
 
 Now what happens when you go to [http://localhost:3000/products](http://localhost:3000/products)? Do you get a different error message? What does this error mean?
 
@@ -401,14 +401,6 @@ Params can come from the routes, as discussed, in the previous slide, or from qu
 
 ---
 
-# Exercise
-
-Make a view for the admin products show action. In the view, print all the param names and their values.
-
-Add some query string params and reload the page and see how the values show up in the output.
-
----
-
 # Named Routes
 
 In the routes, you can give a name to the route. This will allow you generate the route using a method from your controllers and views. Change your admin products show route to look like this:
@@ -486,7 +478,7 @@ Change the both places where were are printing out the price, in the admin produ
 Right now the admin product show is just displaying the product image URL. If we would like to display the actual image, we can use the `image_tag` helper, like this:
 
 ```rhtml
-<%= image_tag product.image_url, alt: @product.image_url %>
+<%= image_tag @product.image_url, alt: @product.image_url %>
 ```
 
 ## Exercise
