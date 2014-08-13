@@ -299,7 +299,7 @@ def create
     session[:user_id] = user.id
     redirect_to admin_products_path
   else
-    flash.now[:danger] = 'Log In Failed'
+    flash\.now[:danger] = 'Log In Failed'
     render 'new'
   end
 end
