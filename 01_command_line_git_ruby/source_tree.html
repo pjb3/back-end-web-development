@@ -75,6 +75,127 @@ class: center
 
 # Source Tree
 
+Source tree is a free graphical Git client. This set of slides will show you how to create a local repository and push your code to a remote repository to share with others.
+
+---
+
+# Create Your Local Repository
+
+In SourceTree, go to *File* > *New / Clone*. Choose the *Create Repository* tab, then enter the name of directory you would like to store your local repository in, which is `ruby_basics` in this example:
+
+![Create Local Repository](img/create_local_repository.png)
+
+Press the create button once you have entered the path for the local repository
+
+---
+
+# Bookmarks
+
+Your repository will now appear in your bookmarks:
+
+![Bookmarks](img/bookmarks.png)
+
+Double-click on the repository to open it
+
+---
+
+# Open in Terminal
+
+You can now open your project in the Terminal by pressing this button:
+
+![Open in Terminal](img/open_in_terminal.png)
+
+---
+
+# Open in Atom
+
+In the command prompt in Terminal, enter this command to open the repository in your text editor, Atom:
+
+    .terminal
+    atom .
+
+The `.` character is the bash shortcut for the current directory, so this command means open the current directory in Atom
+
+If this command is not working, re-read the [instructions on how to set up Atom](https://github.com/pjb3/back-end-web-development#atom)
+
+---
+
+# Create a file
+
+In Atom, add a new file called `README.md` with the following content:
+
+    .terminal
+    # Ruby Basics
+
+    The Ruby basics exercises
+
+This file is in a format called Markdown, which is a simplified version of HTML. All git repositories should have a `README.md` file which explains what the repository contains, how to use it, etc.
+
+Now that our local repository has something in it, we can commit it and push it
+
+---
+
+# Stage your changes
+
+![Stage your changes](img/stage_file.png)
+
+---
+
+# Setup Remote Repository
+
+Go to *Repository* > *Add Remote...*
+
+Click the globe icon next to *URL / Path*
+
+![Add Remote](img/add_remote.png)
+
+---
+
+# Create New Repository
+
+![Create New Repository](img/create_new_repository.png)
+
+---
+
+# Create repository
+
+Enter `ruby_basics` for the name of the new repository and make sure *Publicly Visible* is unchecked
+
+![Create Repository](img/create_repository.png)
+
+---
+
+# Select Repository
+
+Your repository is now created, so select the repository and press *OK*
+
+![Select Repository](img/select_repository.png)
+
+---
+
+# Remote name
+
+Enter `origin` for the `Remote name` and press `OK`
+
+![Remote name](img/remote_name.png)
+
+---
+
+# Commit your changes
+
+![Commit your changes](img/commit.png)
+
+---
+
+# Push your changes
+
+![Push your changes](img/commit_push.png)
+
+---
+
+# Congratulations
+
+Your first commit is now on BitBucket!
 
   </textarea><div id="slideshow"></div>
   </body>
