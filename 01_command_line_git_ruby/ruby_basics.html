@@ -93,10 +93,10 @@ As you can see, the Ruby program printed out the string `Hello, World!`
 
 # Interactive Ruby
 
-Ruby provides an interactive shell called **IRB**. In IRB, you can enter small pieces of Ruby code and see what it evaluates to. Open the file '~/.irbrc` using Sublime Text:
+Ruby provides an interactive shell called **IRB**. In IRB, you can enter small pieces of Ruby code and see what it evaluates to. Open the file '~/.irbrc` using Atom:
 
     .terminal
-    subl ~/.irbrc
+    atom ~/.irbrc
 
 and copy and paste the code from [this gist](https://gist.github.com/pjb3/9166610) into that file and save it.
 
@@ -1088,10 +1088,10 @@ Having two versions of a method, one that ends without an exclamation mark and d
 
 Like any programming language, Ruby allows you to define your own methods. Methods are usually more than one line, so at this point in the tutorial, we're going to switch over to save our code into a file and running the program.
 
-Open a new Ruby file named anything you want, `code.rb`, for example, in Sublime Text:
+Open a new Ruby file named anything you want, `code.rb`, for example, in Atom:
 
     .terminal
-    $ subl code.rb
+    $ atom code.rb
 
 Put the following code in the file:
 
@@ -1105,13 +1105,12 @@ And run it from the bash command line (not IRB), like this:
     $ ruby code.rb
     2.1.0
 
-More conveniently, once you have saved the file in Sublime Text, you can press command-b to run the program from within Sublime Text. The output will look like this:
+More conveniently, you can run the program from Atom. Install the package called "Script" in Atom > Preferences > Packages, then once you have saved the file, you can press command-i to run the program from within Atom (use your right hand). The output will look like this:
 
     .terminal
     2.1.0
-    [Finished in 0.5s]
 
-You will see this output in a small window at the bottom of Sublime Text. You can press ESC to close that output window. Sublime Text puts some additional output that indicates how long the program took to run in the output window. You can ignore that.
+You will see this output in a small window at the bottom of Atom. You can press ESC to close that output window.
 
 ---
 
@@ -1296,7 +1295,7 @@ say_hello "Paul"
 puts name
 ```
 
-Run the program from the bash command line instead of from within Sublime Text and the output will look like this:
+Run the program from the bash command line instead of from within Atom and the output will look like this:
 
 .small[
 
@@ -1309,7 +1308,7 @@ Run the program from the bash command line instead of from within Sublime Text a
 
 Before we go over local variables and scoping, let's go over how to read error messages like this.
 
-_(you can run this program from within Sublime Text and you will also get an error, but the output is a little more confusing, so I suggest running the program from the command line while learning about exceptions and exception handling)_
+_(you can run this program from within Atom and you will also get an error, but the output is a little more confusing, so I suggest running the program from the command line while learning about exceptions and exception handling)_
 ---
 
 # Exceptions
