@@ -633,7 +633,7 @@ The 7 routes for a RESTful controller typically are:
   post '/products'          => 'products#create'
    get '/products/new'      => 'products#new',   as: 'new_product'
    get '/products/:id/edit' => 'products#edit',  as: 'edit_product'
-   get '/products/:id'      => 'products#show',  as: 'order'
+   get '/products/:id'      => 'products#show',  as: 'product'
  patch '/products/:id'      => 'products#update'
 delete '/products/:id'      => 'products#destroy
 ```
@@ -645,13 +645,13 @@ Previous to Rails 4, `put` was commonly used for update
 # Role of RESTful Actions
 
     .terminal
-      index - Show the list of all orders
-       show - Show the details for a order
-        new - Show the form to create a new order
-     create - Create the new order
-       edit - Show the form to edit an existing order
-     update - Update an existing order
-    destroy - Remove an existing order
+      index - Show the list of all products, link to new product
+       show - Show the details for a product, links to edit and delete product
+        new - Show the form to create a new product
+     create - Create the new product
+       edit - Show the form to edit an existing product
+     update - Update an existing product
+    destroy - Remove an existing product
 
 Not every controller will allow for all of these actions, but most actions will map to one of these actions
 
@@ -672,7 +672,7 @@ First, for our products resource, the full routes look like this:
   post '/products'          => 'products#create'
    get '/products/new'      => 'products#new',   as: 'new_product'
    get '/products/:id/edit' => 'products#edit',  as: 'edit_product'
-   get '/products/:id'      => 'products#show',  as: 'order'
+   get '/products/:id'      => 'products#show',  as: 'product'
  patch '/products/:id'      => 'products#update'
 delete '/products/:id'      => 'products#destroy
 ```
