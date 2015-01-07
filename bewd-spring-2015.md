@@ -34,6 +34,9 @@ Weeks 3+4:
 7. More Ruby, stacktraces, and debugging
 8. Routing
 
+#### Briefing:
+Walk me through making the landing page app again, from scratch
+
 ## #2 Todo App (Weeks 5,6)
 #### You should Know:
 
