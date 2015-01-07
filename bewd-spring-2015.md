@@ -25,6 +25,14 @@ Weeks 3+4:
 #### Watch Before:
 
 #### Classes:
+1. Command line, Bash
+2. `rails new landing_page`, HTML, CSS
+3. Heroku, Git, and Github
+4. Bootstrap, Forms and Values
+5. Databases, Models & Migrations
+6. Ruby & Rails Console
+7. More Ruby, stacktraces, and debugging
+8. Routing
 
 ## #2 Todo App (Weeks 5,6)
 #### You should Know:
