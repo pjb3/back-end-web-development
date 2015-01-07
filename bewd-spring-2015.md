@@ -35,8 +35,8 @@ Weeks 3+4:
 8. Routing
 
 #### Briefing:
-Walk me through making the landing page app again, from scratch
-What are some first thoughts on your BYOI app?
+- Walk me through making the landing page app again, from scratch
+- What are some first thoughts on your BYOI app?
 
 ## #2 Todo App (Weeks 5, 6)
 #### You should Know:
@@ -57,8 +57,8 @@ What are some first thoughts on your BYOI app?
 4. Auth + Session
 
 #### Briefing:
-Walk me through the resources that make up <insert top 100 website here>
-What models will go into your BYOI app?
+- Walk me through the resources that make up <insert top 100 website here>
+- What models will go into your BYOI app?
 
 ## #3 Jotly (Weeks 7, 8, 9)
 #### You should Know:
@@ -80,8 +80,8 @@ What models will go into your BYOI app?
 6. Admin + Analytics
 
 #### Briefing:
-How would you research and develop a new "advanced feature" (e.g. SMS integration; charging credit cards; etc.)
-What "advanced features" will go into your BYOI app?
+- How would you research and develop a new "advanced feature" (e.g. SMS integration; charging credit cards; etc.)
+- What "advanced features" will go into your BYOI app?
 
 ## #4 Bring Your Own Idea App (Weeks 10, 11, 12)
 #### You should Know:
