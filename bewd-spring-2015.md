@@ -47,6 +47,10 @@ Weeks 3+4:
 #### Watch Before:
 
 #### Classes:
+1. Resources
+2. Forms
+3. Associations
+4. Auth + Session
 
 ## #3 Jotly (Weeks 7,8,9)
 #### You should Know:
@@ -60,6 +64,12 @@ Weeks 3+4:
 
 #### Watch Before:
 #### Classes:
+1. Jot Models
+2. Uploading + Photos
+3. Followers + Email
+4. Javascript + Location
+5. Google Maps + More Javascript
+6. Admin + Analytics
 
 ## #4 Bring Your Own Idea App (Weeks 10,11,12)
 #### You should Know:
