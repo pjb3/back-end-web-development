@@ -77,5 +77,3 @@ Weeks 3+4:
   - How to make a product to compete in a start-up weekend
 
 #### Watch Before:
-
-#### Classes:
