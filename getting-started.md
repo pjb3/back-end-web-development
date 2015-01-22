@@ -2,21 +2,27 @@ Course Materials for [Back-End Web Development](http://betamore.com/academy/back
 
 # Things to install
 
-## Mac OS X Mavericks
+## Mac OS X Yosemite
 
-On your Mac, click on the Apple icon in the top left (also called the Apple menu), and choose **About this Mac**. If the version is **10.9.0** or higher, you are running the latest version of OS X. If not, launch the Mac App Store (either from the icon in the doc or from the Apple menu), search for Mavericks and install. It is a free upgrade.
+On your Mac, click on the Apple icon in the top left (also called the Apple menu), and choose **About this Mac**. If the version is **10.10.0** or higher, you are running the latest version of OS X. If not, launch the Mac App Store (either from the icon in the doc or from the Apple menu), search for Yosemite and install. It is a free upgrade.
 
 ## Tools
 
+### iTerm
+
+We recommend downloading and installing [iTerm 2](http://iterm2.com/), which is a better terminal application than the one that comes bundled with your Mac. If you like, you can use the Terminal application that comes with OS X.
+
 ### Command-Line Tools
 
-Launch the program called **Terminal**. You can find in Finder under *Applications > Utilities > Terminal*. Terminal is a program that gives you a command prompt. When you enter a command, it gets execute and the result of executing the command, if there is any, are printed out. We will learn more about the Terminal and the Command Prompt in the first class.
+In your terminal application, run the following command:
 
-At the command prompt, type the following command and press enter:
+    git --version
 
-    xcode-select --install
+If you will see a dialog that says **Would you like to install the tools now?**, press the install button and wait for the install to complete. If you see something like this:
 
-You will see a dialog that says **Would you like to install the tools now?**. Press the install button and wait for the install to complete.
+    git version 1.9.3 (Apple Git-50)
+
+Then that means you already have the command-line tools installed.
 
 ### Atom
 
@@ -24,13 +30,17 @@ You will see a dialog that says **Would you like to install the tools now?**. Pr
 
 Once you have downloaded and installed Atom, make it so that you can launch Atom from command line. In the Atom menu, choose *Install Shell Commands*.
 
-### Bitbucket
+### Github
 
-In this course, we are going to use [BitBucket](https://bitbucket.org/) to host our git repositories. BitBucket is a competitor to another site you may have heard of called [Github](https://github.com). Although Github is more popular, we are going to use BitBucket because they offer free hosting of private repositories. Sign up for a free account at [https://bitbucket.org](https://bitbucket.org/).
+In this course, we are going to use [Github](https://github.com/) to host our git repositories and the [Github for Mac](https://mac.github.com) application
 
-### Source Tree
+### Homebrew
 
-[SourceTree](http://www.sourcetreeapp.com/) is a free client application for working with Git. Download and install SourceTree and log into it using your BitBucket account.
+[Homebrew](http://brew.sh)
+
+[install homebrew](http://brew.sh/#install)
+
+    brew install bash-completion git rbenv ruby-build rbenv-gem-rehash
 
 ## Ruby
 
@@ -57,7 +67,7 @@ PATH=~/bin
 PATH+=:~/.rbenv/bin
 
 # postgres
-export PGHOME=/Applications/Postgres.app/Contents/Versions/9.3
+export PGHOME=/Applications/Postgres.app/Contents/Versions/9.4
 PATH+=:$PGHOME/bin
 
 # heroku
@@ -73,27 +83,49 @@ export PATH
 
 # Load rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+
+# Enable bash completion for rbenv commands
+source /usr/local/Cellar/.rbenv/0.4.0/completions/rbenv.bash
+__rbenv_ps1 ()
+{
+  rbenv_ruby_version=`rbenv version | sed -e 's/ .*//'`
+  printf $rbenv_ruby_version
+}
+
+# Colors for prompt
+RED="\[\033[0;31m\]"
+YELLOW="\[\033[0;33m\]"
+GREEN="\[\033[0;32m\]"
+WHITE="\[\033[1;37m\]"
+BLACK="\[\033[0;30m\]"
+OFF="\[\033[0m\]"
+
+# Colorized prompt with rbenv version, git branch and current directory
+export PS1="$RED\$(__rbenv_ps1) $GREEN\w$YELLOW\$(__git_ps1 "[%s]")$OFF \$ "
+
+# This will make the history file keep everything, http://superuser.com/a/664061
+export HISTFILESIZE=
+export HISTSIZE=
+export HISTTIMEFORMAT="[%F %T] "
+export HISTFILE=~/.bash_eternal_history
+
+# This will set the title of the iTerm tab to the name of the current directory
+export PROMPT_COMMAND='history -a; echo -ne "\033]0;${PWD##*/}\007"'  
 ```
 
 Replace the entire contents of your `~/.bash_profile` with this. You can leave other things in your `~/.bash_profile` if you know what they do and you are sure you need them. If you are unsure, ask me.
 
 **Also make sure to start a new terminal tab or window once you have modified your `~/.bash_profile` so the settings take effect.**
 
-Now you can install `rbenv` by running these commands
+### Use Ruby 2.2
 
-    git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-    git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-    git clone https://github.com/sstephenson/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
+With rbenv properly installed, you just need to run this command to install Ruby 2.2:
 
-### Use Ruby 2.1
+    rbenv install 2.2.0
 
-With rbenv properly installed, you just need to run this command to install Ruby 2.1:
+To make Ruby 2.2 be the default, run this command:
 
-    rbenv install 2.1.2
-
-To make Ruby 2.1 be the default, run this command:
-
-    rbenv global 2.1.2
+    rbenv global 2.2.0
 
 Now, if you check which verison of ruby is being used, you should see something like this:
 
@@ -102,27 +134,13 @@ Now, if you check which verison of ruby is being used, you should see something 
     $ ruby -v
     ruby 2.1.2p0 (2013-12-25 revision 44422) [x86_64-darwin13.0]
 
-## Rails
-
-### Postgres
+## Postgres
 
 Download and install [Postgres.app](http://postgresapp.com/). Make sure to run the application. Once you do, you will see an elephant icon in the menu bar in the top right, to the left of things like the wifi, the time, etc.
 
 From that menu, uncheck *Open documentation at Start* and check *Automatically Start at Login*.
 
-### Configure Rubygems
-
-Before we start installing Rubygems, run the following command to use Atom to create a file called `.gemrc` in your home directory at the command prompt in Terminal:
-
-    atom ~/.gemrc
-
-Put the following one line into that file:
-
-    gem: --no-rdoc --no-ri
-
-This will prevent rdoc and ri from being created for each gem that is installed, which isn't needed and significantly slows down the process of installing gems.
-
-### Rails
+## Rails
 
 Now that we have everything in place, installing Rails is as simple as installing the gem, which you can do by running the following command:
 
