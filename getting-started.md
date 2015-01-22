@@ -46,11 +46,15 @@ In this course, we are going to use [Github](https://github.com/) to host our gi
 
 [rbenv](https://github.com/sstephenson/rbenv), *arr-bee-env*, is a ruby installer similar to, but in my opinion [better than RVM](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F), so you should use rbenv for this class. If you have RVM installed, you should [uninstall it](http://rvm.io/support/faq#where-is-everything-installed-to-) by running the following command at the command prompt in Terminal:
 
-    rm -rf ~/.rvm
+```
+rm -rf ~/.rvm
+```
 
 Now to install rbenv, along with a few other goodies, run this command:
 
-   brew install bash-completion git rbenv ruby-build rbenv-gem-rehash
+```
+brew install bash-completion git rbenv ruby-build rbenv-gem-rehash
+```
 
 ### Use rbenv
 
