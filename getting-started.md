@@ -87,11 +87,18 @@ PATH+=:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin
 
 export PATH
 
+# pretty colors
+export LESS='-R'
+
+# Enable bash completion for git commands/branches
+source /usr/local/etc/bash_completion
+source /usr/local/etc/bash_completion.d/git-completion.bash
+
 # Load rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # Enable bash completion for rbenv commands
-source /usr/local/Cellar/.rbenv/0.4.0/completions/rbenv.bash
+source /usr/local/Cellar/rbenv/0.4.0/completions/rbenv.bash
 __rbenv_ps1 ()
 {
   rbenv_ruby_version=`rbenv version | sed -e 's/ .*//'`
