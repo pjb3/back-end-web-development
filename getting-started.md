@@ -36,9 +36,7 @@ In this course, we are going to use [Github](https://github.com/) to host our gi
 
 ### Homebrew
 
-[Homebrew](http://brew.sh) is a package manager for OS X, which means it is command that you use in the terminal to install other commands that you can use in the terminal.
-
-[install homebrew](http://brew.sh/#install)
+[Homebrew](http://brew.sh) is a package manager for OS X, which means it is command that you use in the terminal to install other commands that you can use in the terminal. Enter the one-line command found [here](http://brew.sh/#install) into your terminal to install Homebrew.
 
 ## Ruby
 
