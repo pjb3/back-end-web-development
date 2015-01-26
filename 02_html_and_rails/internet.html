@@ -120,11 +120,10 @@ Uniform Resource Location (URL) is a reference to a page on the internet
 
 `/academy/back-end-web-development` is the path to the document
 
-Possible server configuration:
+Run a simple web server with this command:
 
     .terminal
-    ServerName betamore.com
-    DocumentRoot /var/www/betamore
+    ruby -run -ehttpd /var/www/betamore -p8000
 
 Directory structure
 
@@ -140,103 +139,16 @@ Directory structure
 
 # HTTP
 
-__HyperText Transfer Protocol__ (HTTP) is the underlying protocol of the Internet
+__HyperText Transfer Protocol__ (HTTP) is the underlying protocol of the Internet. You can issue an HTTP request from the command line like this:
 
     .terminal
-    $ curl -v http://www.betamore.com/academy/d-web-development/
-    * About to connect() to www.betamore.com port 80 (#0)
-    *   Trying 50.57.195.189...
-    * Connected to www.betamore.com (50.57.195.189) port 80 (#0)
-    > GET /academy/back-end-web-development/ HTTP/1.1
-    > User-Agent: curl/7.30.0
-    > Host: www.betamore.com
-    > Accept: */*
-    >
-    < HTTP/1.1 200 OK
-    < Server: nginx
-    < Date: Wed, 19 Feb 2014 04:11:12 GMT
-    < Content-Type: text/html; charset=UTF-8
-    < Transfer-Encoding: chunked
-    < Connection: keep-alive
+    $ curl -svo /dev/null http://betamore.com/academy/back-end-web-development/
 
 `curl` is a tool that allow you to send HTTP requests and receive the response
 
 It is like a web browser that doesn't render the HTML document
 
----
-
-# HTTP Request
-
-`curl` first gets the domain, looks it up and connects to that server on port 80
-
-    .terminal
-    * About to connect() to betamore.com port 80 (#0)
-    *   Trying 50.57.195.189...
-    * connected
-    * Connected to betamore.com (50.57.195.189) port 80 (#0)
-
-Then it sends this HTTP Request:
-
-    .terminal
-    GET /academy/back-end-web-development HTTP/1.1
-    User-Agent: curl/7.24.0
-    Host: betamore.com
-    Accept: */*
-
-First line is the HTTP method, the path to the document and the HTTP version
-
-`GET` is used to get a document, `POST` is used for posting forms
-
-Each line after the first is a header in the format of `Name: value`
-
-A blank link indicates the end of the request
-
----
-
-# HTTP Response
-
-    .terminal
-    HTTP/1.1 200 OK
-    Date: Wed, 11 Sep 2013 11:44:20 GMT
-    Server: Apache
-    Vary: Accept-Encoding,User-Agent
-    Last-Modified: Thu, 01 Jan 1970 00:00:00 GMT
-    Transfer-Encoding: chunked
-    Content-Type: text/html
-
-First line has the HTTP version, the response code and a status message
-
-Like the request, each line after the first is a `Name: value` header
-
-After a blank link comes the body of the response, which usually contains the HTML document
-
----
-
-# Cookies
-
-Cookies are a special HTTP header that get stored in the browser and sent back with each request
-
-If the response to an HTTP request contains a header like this:
-
-    .terminal
-    Set-Cookie: session_id=abc123
-
-The browser will store that in the cookies for the current site
-
-All subsequent requests will contain the cookie header in the request:
-
-    .terminal
-    Cookie: session_id=abc123
-
-This can be used to track your shopping cart, who you are logged in as, etc.
-
-Cookies can have an expiration date, which looks like this:
-
-    Set-Cookie: session_id=abc123; expires=Thu, 13-Mar-2014 12:02:59 GMT
-
-Once the `expires` time has passed, the cookie will not be sent by the browser anymore
-
-If there is no `expires`, the cookie will be cleared when the user closes their browser
+There are headers in the request and the response
 
 ---
 
