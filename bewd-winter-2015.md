@@ -1,4 +1,4 @@
-# Backend Web Developement Spring 2015
+# Backend Web Developement Winter 2015 (Rails)
 
 
 ## #1 Landing Page App (Weeks 1, 2, 3, 4)
