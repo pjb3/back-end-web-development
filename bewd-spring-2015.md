@@ -30,9 +30,9 @@ Weeks 1, 2, 3:
 #### Classes:
 1. Running node from the console
 1. Routing
-1. More Node, stacktraces, and debugging
+1. Express, stacktraces, and debugging
 1. Bootstrap, Forms and Values
-1. Databases, Models & Migrations
+1. Databases, SQL
 1.
 
 #### Briefing:
