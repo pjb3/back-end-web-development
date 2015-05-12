@@ -53,8 +53,9 @@ Weeks 1, 2, 3:
 1. Client-side w/ React
 1. Saving state back w/ models; Sails
 1. (Slack)
-1. Associations
 1. Auth, Session
+1. Associations
+
 
 #### Briefing:
 - Walk me through the resources that make up <insert top 100 website here>
@@ -74,8 +75,8 @@ Weeks 1, 2, 3:
 1. Uploading + Photos
 1. Followers + Email
 1. Location + Background jobs
-1.
-1.
+1. Socket.io & live updates
+1. Client-side routing
 
 #### Briefing:
 - How would you research and develop a new "advanced feature" (e.g. SMS integration; charging credit cards; etc.)
