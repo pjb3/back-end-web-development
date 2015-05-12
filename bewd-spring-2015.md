@@ -33,7 +33,7 @@ Weeks 1, 2, 3:
 1. Express, stacktraces, and debugging
 1. Bootstrap, Forms and Values
 1. Databases, SQL
-1.
+1. jQuery, AJAX
 
 #### Briefing:
 - Walk me through making the landing page app again, from scratch
@@ -49,12 +49,12 @@ Weeks 1, 2, 3:
   - Ajax, Webinspector: Network tools
 
 #### Classes:
-1. Auth, Session, HTTP
-1. Resources & Associations 1
-1. React 1
+1. Client-side Todo App w/ just javascript (and maybe jquery)
+1. Client-side w/ React
+1. Saving state back w/ models; Sails
 1. (Slack)
-1. Resources & Associations 2
-1. React 2
+1. Associations
+1. Auth, Session
 
 #### Briefing:
 - Walk me through the resources that make up <insert top 100 website here>
