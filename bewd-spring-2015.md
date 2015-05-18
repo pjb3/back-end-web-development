@@ -3,12 +3,10 @@
 ### Links (for whole class)
  - [Definitive Node Podcast](http://nodeup.com/)
  - [Node School](http://nodeschool.io/)
- - 
-
-
+ - [Eloquent Javascript](http://eloquentjavascript.net/)
 
 ## #0 Prerequisites
-#### You should Know:
+#### You Should Know:
   - Basic command line
   - Git + Github
   - Some HTML & CSS
@@ -21,7 +19,7 @@
 ## #1 Landing Page App (Weeks 1, 2, 3)
 
 Weeks 1, 2, 3:
-#### You should Know:
+#### You will learn:
 
   - Requiring modules
   - Mapping URLs to Actions
@@ -34,7 +32,32 @@ Weeks 1, 2, 3:
   - Storing data with postgres & pg
   - Database tables & migrations
 
-##### Class #1 Running node from the console
+##### Class #1 Intro to Node, Javascript and programming
+ - Installfest
+  - node
+  - xcode
+  - homebrew
+  - atom
+  - postgres app
+  - github app
+  - heroku toolbelt
+ - How does the internet basically work?
+ - JavaScript
+  - Values, Types, and Operators
+  - Program Structure & Control
+  - Functions
+  - Objects and Arrays
+ - The browser
+  - Webinspector
+  - [Code Pen](http://codepen.io/)
+  - Debugging
+ - Node
+  - running programs
+  - [debugging](https://github.com/node-inspector/node-inspector)
+ - Modules
+  - require
+  - exporting
+  - npm (cool-ascii-faces)
 
 ###### Homework
  - In slack, post 3 apps you think are cool
@@ -47,6 +70,7 @@ Weeks 1, 2, 3:
  - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
 - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
+- Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
 
 ##### Class #3 Express, stacktraces, and debugging
 
@@ -61,7 +85,7 @@ Weeks 1, 2, 3:
 - In slack, write to two ideas for your "make your own app"
 
 ## #2 Todo App (Weeks 4, 5, 6)
-#### You should Know:
+#### You will learn:
 
   - HTTP (Methods, Cookies, Querystring) & Session
   - Models & Resources
@@ -83,7 +107,7 @@ Weeks 1, 2, 3:
 - Which of your app ideas works best w/ the modeling concepts introduced? What models will go into your app?
 
 ## #3 Jotly (Weeks 7, 8, 9)
-#### You should Know:
+#### You will learn:
 
   - Modeling Data
   - Uploads
@@ -104,6 +128,6 @@ Weeks 1, 2, 3:
 - What "advanced features" will go into your own app app?
 
 ## #4 Bring Your Own Idea App (Weeks 10, 11, 12)
-#### You should Know:
+#### You will learn:
 
   - How to make a product to compete in a start-up weekend
