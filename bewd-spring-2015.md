@@ -84,6 +84,7 @@ Weeks 1, 2, 3:
 ###### Homework
 - Create a slack post to walk me through making the landing page app again, from scratch
 - In slack, write to two ideas for your "make your own app"
+- Create a slack post to answer the ["How do you judge a Javascript programmer by only 5 questions?"](https://medium.com/humans-create-software/how-do-you-judge-a-javascript-programmer-by-only-5-questions-f2abdf7dfd4a)
 
 ## #2 Todo App (Weeks 4, 5, 6)
 #### You will learn:
