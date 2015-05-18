@@ -4,6 +4,7 @@
  - [Definitive Node Podcast](http://nodeup.com/)
  - [Node School](http://nodeschool.io/)
  - [Eloquent Javascript](http://eloquentjavascript.net/)
+ - [A Re-introduction to JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript)
 
 ## #0 Prerequisites
 #### You Should Know:
