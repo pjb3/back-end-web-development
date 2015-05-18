@@ -125,6 +125,9 @@ Weeks 1, 2, 3:
 - Socket.io & live updates
 - Client-side routing
 
+#### Links:
+ - https://github.com/localytics/node-lambda-starter
+
 #### Briefing:
 - How would you research and develop a new "advanced feature" (e.g. SMS integration; charging credit cards; etc.)
 - What "advanced features" will go into your own app app?
