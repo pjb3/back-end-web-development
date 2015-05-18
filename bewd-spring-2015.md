@@ -61,9 +61,9 @@ Weeks 1, 2, 3:
   - npm (cool-ascii-faces)
 
 ###### Homework
- - In slack, post 3 apps you think are cool
- - Read [What happens when you type google.com into your browser and press enter?](https://github.com/alex/what-happens-when)
- - Write a [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) implementation. Try **not** to look at existing implementations.
+ - In slack, post 3 apps you think are cool. Read you classmates' and @mention someone's you agree with.
+ - Read [What happens when you type google.com into your browser and press enter?](https://github.com/alex/what-happens-when). Post one thing you didn't expect & one thing you did.
+ - Write a [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) implementation. Try **not** to look at existing implementations. Post yours to slack as a snippet. Comment one someone else's.
 
 ##### Class #2 HTTP & Routing
 
