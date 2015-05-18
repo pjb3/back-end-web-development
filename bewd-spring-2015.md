@@ -35,9 +35,9 @@ Weeks 1, 2, 3:
 
 ##### Class #1 Intro to Node, Javascript and programming
  - Installfest
+  - homebrew (fixes /usr/local)
   - node
   - xcode
-  - homebrew
   - atom & sublime
   - postgres app
   - github app
