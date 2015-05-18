@@ -38,7 +38,7 @@ Weeks 1, 2, 3:
   - node
   - xcode
   - homebrew
-  - atom
+  - atom & sublime
   - postgres app
   - github app
   - heroku toolbelt
