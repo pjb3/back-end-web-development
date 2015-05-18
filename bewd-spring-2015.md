@@ -1,5 +1,12 @@
 # Backend Web Developement Spring 2015 (Node)
 
+### Links (for whole class)
+ - [Definitive Node Podcast](http://nodeup.com/)
+ - [Node School](http://nodeschool.io/)
+ - 
+
+
+
 ## #0 Prerequisites
 #### You should Know:
   - Basic command line
@@ -27,17 +34,31 @@ Weeks 1, 2, 3:
   - Storing data with postgres & pg
   - Database tables & migrations
 
-#### Classes:
-1. Running node from the console
-1. Routing
-1. Express, stacktraces, and debugging
-1. Bootstrap, Forms and Values
-1. Databases, SQL
-1. jQuery, AJAX
+##### Class #1 Running node from the console
 
-#### Briefing:
-- Walk me through making the landing page app again, from scratch
-- What are some apps you like? Come up with three ideas for "make your own app".
+###### Homework
+ - In slack, post 3 apps you think are cool
+ - Read [What happens when you type google.com into your browser and press enter?](https://github.com/alex/what-happens-when)
+ - Write a [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) implementation. Try **not** to look at existing implementations.
+
+##### Class #2 HTTP & Routing
+
+###### Homework
+ - Sign-up for these newsletters: [Status Code](http://statuscode.org/) [Node Weekly](http://nodeweekly.com/) [JavaScript Weekly](http://javascriptweekly.com/) [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
+ - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
+- Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
+
+##### Class #3 Express, stacktraces, and debugging
+
+##### Class #4 Bootstrap, Forms and Values
+
+##### Class #5 Databases, SQL
+
+##### Class #6 jQuery, AJAX
+
+###### Homework
+- Create a slack post to walk me through making the landing page app again, from scratch
+- In slack, write to two ideas for your "make your own app"
 
 ## #2 Todo App (Weeks 4, 5, 6)
 #### You should Know:
@@ -49,12 +70,12 @@ Weeks 1, 2, 3:
   - Ajax, Webinspector: Network tools
 
 #### Classes:
-1. Client-side Todo App w/ just javascript (and maybe jquery)
-1. Client-side w/ React
-1. Saving state back w/ models; Sails
-1. (Slack)
-1. Auth, Session
-1. Associations
+- Client-side Todo App w/ just javascript (and maybe jquery)
+- Client-side w/ React
+- Saving state back w/ models; Sails
+- (Slack)
+- Auth, Session
+- Associations
 
 
 #### Briefing:
@@ -71,12 +92,12 @@ Weeks 1, 2, 3:
   - Live updates
 
 #### Classes:
-1. Auth + Jots
-1. Uploading + Photos
-1. Followers + Email
-1. Location + Background jobs
-1. Socket.io & live updates
-1. Client-side routing
+- Auth + Jots
+- Uploading + Photos
+- Followers + Email
+- Location + Background jobs
+- Socket.io & live updates
+- Client-side routing
 
 #### Briefing:
 - How would you research and develop a new "advanced feature" (e.g. SMS integration; charging credit cards; etc.)
@@ -86,4 +107,3 @@ Weeks 1, 2, 3:
 #### You should Know:
 
   - How to make a product to compete in a start-up weekend
-
