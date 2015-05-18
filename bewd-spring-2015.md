@@ -44,7 +44,7 @@ Weeks 1, 2, 3:
 ##### Class #2 HTTP & Routing
 
 ###### Homework
- - Sign-up for these newsletters: [Status Code](http://statuscode.org/) [Node Weekly](http://nodeweekly.com/) [JavaScript Weekly](http://javascriptweekly.com/) [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
+ - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
 - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
 
