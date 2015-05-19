@@ -103,6 +103,10 @@ Weeks 1, 2, 3:
 - Auth, Session
 - Associations
 
+#### Links
+ - [Higher Order Functions (map, reduce, etc)](https://medium.com/humans-create-software/a-dirt-simple-introduction-to-higher-order-functions-in-javascript-b33bf9e19056)
+ - [JS Extra Good Parts](http://engineering.wix.com/2015/04/21/javascript-the-extra-good-parts/?utm_source=javascriptweekly&utm_medium=email)
+
 
 #### Briefing:
 - Walk me through the resources that make up <insert top 100 website here>
