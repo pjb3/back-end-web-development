@@ -75,6 +75,8 @@ Weeks 1, 2, 3:
 
 ##### Class #3 Express, stacktraces, and debugging
 
+[Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
+
 ##### Class #4 Bootstrap, Forms and Values
 
 ##### Class #5 Databases, SQL
