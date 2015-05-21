@@ -75,7 +75,9 @@ Weeks 1, 2, 3:
 
 ##### Class #3 Express, stacktraces, and debugging
 
+[First Node Program](http://throwerr.com/2015/05/12/node-js-tutorial-your-first-simple-program/)
 [Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
+[EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
 
 ##### Class #4 Bootstrap, Forms and Values
 
