@@ -106,6 +106,11 @@
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
  - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
  - Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
+ - [Testing react](https://medium.com/qubit-engineering/easily-testing-react-components-with-react-test-tree-f9e1668b1c2d)
+ - [es6 generators](https://hacks.mozilla.org/2015/05/es6-in-depth-generators/?utm_source=javascriptweekly&utm_medium=email)
+ - [jsx](https://medium.com/javascript-scene/jsx-looks-like-an-abomination-1c1ec351a918) 
+ - [Coffee to es6](https://gist.github.com/danielgtaylor/0b60c2ed1f069f118562?utm_source=javascriptweekly&utm_medium=email)
+ 
 
 ##### Class Express, stacktraces, and debugging
 
