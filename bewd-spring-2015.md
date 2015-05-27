@@ -97,28 +97,26 @@ Weeks 1, 2, 3:
   - Store TODO items in an array & persist that array with local storage
   - Allow you to add & remove TODO items
   - Keep two pieces of state info for each todo item: `name` and `isDone`
+ - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
 
 ### (Tentitive below)
 
-##### Class #2 HTTP & Routing
+##### Class HTTP & Routing
 
 ###### Homework
- - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
 - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
 - Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
 
-##### Class #3 Express, stacktraces, and debugging
+##### Class Express, stacktraces, and debugging
 
 [First Node Program](http://throwerr.com/2015/05/12/node-js-tutorial-your-first-simple-program/)
 [Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
 [EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
 
-##### Class #4 Bootstrap, Forms and Values
+##### Class Forms and Values; Databases, SQL
 
-##### Class #5 Databases, SQL
-
-##### Class #6 jQuery, AJAX
+##### Class jQuery, AJAX
 
 ###### Homework
 - Create a slack post to walk me through making the landing page app again, from scratch
