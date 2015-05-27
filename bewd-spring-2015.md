@@ -17,7 +17,7 @@
     - Objects & methods
     - Lists & data structures
 
-## Unit #1 Landing Page App (Weeks 1, 2, 3)
+## Unit #1 Simple TODO App (Weeks 1, 2, 3)
 
 #### In this unit, you will learn:
 
