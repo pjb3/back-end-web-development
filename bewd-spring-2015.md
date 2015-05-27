@@ -105,8 +105,8 @@ Weeks 1, 2, 3:
 
 ###### Homework
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
-- Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
-- Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
+ - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
+ - Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
 
 ##### Class Express, stacktraces, and debugging
 
