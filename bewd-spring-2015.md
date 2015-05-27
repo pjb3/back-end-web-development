@@ -65,6 +65,41 @@ Weeks 1, 2, 3:
  - Read [What happens when you type google.com into your browser and press enter?](https://github.com/alex/what-happens-when). Post one thing you didn't expect & one thing you did.
  - Write a [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) implementation. Try **not** to look at existing implementations. Post yours to slack as a snippet. Comment one someone else's.
 
+##### Class #2 jQuery & DOM manipulation
+ - Objects/Hashes in Javascript
+ - jQuery based DOM manipulation
+ - Handling forms client side
+ - CSS selectors
+ - Bootstrap
+
+##### Homework
+  1. Make the table get populated with a row with the email and password from what you enter into the form
+  2. Add a remove link to each row that when you click on it, removes the row [Hint: you’ll probably run into an issue trying to attach a handler to an element generated at runtime. Read the docs for `.on()`. Pay particularily close attention to the last 2 examples. http://api.jquery.com/on/]
+  3. Store the email/password for users records in Web Storage (`localstorage`). That way the data will persist when you reload the page. Checkout http://diveintohtml5.info/storage.html, http://blog.teamtreehouse.com/html5-local-storage, https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+  4. If you're really crushing it, read & follow along with the [React Tutorial](https://facebook.github.io/react/docs/tutorial.html). React makes building HTML from Javascript really easy. When you get to the section called "Fetching from the Server” you can stop; you’ll need a slightly more sophisticated setup to get that to work correctly.
+ 
+[One implementation](https://gist.github.com/kylefritz/3692723f2abbdf51c685)
+
+##### Class #3 More events, Intro to data-modeling/data-flow, React!
+ - jQuery's factory method: Building DOM nodes vs selecting DOM nodes
+ - Eventing, `.on()`, & prevent default
+ - Storing objects in arrays
+ - Serializing data with `JSON.stringify` and `JSON.parse`
+ - `localStorage` for persistence
+ - React as a "better jQuery"
+ - Stores and models
+ - React `render`
+ - React `props`
+ - React event handling
+
+###### Homework
+ - Build a simple todo list application in React. It should:
+  - Store TODO items in an array & persist that array with local storage
+  - Allow you to add & remove TODO items
+  - Keep two pieces of state info for each todo item: `name` and `isDone`
+
+### (Tentitive below)
+
 ##### Class #2 HTTP & Routing
 
 ###### Homework
