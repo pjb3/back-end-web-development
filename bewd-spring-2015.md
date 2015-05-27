@@ -17,10 +17,9 @@
     - Objects & methods
     - Lists & data structures
 
-## #1 Landing Page App (Weeks 1, 2, 3)
+## Unit #1 Landing Page App (Weeks 1, 2, 3)
 
-Weeks 1, 2, 3:
-#### You will learn:
+#### In this unit, you will learn:
 
   - Requiring modules
   - Mapping URLs to Actions
@@ -123,7 +122,7 @@ Weeks 1, 2, 3:
 - In slack, write to two ideas for your "make your own app"
 - Create a slack post to answer the ["How do you judge a Javascript programmer by only 5 questions?"](https://medium.com/humans-create-software/how-do-you-judge-a-javascript-programmer-by-only-5-questions-f2abdf7dfd4a)
 
-## #2 Todo App (Weeks 4, 5, 6)
+## Unit #2 Todo App (Weeks 4, 5, 6)
 #### You will learn:
 
   - HTTP (Methods, Cookies, Querystring) & Session
@@ -149,7 +148,7 @@ Weeks 1, 2, 3:
 - Walk me through the resources that make up <insert top 100 website here>
 - Which of your app ideas works best w/ the modeling concepts introduced? What models will go into your app?
 
-## #3 Jotly (Weeks 7, 8, 9)
+## Unit #3 Jotly (Weeks 7, 8, 9)
 #### You will learn:
 
   - Modeling Data
