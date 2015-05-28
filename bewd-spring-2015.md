@@ -93,9 +93,9 @@
   - Allow you to add TODO items
   - Keep two pieces of state info for each todo item: `name` and `isDone`
   - handle done/not done & delete:
-   - if an item is not done, when you click on it, make it done
-   - if an item is done, when you click on it, make it not done
-   - if an item is done, when you double click on it, delete it
+    - if an item is not done, when you click on it, make it done
+    - if an item is done, when you click on it, make it not done
+    - if an item is done, when you double click on it, delete it
  - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
 
 ### (Tentitive below)
