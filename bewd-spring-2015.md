@@ -79,26 +79,33 @@
  
 [One implementation](https://gist.github.com/kylefritz/3692723f2abbdf51c685)
 
-##### Class #3 More events, Intro to data-modeling/data-flow, React!
+##### Class #3 More events, Intro to data-modeling
  - jQuery's factory method: Building DOM nodes vs selecting DOM nodes
  - Eventing, `.on()`, & prevent default
  - Storing objects in arrays
  - Serializing data with `JSON.stringify` and `JSON.parse`
  - `localStorage` for persistence
+
+
+###### Homework
+ - Build a simple todo list application w/ jQuery. It should:
+  - Store TODO items in an array & persist that array with localStorage
+  - Allow you to add TODO items
+  - Keep two pieces of state info for each todo item: `name` and `isDone`
+  - handle done/not done & delete:
+   - if an item is not done, when you click on it, make it done
+   - if an item is done, when you click on it, make it not done
+   - if an item is done, when you double click on it, delete it
+ - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
+
+### (Tentitive below)
+
+##### Intro to React
  - React as a "better jQuery"
  - Stores and models
  - React `render`
  - React `props`
  - React event handling
-
-###### Homework
- - Build a simple todo list application in React. It should:
-  - Store TODO items in an array & persist that array with local storage
-  - Allow you to add & remove TODO items
-  - Keep two pieces of state info for each todo item: `name` and `isDone`
- - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
-
-### (Tentitive below)
 
 ##### Class HTTP & Routing
 
