@@ -98,6 +98,18 @@
     - if an item is done, when you double click on it, delete it
  - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
 
+##### Class #4 Intro to Git and React
+ - Git using the Github app
+ - http-server vs file://
+ - React for templating
+ - React to re-create the TODO list
+
+###### Homework
+ - Build a notes app with react:
+   - Store notes as objects in an array and persist with localStorage
+   - Add/Edit/Delete Notes
+   - Parse & display markdown
+
 ### (Tentitive below)
 
 ##### Intro to React
