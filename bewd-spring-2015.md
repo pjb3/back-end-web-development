@@ -105,7 +105,10 @@
  - React to re-create the TODO list
 
 ###### Homework
- - Build a notes app with react:
+ - Read the [react tutorial](https://facebook.github.io/react/docs/tutorial.html). Where they talk about "getting data from the server", instead just get data to and from `localStorage`
+ - Read [thinking in react](https://facebook.github.io/react/docs/thinking-in-react.html)
+ - Checkout the kinds of docs on the sidebar of the react site. This is the best place to learn about React.
+ - Build the osx notes app with react:
    - Store notes as objects in an array and persist with localStorage
    - Add/Edit/Delete Notes
    - Parse & display markdown
