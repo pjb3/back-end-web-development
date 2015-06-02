@@ -64,6 +64,8 @@
  - Read [What happens when you type google.com into your browser and press enter?](https://github.com/alex/what-happens-when). Post one thing you didn't expect & one thing you did.
  - Write a [FizzBuzz](http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/) implementation. Try **not** to look at existing implementations. Post yours to slack as a snippet. Comment one someone else's.
 
+**[HW 1 "solution"](https://gist.github.com/kylefritz/2f7159393b7ac51ad5df)**
+
 ##### Class #2 jQuery & DOM manipulation
  - Objects/Hashes in Javascript
  - jQuery based DOM manipulation
@@ -77,7 +79,7 @@
   3. Store the email/password for users records in Web Storage (`localstorage`). That way the data will persist when you reload the page. Checkout http://diveintohtml5.info/storage.html, http://blog.teamtreehouse.com/html5-local-storage, https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   4. If you're really crushing it, read & follow along with the [React Tutorial](https://facebook.github.io/react/docs/tutorial.html). React makes building HTML from Javascript really easy. When you get to the section called "Fetching from the Server” you can stop; you’ll need a slightly more sophisticated setup to get that to work correctly.
  
-[One implementation](https://gist.github.com/kylefritz/3692723f2abbdf51c685)
+**[HW 2 "solution"](https://gist.github.com/kylefritz/3692723f2abbdf51c685)**
 
 ##### Class #3 More events, Intro to data-modeling
  - jQuery's factory method: Building DOM nodes vs selecting DOM nodes
@@ -85,7 +87,6 @@
  - Storing objects in arrays
  - Serializing data with `JSON.stringify` and `JSON.parse`
  - `localStorage` for persistence
-
 
 ###### Homework
  - Build a simple todo list application w/ jQuery. It should:
@@ -98,11 +99,13 @@
     - if an item is done, when you double click on it, delete it
  - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
 
+**[HW 3 "solution"](https://gist.github.com/kylefritz/a9536fdb5128a08a8f16)**
+
 ##### Class #4 Intro to Git and React
  - Git using the Github app
  - http-server vs file://
  - React for templating
- - React to re-create the TODO list
+ - React to re-create the TODO list. [One implementation](https://gist.github.com/kylefritz/584914ffee4d6438b7a5)
 
 ###### Homework
  - Read the [react tutorial](https://facebook.github.io/react/docs/tutorial.html). Where they talk about "getting data from the server", instead just get data to and from `localStorage`
@@ -112,6 +115,29 @@
    - Store notes as objects in an array and persist with localStorage
    - Add/Edit/Delete Notes
    - Parse & display markdown
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### (Tentitive below)
 
