@@ -51,13 +51,6 @@
   - Webinspector
   - [Code Pen](http://codepen.io/)
   - Debugging
- - Node
-  - running programs
-  - [debugging](https://github.com/node-inspector/node-inspector)
- - Modules
-  - require
-  - exporting
-  - npm (cool-ascii-faces)
 
 ###### Homework
  - In slack, post 3 apps you think are cool. Read you classmates' and @mention someone's you agree with.
@@ -147,6 +140,15 @@
  - React `render`
  - React `props`
  - React event handling
+
+##### Intro to Node
+ - Node
+  - running programs
+  - [debugging](https://github.com/node-inspector/node-inspector)
+ - Modules
+  - require
+  - exporting
+  - npm (cool-ascii-faces)
 
 ##### Class HTTP & Routing
 
