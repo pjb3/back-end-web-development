@@ -117,7 +117,7 @@
 
 Homework:
  1. Make an awesome music player like Spotify
-  1. Go to soundcloud or a similar service and download a couple of music files, put them in your project folder
+  1. Go to [soundcloud](https://soundcloud.com/starlightnatives) or a similar service and download a couple of music files, put them in your project folder
   2. Show a list of the music files (you'll need to "hard code" the data; `{title: , audioUrl: }`)
   3. Create an HTML5 `<audio/>` element as a player
   4. When you click on one of the tracks in your list, play that file in the audio tag
