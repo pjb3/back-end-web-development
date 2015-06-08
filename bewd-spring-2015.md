@@ -94,7 +94,7 @@
 
 **[HW 3 "solution"](https://gist.github.com/kylefritz/a9536fdb5128a08a8f16)**
 
-##### Class #4 Intro to Git and React
+##### Class #4 Intro to Git and React 1
  - Git using the Github app
  - http-server vs file://
  - React for templating
@@ -109,11 +109,11 @@
    - Add/Edit/Delete Notes
    - Parse & display markdown
 
+##### Class #5 React 2: props and state
 
+##### Class #6 React 3 In-Class Lab: Photos Stream
 
-
-
-
+##### Class #7 React 4: Photos Stream
 
 
 
