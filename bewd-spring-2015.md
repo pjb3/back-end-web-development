@@ -109,13 +109,18 @@
    - Add/Edit/Delete Notes
    - Parse & display markdown
 
+**[HW 4 "solution"](https://gist.github.com/kylefritz/5da06335a878316b8b1e)**
+
 ##### Class #5 React 2: props and state
 
-##### Class #6 React 3 In-Class Lab: Photos Stream
+Homework:
+ 1. Finish the OSX notes app
 
-##### Class #7 React 4: Photos Stream
+##### Class #6 React 3 In-Class Lab: Photos Stream
+ - [Do the lab](https://gist.github.com/kylefritz/d987b2a3c60423239354)
 
 Homework:
+ 1. Finish the in-class lab
  1. Make an awesome music player like Spotify
   1. Go to [soundcloud](https://soundcloud.com/starlightnatives) or a similar service and download a couple of music files, put them in your project folder
   2. Show a list of the music files (you'll need to "hard code" the data; `{title: , audioUrl: }`)
@@ -123,7 +128,7 @@ Homework:
   4. When you click on one of the tracks in your list, play that file in the audio tag
   5. Allow people to add/remove files to the list; store to `localStorage`
 
-
+##### Class #7 React 4: Photos Stream
 
 
 
