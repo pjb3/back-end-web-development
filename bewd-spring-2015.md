@@ -128,8 +128,10 @@ Homework:
   4. When you click on one of the tracks in your list, play that file in the audio tag
   5. Allow people to add/remove files to the list; store to `localStorage`
 
-##### Class #7 React 4: Photos Stream
-
+##### Class #7 React 4: Chat App
+ - [John Resig's intro to intense JS](http://ejohn.org/apps/learn/)
+ - [Simple Chat Server](https://gist.github.com/pjb3/66d12e022010bc06a2a0#file-index-html)
+ - [Node Chat Back-end](https://github.com/pjb3/node-chat)
 
 
 
