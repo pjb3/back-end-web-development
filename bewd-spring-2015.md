@@ -91,16 +91,22 @@
     - if an item is done, when you click on it, make it not done
     - if an item is done, when you double click on it, delete it
  - Sign-up for these newsletters: [Status Code](http://statuscode.org/), [Node Weekly](http://nodeweekly.com/), [JavaScript Weekly](http://javascriptweekly.com/), [HTML5 Weekly](http://html5weekly.com/) and browse and read the latest one for articles that interest you. Post your fav (of all of them) into slack.
+ - Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
 
 **[HW 3 "solution"](https://gist.github.com/kylefritz/a9536fdb5128a08a8f16)**
 
 ##### Class #4 Intro to Git and React 1
  - Git using the Github app
  - http-server vs file://
- - React for templating
+ - React as a "better jQuery"
+ - Stores and models
+ - React `render`
+ - React `props`
+ - React event handling
  - React to re-create the TODO list. [One implementation](https://gist.github.com/kylefritz/584914ffee4d6438b7a5)
 
 ###### Homework
+- [jsx](https://medium.com/javascript-scene/jsx-looks-like-an-abomination-1c1ec351a918) 
  - Read the [react tutorial](https://facebook.github.io/react/docs/tutorial.html). Where they talk about "getting data from the server", instead just get data to and from `localStorage`
  - Read [thinking in react](https://facebook.github.io/react/docs/thinking-in-react.html)
  - Checkout the kinds of docs on the sidebar of the react site. This is the best place to learn about React.
@@ -133,8 +139,20 @@ Homework:
  - [Simple Chat Server](https://gist.github.com/pjb3/66d12e022010bc06a2a0#file-index-html)
  - [Node Chat Back-end](https://github.com/pjb3/node-chat)
 
+##### Class #8 All in on Node
+ - Node
+  - running programs
+  - [debugging](https://github.com/node-inspector/node-inspector)
+ - Modules
+  - require
+  - exporting
+  - npm (cool-ascii-faces)
+ - HTTP (Methods, Cookies, Querystring) & Session
+ - Ajax, Webinspector: Network tools
+ - [EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
+ - [Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
 
-
+Homework:
 
 
 
@@ -148,57 +166,34 @@ Homework:
 ### (Tentitive below)
 ---------------------------------------
 
-##### Intro to React
- - React as a "better jQuery"
- - Stores and models
- - React `render`
- - React `props`
- - React event handling
-
-##### Intro to Node
- - Node
-  - running programs
-  - [debugging](https://github.com/node-inspector/node-inspector)
- - Modules
-  - require
-  - exporting
-  - npm (cool-ascii-faces)
 
 ##### Class HTTP & Routing
 
 ###### Homework
  - Listen to [NodeUp episode #87](http://nodeup.com/eightyseven)
- - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm. 
- - Do at least half of [Learn the CLI the Hard Way](http://cli.learncodethehardway.org/book/)
+ - Complete the [nodeschool workshoppers](http://nodeschool.io/#workshoppers): javascripting, git-it, learnyounode, how-to-npm.
  - [Testing react](https://medium.com/qubit-engineering/easily-testing-react-components-with-react-test-tree-f9e1668b1c2d)
  - [es6 generators](https://hacks.mozilla.org/2015/05/es6-in-depth-generators/?utm_source=javascriptweekly&utm_medium=email)
- - [jsx](https://medium.com/javascript-scene/jsx-looks-like-an-abomination-1c1ec351a918) 
  - [Coffee to es6](https://gist.github.com/danielgtaylor/0b60c2ed1f069f118562?utm_source=javascriptweekly&utm_medium=email)
  
-
 ##### Class Express, stacktraces, and debugging
 
 [First Node Program](http://throwerr.com/2015/05/12/node-js-tutorial-your-first-simple-program/)
-[Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
-[EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
+
 
 ##### Class Forms and Values; Databases, SQL
 
 ##### Class jQuery, AJAX
 
 ###### Homework
-- Create a slack post to walk me through making the landing page app again, from scratch
 - In slack, write to two ideas for your "make your own app"
 - Create a slack post to answer the ["How do you judge a Javascript programmer by only 5 questions?"](https://medium.com/humans-create-software/how-do-you-judge-a-javascript-programmer-by-only-5-questions-f2abdf7dfd4a)
 
 ## Unit #2 Todo App (Weeks 4, 5, 6)
 #### You will learn:
-
-  - HTTP (Methods, Cookies, Querystring) & Session
   - Models & Resources
   - Associations
   - React.js
-  - Ajax, Webinspector: Network tools
 
 #### Classes:
 - Client-side Todo App w/ just javascript (and maybe jquery)
@@ -219,7 +214,6 @@ Homework:
 
 ## Unit #3 Jotly (Weeks 7, 8, 9)
 #### You will learn:
-
   - Modeling Data
   - Uploads
   - Sending Emails
