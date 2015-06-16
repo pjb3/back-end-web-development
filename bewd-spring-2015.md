@@ -140,26 +140,37 @@ Homework:
  - [Node Chat Back-end](https://github.com/pjb3/node-chat)
 
 ##### Class #8 All in on Node
- - Node
-  - running programs
-  - [debugging](https://github.com/node-inspector/node-inspector)
- - Modules
-  - require
-  - exporting
-  - npm (cool-ascii-faces)
- - HTTP (Methods, Cookies, Querystring) & Session
- - Ajax, Webinspector: Network tools
- - [EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
+ - Running Node programs
+ - `require()`
+ - `module.exports`
+ - npm (cool-ascii-faces)
+ - HTTP Methods: `GET` vs `POST`
+ - Query-string
+
+Homework (Goal: understand express routes):
+  
+ 0. Read [Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
+ 1. use the first code snippet as a basis for your app
+ 2. initialize a new git repo `git init`; add a node-style gitignore from https://www.gitignore.io/api/node; make your initial commit
+ 3. make /tweets return the words "these are your tweeets" <make a comit>
+ 4. make /user return the words "this is your user account" <make a comit>
+ 5. make a route /login that uses the query string to dispay a message dynamically. `/login?user=kyle` should return "logged in as kyle" <make a comit>
+
+
+##### Class #9 Express & CRUD
+
  - [Routing in Express 4.0](http://throwerr.com/2015/05/15/get-started-with-routing-in-express-4-0/)
-
-Homework:
-
-##### Class #9 Intro to Databases
+ - [Debugging Node](https://github.com/node-inspector/node-inspector)
+ - HTTP
+  - Methods
+  - Querystring
+  - Cookies
+  - Session
+ - [EJS](http://throwerr.com/2015/05/17/using-ejs-with-express-for-templating/)
 
 ##### Class #10 Some More SQL
 
-##### Class #10 Hello, Sails
-
+##### Class #11 Relationships?
 
 
 
