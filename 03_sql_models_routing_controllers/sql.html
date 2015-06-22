@@ -85,29 +85,20 @@ A Relational DataBase Management System is a server that stores data in related 
 
 ---
 
-# Clients for Postgres
+# Install Postgres.app
 
-## Command Line
+Mac, use [Postgres.app](http://postgresapp.com/)
+
+Make sure to follow the instructions to [setup your path](http://postgresapp.com/documentation/cli-tools.html)
+
+If you can run this command, it's working!
 
     .terminal
-    $ psql -d betastore_development
+    $ psql
+    psql (9.3.6)
+    Type "help" for help.
 
-or launch it based on the database configuration in your Rails app
-
-    .terminal
-    $ rails dbconsole
-
-## GUI (Graphical User Interface) Clients
-
-[Navicat Essentials for PostgreSQL](http://navicat.com/download/navicat-essentials#pgsql_essentials) - Lots of features, Free Trial, $10 license, also available in the Mac App Store
-
-[PG Commander](https://eggerapps.at/pgcommander/) - Very clear/fast UI for querying, Free Trial, $39 license, also available in the Mac App Store
-
-[PGAdmin - http://www.pgadmin.org](http://www.pgadmin.org) - Free/Open Source, Clunky on a Mac, maybe good on Windows/Linux?
-
-[Induction](http://inductionapp.com/) - Free/Open Source, only for viewing data
-
-In these slides, we will use `psql`, which is good to learn first and then you can choose to learn to use a graphical tool like Navicat/PG Commander later if you find it more convenient.
+    paul=#
 
 ---
 
@@ -116,12 +107,12 @@ In these slides, we will use `psql`, which is good to learn first and then you c
 `psql` is the command-line tool that comes with Postgres for interacting with your database. It is similar to a bash or irb prompt in that you type commands, it prints the result and waits for you to type the next command. The default prompt in `psql` looks like this:
 
     .terminal
-    betastore_development=#
+    paul=#
 
 That is the name of the database you are connected to followed by an `=` and a `#`. You can can out about what commands you can use within psql using the `help` command:
 
     .terminal
-    betastore_development=# help
+    paul=# help
     You are using psql, the command-line interface to PostgreSQL.
     Type:  \copyright for distribution terms
            \h for help with SQL commands
@@ -131,57 +122,123 @@ That is the name of the database you are connected to followed by an `=` and a `
 
 ---
 
-# Tables
+# Create Database
 
-A table is a like a spreadsheet with data organized in rows and columns. You can query for the data in a table using a `SELECT` statement, like this:
-
-.small[
+To create a database, use the `createdb` command, followed by the name of the database:
 
     .terminal
-    betastore_development=# SELECT * from subscriptions;
-     id |      email       |         created_at         |         updated_at
-    ----+------------------+----------------------------+----------------------------
-      1 | test@example.com | 2013-09-24 00:45:24.755576 | 2013-09-24 00:45:24.755576
-    (1 row)
+    createdb betastore
 
-]
-
-When using `psql`, you must always end each statement with a `;`. If forget the `;`, that is ok, `psql` will allow you to enter it on the next line:
-
-.small[
+To use that database, you can start the psql command in that database:
 
     .terminal
-    betastore_development=# select * from subscriptions
-    betastore_development-# ;
-     id |      email       |         created_at         |         updated_at
-    ----+------------------+----------------------------+----------------------------
-      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
-    (1 row)
+    psql -d betastore
 
-]
+Or from within psql you can switch:
 
-This is because `psql` allows you enter a query on multiple lines and the `;` character indicates when you are finished with the query. You can see that the character before the `#` in the prompt changes to a `-` when you have started a query but haven't completed it with a `;` yet.
+    .terminal
+    paul=# \c betastore
+    You are now connected to database "betastore" as user "paul".
+    betastore=#
 
 ---
 
-# Using Sublime Text with psql
+# Tables
 
-You can edit your queries from within a `psql` session using Sublime Text. Type the command `\e` and press enter. This should bring up the last query you entered in Sublime Text. Change the query to look like this:
+A table is a like a spreadsheet (or worksheet) in excel, with data organized in rows and columns.
+
+.center[![Popular RDMBSs](img/excel.gif)]
+
+The name of this "table" is "Sheet1". Rows are identified by numbers and columns are identified by letters.
+
+---
+
+# Create a Table
+
+To start storing data in a table, you first have to create a table. In Postgres, as in all relational databases, instead
+of referring to the columns by letters, the columns have names. The rows are identified by the primary key. In many apps,
+the primary key is just an incrementing number.
+
+To create your first table, put this into a file named `create_customers.sql` using atom:
 
 ```sql
-select email from subscriptions;
+CREATE TABLE customers (
+  id serial primary key,
+  first_name varchar(255),
+  last_name varchar(255),
+  email varchar(255)
+);
 ```
 
-In Sublime Text, press `⌘+s` to save the file, then `⌘+w` close the file. This will take you back to the terminal and you will see that `psql` ran your query:
+Then from within `psql` run this command to run the query:
 
     .terminal
-    betastore_development=# \e
-          email
-    ------------------
-     test@example.com
+    betastore=# \i create_customers.sql
+    CREATE TABLE
+
+---
+
+# View tables
+
+You can view the list of tables with this command:
+
+    .terminal
+    betastore=# \dt
+             List of relations
+     Schema |   Name    | Type  | Owner
+    --------+-----------+-------+-------
+     public | customers | table | paul
     (1 row)
 
-You can enter the command `\e` to pull up the query again in Sublime Text and then you can continue the cycle of editing, saving and closing the file to run different queries throughout your `psql` session.
+You can see the structure of one table with this command:
+
+.small[
+
+    .terminal
+    betastore=# \d customers
+                                       Table "public.customers"
+       Column   |          Type          |                       Modifiers
+    ------------+------------------------+--------------------------------------------------------
+     id         | integer                | not null default nextval('customers_id_seq'::regclass)
+     first_name | character varying(255) |
+     last_name  | character varying(255) |
+     email      | character varying(255) |
+    Indexes:
+        "customers_pkey" PRIMARY KEY, btree (id)
+]
+
+**Tab completion works for file names and table name in psql!**
+
+---
+
+# Creating records
+
+You create records by using an `insert` statement. Put this into `create_customer_records.sql` in atom:
+
+```sql
+insert into customers (first_name, last_name, email)
+  values ('Paul','Barry','paul@betamore.com');
+insert into customers (first_name, last_name, email)
+  values ('Kyle','Fritz','kyle@betamore.com');
+```
+
+Then run the file from `psql` *(see `\i` from 2 slides ago)*
+
+---
+
+# Selecting Records
+
+You use a `select` statement to display records:
+
+    .terminal
+    betastore=# select * from customers;
+     id | first_name | last_name |       email
+    ----+------------+-----------+-------------------
+      1 | Paul       | Barry     | paul@betamore.com
+      2 | Kyle       | Fritz     | kyle@betamore.com
+    (2 rows)
+
+Think of a `select` statement as a way to dynamically create a spreadsheet:
 
 ---
 
@@ -192,28 +249,28 @@ As your tables get more complicated, they will have more columns and the output 
 .small[
 
     .terminal
-    betastore_development=# select * from subscriptions;
-     id |      email       |         created_at         |         updated_at
-    ----+------------------+----------------------------+----------------------------
-      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
-    (1 row)
-
-    betastore_development=# \x
+    betastore=# \x
     Expanded display is on.
-    betastore_development=# select * from subscriptions;
-    -[ RECORD 1 ]--------------------------
+    betastore=# select * from customers;
+    -[ RECORD 1 ]-----------------
     id         | 1
-    email      | test@example.com
-    created_at | 2014-03-05 01:44:58.602869
-    updated_at | 2014-03-05 01:44:58.602869
+    first_name | Paul
+    last_name  | Barry
+    email      | paul@betamore.com
+    -[ RECORD 2 ]-----------------
+    id         | 2
+    first_name | Kyle
+    last_name  | Fritz
+    email      | kyle@betamore.com
 
-    betastore_development=# \x
+    betastore=# \x
     Expanded display is off.
-    betastore_development=# select * from subscriptions;
-     id |      email       |         created_at         |         updated_at
-    ----+------------------+----------------------------+----------------------------
-      1 | test@example.com | 2014-03-05 01:44:58.602869 | 2014-03-05 01:44:58.602869
-    (1 row)
+    betastore=# select * from customers;
+     id | first_name | last_name |       email
+    ----+------------+-----------+-------------------
+      1 | Paul       | Barry     | paul@betamore.com
+      2 | Kyle       | Fritz     | kyle@betamore.com
+    (2 rows)
 
 ]
 
@@ -238,7 +295,7 @@ In Rails, this is always a auto-incrementing integer called `id`, as is the case
 In an RDMBS, you must create the structure of each table before you can create records in the table. You define which columns a table is allowed to have and what the columns are named. We can look at which tables exist in the database using the `\dt` command in `psql`:
 
     .terminal
-    betastore_development=# \dt
+    betastore=# \dt
                  List of relations
      Schema |       Name        | Type  | Owner
     --------+-------------------+-------+-------
@@ -437,7 +494,7 @@ This type of diagram is often referred to as an Entity-Relationship Diagram, or 
 
 ---
 
-# Creating Tables with Rails
+# Exercise: Creating Tables
 
 So we want to create our tables so they look like this:
 
@@ -450,108 +507,60 @@ So we want to create our tables so they look like this:
     name           placed_at           quantity        name
     email          total_amount        price           price
 
-We can use Rails generators to do that for us. Run these commands in a bash shell in the directory of your Rails app:
 
-.small[
-
-    .terminal
-    $ rails generate model customer name email
-    $ rails generate model product name price:decimal
-    $ rails generate model order customer:belongs_to placed_at:datetime total_amount:decimal
-    $ rails generate model line_item order:belongs_to product:belongs_to quantity:integer price:decimal
-    $ rake db:migrate
-
-]
-
-We will cover what these commands mean and the code they generate in more detail in the lesson on ActiveRecord.
+Write the SQL statements to create these tables
 
 ---
 
-# Creating Data with Rails
+# Creating Data
 
-Replace the contents of the `db/seeds.rb` file in your Rails app with the following code:
+Write `insert` statements to create the following data
 
-.small[
-```ruby
-me = Customer.create(name: 'Paul Barry', email: 'mail@paulbarry.com')
-test = Customer.create(name: 'John Doe', email: 'test@example.com')
-Customer.create(name: 'Nowhere Man', email: 'man@nowhere.com')
-
-muffin = Product.create(name: 'Muffin', price: 2.99)
-smoothie = Product.create(name: 'Smoothie', price: 3.75)
-coffee = Product.create(name: 'Coffee', price: 3.99)
-
-order = Order.create(customer: me, placed_at: '2013-09-27')
-LineItem.create(order: order, quantity: 1, product: muffin)
-LineItem.create(order: order, quantity: 1, product: smoothie)
-
-order = Order.create(customer: me, placed_at: Time.current)
-LineItem.create(order: order, quantity: 1, product: smoothie)
-
-order = Order.create(customer: test, placed_at: Time.current)
-LineItem.create(order: order, quantity: 1, product: muffin)
-LineItem.create(order: order, quantity: 1, product: coffee)
+## customers
 ```
-]
+ id |    name     |       email
+----+-------------+--------------------
+  1 | Paul Barry  | mail@paulbarry.com
+  2 | John Doe    | test@example.com
+  3 | Nowhere Man | man@nowhere.com
+```
 
-This code is using the code generated by the commands we ran in the previous slide to create data in our database. Use this command to run it:
-
-    .terminal
-    $ rake db:seed
-
-If you need to reload the data for any reason, use this command:
-
-    .terminal
-    $ rake db:setup
-
----
-
-# Let's Write Some SQL!
-
-Use `rails dbconsole` to bring up `psql` connected to database:
-
-    .terminal
-    $ rails dbconsole
-    psql (9.3.1)
-    Type "help" for help.
-
-    betastore_development=#
+## products
+```
+ id  |            name             | price
+-----+-----------------------------+-------
+   1 | Blueberry Muffin            |  2.99
+   2 | Smoothie                    |  3.75
+   3 | Coffee                      |  3.99
+```
 
 ---
 
-# See what a table looks like
+# More Data
 
-Use the `\?` command to get a list of psql commands:
+## orders
 
-    .terminal
-    betastore_development=# \?
-    ...
-           \d[S+]                 list tables, views, and sequences
-           \d[S+]  NAME           describe table, view, sequence, or index
-    ...
+*HINT: use `now()` to get the current time*
 
-These are psql-specific commands, other clients and databases have different ones.
+```
+ id | customer_id |         placed_at          | total_amount
+----+-------------+----------------------------+--------------
+  1 |           1 | 2015-06-22 17:35:32.020386 |
+  2 |           1 | 2015-06-22 17:35:32.020386 |
+  3 |           2 | 2015-06-22 17:35:32.020386 |
+```
 
-See what the **orders** table looks like:
+## line items
 
-.small[
-
-    .terminal
-    betastore_development=# \d orders;
-                                          Table "public.orders"
-        Column    |            Type             |                      Modifiers
-    --------------+-----------------------------+-----------------------------------------------------
-     id           | integer                     | not null default nextval('orders_id_seq'::regclass)
-     customer_id  | integer                     |
-     placed_at    | timestamp without time zone |
-     total_amount | numeric                     |
-     created_at   | timestamp without time zone |
-     updated_at   | timestamp without time zone |
-    Indexes:
-        "orders_pkey" PRIMARY KEY, btree (id)
-        "index_orders_on_customer_id" btree (customer_id)
-
-]
+```
+ id | order_id | product_id | quantity | price
+----+----------+------------+----------+-------
+  1 |        1 |          1 |        1 |
+  2 |        1 |          2 |        1 |
+  3 |        2 |          2 |        1 |
+  4 |        3 |          1 |        1 |
+  5 |        3 |          3 |        1 |
+```
 
 ---
 
@@ -586,14 +595,14 @@ SELECT id, customer_id, placed_at FROM orders
 Use `\e` to enter the query using Sublime Text. Once you save the file _(⌘+s)_ and close the tab _(`⌘+w`)_, you will see the result of the query in `psql`:
 
     .terminal
-    betastore_development=# \e
+    betastore=# \e
      id | customer_id |         placed_at
     ----+-------------+----------------------------
       1 |           1 | 2013-09-27 00:00:00
       2 |           1 | 2014-03-06 09:47:20.374823
       3 |           2 | 2014-03-06 09:47:20.380245
     (3 rows)
-    betastore_development=# \e
+    betastore=# \e
     ...
 
 You can use `*` in place of column names to get all columns:
@@ -699,7 +708,7 @@ ORDER BY placed_at LIMIT 1;
 ```
 
     .terminal
-    betastore_development=# \e
+    betastore=# \e
      id | customer_id |         placed_at
     ----+-------------+----------------------------
       2 |           1 | 2014-03-06 09:47:20.374823
@@ -896,7 +905,7 @@ WHERE placed_at > '2013-09-30';
 There are other aggregate functions available like `sum`, `avg`, `min` and `max`. Before we take a look at these, toggle into extended display mode:
 
     .terminal
-    betastore_development=# \x
+    betastore=# \x
     Expanded display is on.
 
 Now run this query:
@@ -918,7 +927,7 @@ You will see the following result:
 You can switch back into non-extended display:
 
     .terminal
-    betastore_development=# \x
+    betastore=# \x
     Expanded display is off.
 
 ---
@@ -1200,9 +1209,9 @@ One thing that you might find yourself needing to do is to export the data to CS
 Postgres allows you to use `COPY` to do this. For example, run this command from `psql` to copy the data from the orders table to a CSV file:
 
     .terminal
-    betastore_development=# COPY orders TO '/tmp/orders.csv' CSV;
+    betastore=# COPY orders TO '/tmp/orders.csv' CSV;
     COPY 3
-    betastore_development=# \q
+    betastore=# \q
 
 The file looks like this:
 
